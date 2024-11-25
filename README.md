@@ -1,11 +1,11 @@
 # Dexter
 ![dexter](https://github.com/user-attachments/assets/c6403bfd-69df-4d84-ba39-a9fdfed99599)
 <p align="center">
-  <h1>AI Liquidity Management Agents</h1>
+  <h1>AI Liquidity Management Agent</h1>
 </p>
 
 ## Overview:
-AI agents for automated liquidity management. These agents provide interactive chat-based guidance and automate liquidity provisioning to optimize returns.
+AI agent for automated liquidity management. These agents provide interactive chat-based guidance and automate liquidity provisioning to optimize returns.
 
 ## Features:
 
