@@ -1,5 +1,8 @@
 # Backend Directory
 
+![1](https://github.com/user-attachments/assets/9feeee0d-03e1-4741-8bb3-9e2a3e522ed4)
+
+
 This directory contains the backend logic, database schemas, and AI agent integration for the **DexBrain** system. The backend handles data storage, processing, and interaction with the knowledge database, as well as AI-driven decision-making.
 
 ---
