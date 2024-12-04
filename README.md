@@ -4,8 +4,6 @@ icon: user-robot
 
 # Dexter
 
-## Dexter
-
 ![](https://github.com/user-attachments/assets/c6403bfd-69df-4d84-ba39-a9fdfed99599)
 
 ## AI Liquidity Management Agent

@@ -21,26 +21,11 @@ The launch of $DEX on Virtuals Protocol employs a **fair launch mechanism** util
 1. **Bundling Supply**:
    * 50% of the total $DEX supply is bundled during the bonding curve launch to prevent bots and snipers from grabbing a significant portion of tokens.
 2. **Post-Launch Deflationary Mechanism**:
-   * One hour after Bonding, **30% of the total supply** (300,000,000 tokens) will be permanently burned. This strategic burn reduces supply and benefits both early adopters and long-term holders.
+   * One hour after the launch, **30% of the total supply** (300,000,000 tokens) will be permanently burned. This strategic burn reduces supply and benefits both early adopters and long-term holders.
 3. **Community Incentives and Ecosystem Growth**:
    * **15% of the total supply** is allocated to a vesting contract with a 24-month linear unlock schedule. These funds will support community incentives, marketing, and ecosystem development to ensure long-term sustainability and growth.
 4. **Core Team and Treasury Vesting**:
    * **5% of the total supply** will be locked in separate vesting contracts, split between the core team and treasury. This ensures alignment with the protocol's long-term success.
-
-***
-
-#### **Tokenomics**
-
-**Initial Supply:**
-
-* Total Supply: **1,000,000,000 $DEX**
-
-**Token Distribution:**
-
-* **50% Bundled Supply**: To prevent sniper attacks and promote fair distribution during the bonding curve launch.
-* **30% Burn**: Tokens permanently removed from circulation one hour after Bonding.
-* **15% Community Incentives, Marketing, and Growth**: A 24-month linear unlock schedule for ecosystem support.
-* **5% Core Team and Treasury**: Locked in separate vesting contracts for governance, development, and team incentives.
 
 ***
 
