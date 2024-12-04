@@ -122,14 +122,6 @@ Dexter will leverage the following APIs to provide real-time updates, insights, 
 
 ***
 
-1. **API Integration**:
-   * Integrate the listed APIs into Dexter using Python SDKs, REST clients, or WebSocket connections.
-   * Start with frequently used APIs like CoinGecko, DefiLlama, and Uniswap.
-2. **Real-Time Feeds**:
-   * Use WebSocket or event listeners for real-time updates on Base and Solana.
-3. **Data Aggregation**:
-   * Create a middleware service to combine data from multiple sources for more comprehensive insights.
-
 ***
 
 These APIs will enable Dexter to provide the latest DeFi updates, answer user questions in real-time, and maintain compatibility with both Solana and EVM chains.
