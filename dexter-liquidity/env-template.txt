@@ -1,0 +1,33 @@
+# API Keys
+ALCHEMY_API_KEY=rwgz4HtlJXqsyNqJrwd2oiBnUY85ymaP
+BASESCAN_API_KEY=your_basescan_key
+
+# Network RPC URLs
+BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}
+BASE_WEBSOCKET_URL=wss://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}
+
+# Subgraph URLs
+UNISWAP_SUBGRAPH_URL=https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-base
+METEORA_API_URL=https://api.meteora.ag/
+
+# Contract Addresses
+DEX_TOKEN_ADDRESS=
+POSITION_MANAGER_ADDRESS=
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/dexter
+
+# Server Configuration
+SERVER_HOST=0.0.0.0
+SERVER_PORT=8000
+LOG_LEVEL=INFO
+
+# Security
+JWT_SECRET=your_jwt_secret
+PRIVATE_KEY=your_wallet_private_key
+
+# Rate Limiting
+MAX_REQUESTS_PER_MINUTE=60
+
+# Monitoring
+PROMETHEUS_PORT=9090
