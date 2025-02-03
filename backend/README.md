@@ -1,125 +1,198 @@
----
-icon: brain-circuit
----
+# DexBrain
 
-# DexBrain: The Collective Intelligence of AI Agents in DeFi
+DexBrain is an AI-powered analytics and strategy engine for Dynamic Liquidity Market Makers (DLMMs). It provides real-time data access, strategy suggestions, and performance metrics for DLMM positions.
 
-![1](https://github.com/user-attachments/assets/9feeee0d-03e1-4741-8bb3-9e2a3e522ed4)
+## Features
 
-## Overview
+- **DLMM Analytics**: Real-time pool data and metrics
+- **AI Strategy Generation**: Risk-adjusted position suggestions
+- **Performance Tracking**: Historical data and metrics
+- **Fast API Access**: Redis-cached endpoint responses
 
-DexBrain is the neural core that powers the intelligence of Dexter AI agents. Acting as a centralized knowledge hub, DexBrain aggregates, processes, and shares data across all deployed Dexter agents to enable superior decision-making in decentralized finance (DeFi).
+## Quick Start
 
-Built with state-of-the-art machine learning algorithms and designed for seamless interaction with blockchain ecosystems, DexBrain is the next evolution in AI-driven DeFi intelligence.
+### Prerequisites
 
-***
+- Python 3.9+
+- PostgreSQL
+- Redis
+- Solana RPC access
 
-## What is DexBrain?
+### Installation
 
-DexBrain is a global knowledge database shared by all Dexter AI agents. It enables the agents to:
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/dexbrain.git
+cd dexbrain
+```
 
-* Access and learn from historical data on liquidity provisioning and market dynamics.
-* Analyze real-time blockchain data and DeFi metrics for superior decision-making.
-* Continuously improve through machine learning models trained on diverse datasets.
-* Share insights and learnings, creating a feedback loop of collective intelligence.
+2. Create and activate virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+```
 
-By pooling knowledge from multiple agents across different DeFi ecosystems, DexBrain ensures that every Dexter agent operates with the highest level of intelligence and efficiency.
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-***
+4. Create `.env` file:
+```bash
+cp .env.example .env
+# Edit .env with your configurations
+```
 
-## The Purpose of DexBrain
+5. Initialize the database:
+```bash
+python -m db.models
+```
 
-### Advancing DeFi Efficiency
+6. Start the server:
+```bash
+uvicorn app.api.routes:app --reload
+```
 
-* **Optimal Liquidity Management**: DexBrain allows Dexter agents to dynamically adjust liquidity pools based on market trends and historical data.
-* **Enhanced Risk Management**: By learning from past events, agents can better forecast potential risks, mitigating impermanent loss and other challenges in DeFi.
+### Configuration
 
-### Improving AI Agent Performance
+Required environment variables:
+```env
+SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+REDIS_URL=redis://localhost:6379
+POSTGRES_URL=postgresql://user:pass@localhost:5432/dexbrain
+LOG_LEVEL=INFO
+```
 
-* **Collective Learning**: Each agent contributes its experience to DexBrain, helping others make more informed decisions.
-* **Real-Time Updates**: DexBrain processes real-time data to provide immediate insights and recommendations for DeFi participants.
-* **Machine Learning Integration**: Constant updates to the ML models ensure that agents stay ahead of rapidly changing markets.
+## API Usage
 
-***
+### Get All Pools
+```http
+GET /api/v1/pools
+```
 
-## Key Features of DexBrain
+Response:
+```json
+[
+  {
+    "pool_id": "string",
+    "token_a": "string",
+    "token_b": "string",
+    "tvl_usd": "string",
+    "fee_rate": "string",
+    "apy": "string",
+    "range_lower": "string",
+    "range_upper": "string",
+    "status": "string",
+    "last_updated": "2024-02-03T12:00:00Z"
+  }
+]
+```
 
-### 1. Shared Knowledge Database
+### Get Pool Details
+```http
+GET /api/v1/pools/{pool_id}
+```
 
-DexBrain acts as a shared repository where agents store and retrieve critical insights. By enabling collective intelligence, every agent benefits from the success and learnings of others.
+### Get Strategy Suggestion
+```http
+GET /api/v1/pools/{pool_id}/strategy?risk_level=0.5
+```
 
-### 2. Machine Learning Models
+Response:
+```json
+{
+  "pool_id": "string",
+  "token_pair": "string",
+  "optimal_range": [0.95, 1.05],
+  "suggested_fee": 0.1,
+  "confidence_score": 0.8,
+  "timestamp": "2024-02-03T12:00:00Z"
+}
+```
 
-DexBrain integrates advanced machine learning techniques to process vast amounts of blockchain and DeFi data, ensuring high-quality insights and predictions.
+## Project Structure
 
-### 3. Real-Time Analytics
+```
+dexbrain/
+├── app/
+│   ├── api/          # FastAPI routes
+│   ├── core/         # Core functionality
+│   │   ├── agent.py  # AI strategy generation
+│   │   └── metrics.py # Metrics collection
+│   ├── cache/        # Redis caching
+│   └── protocols/    # Protocol adapters
+│       └── meteora/  # Meteora implementation
+├── config/           # Configuration settings
+│   └── settings.py
+├── db/              # Database layer
+│   └── models.py    # Database models
+├── .env             # Environment variables
+├── .env.example     # Example environment file
+├── requirements.txt # Project dependencies
+└── README.md       # Project documentation
+```
 
-With access to APIs and blockchain nodes, DexBrain enables Dexter agents to fetch real-time liquidity, price, and market data across EVM-compatible chains and Solana.
+## Development
 
-### 4. Cross-Chain Compatibility
+### Running Tests
+```bash
+pytest
+```
 
-DexBrain supports multiple blockchain ecosystems, including:
+### Code Style
+The project follows PEP 8 style guide. Format code using:
+```bash
+black .
+```
 
-* **Solana**
-* **Base**
-* **Ethereum**
-* **Other EVM-compatible chains**
+## Architecture
 
-This ensures Dexter agents can seamlessly interact with diverse DeFi protocols and pools.
+### Components
 
-### 5. Scalability
+1. **API Layer** (`app/api/`): FastAPI endpoints for data access
+2. **Protocol Layer** (`app/protocols/`): DLMM data integration
+3. **Strategy Layer** (`app/core/agent.py`): AI-based position suggestions
+4. **Cache Layer** (`app/cache/`): Redis for performance
+5. **Database Layer** (`db/`): Historical data storage
 
-DexBrain is designed to scale with the growth of DeFi, capable of handling millions of transactions and data points, and training ML models to optimize agent performance.
+### Data Flow
 
-***
+1. Client requests pool data or strategy
+2. System checks Redis cache
+3. If not cached, fetches from Solana
+4. Processes data and generates strategy
+5. Caches result and returns response
 
-## Benefits of DexBrain to DeFi and AI Agents
+## Performance Considerations
 
-### For DeFi Participants
+- Uses Redis caching for frequent requests
+- Implements connection pooling
+- Handles RPC rate limiting
+- Caches strategies for 15 minutes
+- Caches pool data for 5 minutes
 
-* **Improved Liquidity Pool Management**: More efficient liquidity provisioning leads to better returns for liquidity providers.
-* **Transparency**: Agents explain their decisions, making DeFi strategies accessible to all users, regardless of expertise.
-* **Reduced Risk**: Advanced insights help mitigate risks like impermanent loss and poorly optimized liquidity ranges.
+## Error Handling
 
-### For AI Agents
+The API uses standard HTTP status codes:
+- 200: Success
+- 400: Bad Request
+- 404: Not Found
+- 500: Server Error
 
-* **Faster Learning**: Each agent learns from the collective experience of all deployed agents.
-* **Enhanced Performance**: Continuous updates and model improvements ensure agents operate at peak efficiency.
-* **Broader Use Cases**: With DexBrain's capabilities, agents can expand beyond liquidity provisioning into other DeFi applications.
+All errors include detailed messages in the response body.
 
-***
+## Contributing
 
-## Use Cases of DexBrain
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-### 1. Liquidity Management
+## License
 
-DexBrain enables agents to:
+[MIT License](LICENSE)
 
-* Suggest optimal price ranges for liquidity pools.
-* Dynamically rebalance liquidity based on real-time data.
-* Auto-compound rewards to maximize returns.
+## Support
 
-### 2. DeFi Education and Engagement
-
-Dexter agents powered by DexBrain can:
-
-* Interact with users on platforms like Twitter, providing real-time DeFi updates.
-* Answer questions about liquidity pools, token prices, and governance proposals.
-
-### 3. Cross-Chain Insights
-
-DexBrain aggregates data from multiple blockchains, helping agents recommend strategies that consider global DeFi trends.
-
-***
-
-## Vision for DexBrain
-
-DexBrain represents the future of AI in DeFi—an interconnected intelligence network that empowers both users and agents to thrive in the decentralized economy. By integrating with innovative protocols like Virtuals and leveraging state-of-the-art machine learning, DexBrain aims to:
-
-* Democratize access to high-quality financial tools and insights.
-* Create an ecosystem where AI agents are not just tools but productive, revenue-generating assets.
-* Drive the next wave of innovation in decentralized finance.
-
-***
-
-DexBrain is more than a database; it is the collective consciousness of DeFi-focused AI agents, constantly learning, evolving, and optimizing for the benefit of the entire ecosystem.
+For support, please open an issue in the GitHub repository.
