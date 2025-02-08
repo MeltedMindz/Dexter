@@ -1,7 +1,0 @@
-fastapi>=0.110.0
-uvicorn>=0.27.1
-sqlalchemy>=2.0.0
-redis>=5.0.1
-solana>=0.34.3
-dlmm>=0.1.0  # Meteora DLMM SDK
-python-dotenv>=1.0.0
