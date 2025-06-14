@@ -25,17 +25,17 @@ export function ConnectButton() {
       <div className="relative">
         <button
           onClick={() => setShowConnectors(!showConnectors)}
-          className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center space-x-2"
+          className="bg-primary text-black px-4 py-2 border-2 border-black shadow-brutal font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150 flex items-center space-x-2 uppercase tracking-wider"
         >
-          <Wallet className="w-4 h-4" />
+          <Wallet className="w-5 h-5" />
           <span>Connect Wallet</span>
         </button>
         
         {showConnectors && (
-          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-dark-700 border border-slate-200 dark:border-white/10 rounded-lg shadow-lg dark:shadow-xl z-50">
-            <div className="p-2">
-              <div className="px-3 py-2 border-b border-slate-200 dark:border-white/10 mb-2">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+          <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal z-50">
+            <div className="p-3">
+              <div className="px-3 py-2 border-b-2 border-black dark:border-white mb-3">
+                <span className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
                   Select Wallet
                 </span>
               </div>
@@ -46,14 +46,14 @@ export function ConnectButton() {
                     connect({ connector })
                     setShowConnectors(false)
                   }}
-                  className="w-full text-left px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-dark-600 transition-colors flex items-center space-x-3 text-slate-900 dark:text-white"
+                  className="w-full text-left px-3 py-3 mb-2 border-2 border-black dark:border-white hover:bg-primary hover:border-black dark:hover:bg-primary dark:hover:border-black transition-all duration-150 flex items-center space-x-3 bg-white dark:bg-gray-900 group"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-600 rounded-lg flex items-center justify-center shadow-sm">
-                    <Wallet className="w-4 h-4 text-white" />
+                  <div className="w-10 h-10 bg-black dark:bg-white flex items-center justify-center group-hover:bg-white dark:group-hover:bg-black transition-colors duration-150">
+                    <Wallet className="w-5 h-5 text-white dark:text-black group-hover:text-black dark:group-hover:text-white transition-colors duration-150" />
                   </div>
                   <div className="flex-1">
-                    <span className="text-sm font-medium">{connector.name}</span>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-sm font-bold text-black dark:text-white group-hover:text-black">{connector.name}</span>
+                    <div className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-black font-medium">
                       {connector.name === 'Injected' && 'Browser Wallet'}
                       {connector.name === 'WalletConnect' && 'Mobile & Hardware'}
                       {connector.name === 'Coinbase Wallet' && 'Coinbase Extension'}
@@ -73,43 +73,44 @@ export function ConnectButton() {
     <div className="relative">
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="bg-slate-100 dark:bg-dark-600 text-slate-900 dark:text-white px-4 py-2 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors flex items-center space-x-2"
+        className="bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150 flex items-center space-x-2"
       >
-        <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary-600 rounded-full"></div>
-        <span className="mono-numbers">{formatAddress(address!)}</span>
+        <div className="w-6 h-6 bg-primary border-2 border-black"></div>
+        <span className="font-mono">{formatAddress(address!)}</span>
         <ChevronDown className="w-4 h-4" />
       </button>
       
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-dark-700 border border-slate-200 dark:border-white/10 rounded-lg shadow-lg dark:shadow-xl z-50">
-          <div className="p-2">
-            <div className="px-3 py-2 border-b border-slate-200 dark:border-white/10 mb-2">
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal z-50">
+          <div className="p-3">
+            <div className="px-3 py-2 border-b-2 border-black dark:border-white mb-3">
+              <span className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
                 Wallet Actions
               </span>
             </div>
             <button
               onClick={copyAddress}
-              className="w-full text-left px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-dark-600 transition-colors flex items-center space-x-3 text-slate-900 dark:text-white"
+              className="w-full text-left px-3 py-3 mb-2 border-2 border-black dark:border-white hover:bg-accent-cyan hover:border-black dark:hover:bg-accent-cyan dark:hover:border-black transition-all duration-150 flex items-center space-x-3 bg-white dark:bg-gray-900 group"
             >
-              <Copy className="w-4 h-4" />
-              <span className="text-sm">Copy Address</span>
+              <Copy className="w-4 h-4 text-black dark:text-white group-hover:text-black" />
+              <span className="text-sm font-bold text-black dark:text-white group-hover:text-black">Copy Address</span>
             </button>
             <button
               onClick={() => window.open(`https://basescan.org/address/${address}`, '_blank')}
-              className="w-full text-left px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-dark-600 transition-colors flex items-center space-x-3 text-slate-900 dark:text-white"
+              className="w-full text-left px-3 py-3 mb-2 border-2 border-black dark:border-white hover:bg-accent-yellow hover:border-black dark:hover:bg-accent-yellow dark:hover:border-black transition-all duration-150 flex items-center space-x-3 bg-white dark:bg-gray-900 group"
             >
-              <ExternalLink className="w-4 h-4" />
-              <span className="text-sm">View on Explorer</span>
+              <ExternalLink className="w-4 h-4 text-black dark:text-white group-hover:text-black" />
+              <span className="text-sm font-bold text-black dark:text-white group-hover:text-black">View on Explorer</span>
             </button>
-            <hr className="my-2 border-slate-200 dark:border-white/10" />
-            <button
-              onClick={() => disconnect()}
-              className="w-full text-left px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors flex items-center space-x-3"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm">Disconnect</span>
-            </button>
+            <div className="border-t-2 border-black dark:border-white mt-3 pt-3">
+              <button
+                onClick={() => disconnect()}
+                className="w-full text-left px-3 py-3 border-2 border-error hover:bg-error hover:border-black dark:hover:border-black transition-all duration-150 flex items-center space-x-3 bg-white dark:bg-gray-900 group"
+              >
+                <LogOut className="w-4 h-4 text-error group-hover:text-white" />
+                <span className="text-sm font-bold text-error group-hover:text-white">Disconnect</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
