@@ -2,7 +2,7 @@ import { http, createConfig } from 'wagmi'
 import { base, mainnet } from 'wagmi/chains'
 import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors'
 
-const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID || 'demo-project-id'
+const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID || '130fac92acf3681422903f821a58922a'
 const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org'
 
 export const config = createConfig({
