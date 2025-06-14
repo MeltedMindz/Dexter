@@ -78,43 +78,43 @@ export function Footer() {
   }
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-dark-900/80 backdrop-blur-md border-t border-slate-200 dark:border-white/10 z-40">
+    <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t-2 border-black dark:border-white z-40">
       <div className="w-full px-6 lg:px-12">
-        <div className="flex items-center justify-between h-12 text-xs">
+        <div className="flex items-center justify-between h-12 text-xs font-mono">
           {/* Left side - Blockchain data */}
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`}></div>
-              <span className="text-slate-600 dark:text-slate-400">Base Network</span>
+              <span className="text-black dark:text-white text-brutal">BASE</span>
             </div>
             
             <div className="flex items-center space-x-1">
-              <Globe className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-slate-500 dark:text-slate-400">Block:</span>
-              <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+              <Globe className="w-3 h-3 text-black dark:text-white" />
+              <span className="text-black dark:text-white">BLOCK:</span>
+              <span className="font-mono font-bold text-black dark:text-white">
                 {blockchainData.blockNumber}
               </span>
             </div>
             
             <div className="flex items-center space-x-1">
-              <Fuel className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-slate-500 dark:text-slate-400">Gas:</span>
-              <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+              <Fuel className="w-3 h-3 text-black dark:text-white" />
+              <span className="text-black dark:text-white">GAS:</span>
+              <span className="font-mono font-bold text-black dark:text-white">
                 {blockchainData.gasPrice} gwei
               </span>
             </div>
             
             <div className="flex items-center space-x-1">
-              <TrendingUp className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-slate-500 dark:text-slate-400">ETH:</span>
-              <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+              <TrendingUp className="w-3 h-3 text-black dark:text-white" />
+              <span className="text-black dark:text-white">ETH:</span>
+              <span className="font-mono font-bold text-black dark:text-white">
                 ${blockchainData.ethPrice}
               </span>
             </div>
             
             <div className="flex items-center space-x-1">
-              <Clock className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-              <span className="text-slate-500 dark:text-slate-400">
+              <Clock className="w-3 h-3 text-black dark:text-white" />
+              <span className="text-black dark:text-white">
                 {formatTime(blockchainData.lastUpdated)}
               </span>
             </div>
@@ -127,7 +127,7 @@ export function Footer() {
                 href="https://github.com/MeltedMindz/Dexter"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                className="flex items-center space-x-1 text-black dark:text-white hover:text-primary transition-colors text-brutal"
               >
                 <span>GitHub</span>
                 <ExternalLink className="w-3 h-3" />
@@ -137,7 +137,7 @@ export function Footer() {
                 href="https://basescan.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                className="flex items-center space-x-1 text-black dark:text-white hover:text-primary transition-colors text-brutal"
               >
                 <span>Explorer</span>
                 <ExternalLink className="w-3 h-3" />
@@ -147,7 +147,7 @@ export function Footer() {
                 href="https://x.com/Dexter_AI_"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                className="flex items-center space-x-1 text-black dark:text-white hover:text-primary transition-colors text-brutal"
               >
                 <span>Twitter</span>
                 <ExternalLink className="w-3 h-3" />
@@ -157,15 +157,15 @@ export function Footer() {
                 href="https://t.me/+VELgzJret51mYzkx"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                className="flex items-center space-x-1 text-black dark:text-white hover:text-primary transition-colors text-brutal"
               >
                 <span>Telegram</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
             
-            <div className="text-slate-500 dark:text-slate-400">
-              <span>DEXTER © 2025</span>
+            <div className="text-black dark:text-white">
+              <span className="text-brutal">DEXTER © 2025</span>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
-import { Dashboard } from '@/components/Dashboard'
+import { AboutPage } from '@/components/AboutPage'
 
-export default function AboutPage() {
+export default function About() {
   return (
-    <Dashboard />
+    <AboutPage />
   )
 }

@@ -1,11 +1,20 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 
-const inter = Inter({ subsets: ['latin'] })
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ['latin'],
+  variable: '--font-space-grotesk'
+})
+
+const ibmPlexMono = IBM_Plex_Mono({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-ibm-plex-mono'
+})
 
 export const metadata: Metadata = {
   title: 'Dexter Protocol - AI-Powered Liquidity Management',
@@ -19,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} h-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-dark-900 dark:to-dark-800 transition-colors`}>
+      <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans h-full bg-white dark:bg-black transition-colors`}>
         <Providers>
           <div className="flex flex-col h-full">
             {/* Fixed Header */}

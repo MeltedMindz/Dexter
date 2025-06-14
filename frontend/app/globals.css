@@ -2,184 +2,167 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Light theme variables */
-  --background: 248 250 252;
-  --foreground: 15 23 42;
-  --card: 255 255 255;
-  --card-foreground: 15 23 42;
-  --primary: 99 102 241;
-  --primary-foreground: 255 255 255;
-  --secondary: 241 245 249;
-  --secondary-foreground: 15 23 42;
-  --muted: 241 245 249;
-  --muted-foreground: 100 116 139;
-  --accent: 241 245 249;
-  --accent-foreground: 15 23 42;
-  --border: 226 232 240;
-  --input: 226 232 240;
-  --ring: 99 102 241;
-  
-  /* Success colors */
-  --success: 16 185 129;
-  --success-foreground: 255 255 255;
-  
-  /* Warning colors */
-  --warning: 245 158 11;
-  --warning-foreground: 255 255 255;
-  
-  /* Error colors */
-  --error: 239 68 68;
-  --error-foreground: 255 255 255;
+  /* Neo-Brutalism Color System */
+  --background: 255 255 255;
+  --foreground: 0 0 0;
+  --primary: 0 255 0;
+  --primary-foreground: 0 0 0;
+  --accent-yellow: 255 255 0;
+  --accent-cyan: 0 255 255;
+  --accent-magenta: 255 0 255;
+  --border: 0 0 0;
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+  --font-ibm-plex-mono: 'IBM Plex Mono', monospace;
 }
 
 .dark {
-  /* Dark theme variables - matching Revert Finance */
-  --background: 10 10 10;
+  /* Dark mode for Neo-Brutalism */
+  --background: 0 0 0;
   --foreground: 255 255 255;
-  --card: 20 20 20;
-  --card-foreground: 255 255 255;
-  --primary: 99 102 241;
-  --primary-foreground: 255 255 255;
-  --secondary: 31 31 31;
-  --secondary-foreground: 255 255 255;
-  --muted: 42 42 42;
-  --muted-foreground: 156 163 175;
-  --accent: 31 31 31;
-  --accent-foreground: 255 255 255;
-  --border: 42 42 42;
-  --input: 42 42 42;
-  --ring: 99 102 241;
-  
-  /* Success colors for dark mode */
-  --success: 16 185 129;
-  --success-foreground: 10 10 10;
-  
-  /* Warning colors for dark mode */
-  --warning: 245 158 11;
-  --warning-foreground: 10 10 10;
-  
-  /* Error colors for dark mode */
-  --error: 239 68 68;
-  --error-foreground: 255 255 255;
+  --border: 255 255 255;
 }
 
 * {
-  border-color: rgb(var(--border));
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   background: rgb(var(--background));
   color: rgb(var(--foreground));
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: var(--font-space-grotesk);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.dark body {
-  background: linear-gradient(135deg, #0A0A0A 0%, #141414 100%);
+/* Typography Classes */
+.font-display {
+  font-family: var(--font-space-grotesk);
+  font-weight: 600;
 }
 
-/* Custom scrollbar */
+.font-mono {
+  font-family: var(--font-ibm-plex-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Neo-Brutalism Utilities */
+.text-brutal {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.border-brutal {
+  border-width: 2px;
+  border-color: rgb(var(--border));
+}
+
+.shadow-brutal {
+  box-shadow: 4px 4px 0px 0px rgb(var(--border));
+}
+
+.shadow-brutal-sm {
+  box-shadow: 2px 2px 0px 0px rgb(var(--border));
+}
+
+.shadow-brutal-lg {
+  box-shadow: 8px 8px 0px 0px rgb(var(--border));
+}
+
+.shadow-brutal-green {
+  box-shadow: 4px 4px 0px 0px rgb(var(--primary));
+}
+
+.shadow-brutal-yellow {
+  box-shadow: 4px 4px 0px 0px rgb(var(--accent-yellow));
+}
+
+.bg-grid {
+  background-image: 
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .bg-grid {
+  background-image: 
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+}
+
+/* Animations */
+@keyframes snapIn {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+.animate-snap-in {
+  animation: snapIn 0.1s ease-out;
+}
+
+.animate-glitch {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(var(--muted));
+  background: rgb(var(--background));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--muted-foreground));
-  border-radius: 4px;
+  background: rgb(var(--border));
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--accent-foreground));
+  background: rgb(var(--primary));
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: #1f1f1f;
+/* Remove default focus outlines and add our own */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(var(--primary));
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #525252;
+/* Ensure high contrast for accessibility */
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+a:hover {
+  text-decoration: underline;
 }
 
-/* Number formatting */
-.mono-numbers {
-  font-family: 'JetBrains Mono', monospace;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.3s ease-out;
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 2s ease-in-out infinite;
-}
-
-/* Chart styles */
-.chart-line {
-  stroke: rgb(var(--success));
-  stroke-width: 2;
-  fill: none;
-}
-
-.dark .chart-line {
-  stroke: #10B981;
-}
-
-/* Glass morphism effect */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark .glass {
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
