@@ -123,10 +123,10 @@ export function V4PositionManager() {
       <div className="max-w-4xl mx-auto p-6">
         <div className="text-center py-12">
           <Target className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-bold text-white dark:text-white mb-2">
             Connect Wallet to View Positions
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">
+          <p className="text-gray-300 dark:text-gray-300">
             Connect your wallet to view and manage your Uniswap V4 positions
           </p>
         </div>
@@ -144,37 +144,37 @@ export function V4PositionManager() {
     <div className="max-w-7xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+        <h1 className="text-4xl font-bold text-white dark:text-white mb-2">
           Your V4 Positions
         </h1>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-gray-300 dark:text-gray-300">
           Manage your Uniswap V4 liquidity positions and track performance
         </p>
       </div>
 
       {/* Portfolio Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white dark:bg-dark-700 rounded-xl p-6 border border-slate-200 dark:border-white/10">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white dark:border-white">
           <div className="flex items-center space-x-3 mb-2">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
               <DollarSign className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Total Value</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+              <p className="text-sm text-gray-300 dark:text-gray-300">Total Value</p>
+              <p className="text-2xl font-bold text-white dark:text-white mono-numbers">
                 ${totalValue.toLocaleString()}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-dark-700 rounded-xl p-6 border border-slate-200 dark:border-white/10">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white dark:border-white">
           <div className="flex items-center space-x-3 mb-2">
             <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Total Fees Earned</p>
+              <p className="text-sm text-gray-300 dark:text-gray-300">Total Fees Earned</p>
               <p className="text-2xl font-bold text-green-600 mono-numbers">
                 ${totalFees.toLocaleString()}
               </p>
@@ -182,28 +182,28 @@ export function V4PositionManager() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-dark-700 rounded-xl p-6 border border-slate-200 dark:border-white/10">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white dark:border-white">
           <div className="flex items-center space-x-3 mb-2">
             <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Avg APY</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+              <p className="text-sm text-gray-300 dark:text-gray-300">Avg APY</p>
+              <p className="text-2xl font-bold text-white dark:text-white mono-numbers">
                 {avgApy.toFixed(1)}%
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-dark-700 rounded-xl p-6 border border-slate-200 dark:border-white/10">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white dark:border-white">
           <div className="flex items-center space-x-3 mb-2">
             <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
               <Target className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Active Positions</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+              <p className="text-sm text-gray-300 dark:text-gray-300">Active Positions</p>
+              <p className="text-2xl font-bold text-white dark:text-white mono-numbers">
                 {positions.length}
               </p>
             </div>
@@ -252,7 +252,7 @@ function PositionCard({
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+    <div className="bg-gray-800 dark:bg-gray-900 rounded-xl border-2 border-white dark:border-white overflow-hidden">
       {/* Header */}
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -262,10 +262,10 @@ function PositionCard({
               <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full border-2 border-white dark:border-dark-700"></div>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+              <h3 className="text-xl font-bold text-white dark:text-white">
                 {position.pool.token0.symbol}/{position.pool.token1.symbol}
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-sm text-gray-300 dark:text-gray-300">
                 {position.pool.feeTier}% Fee Tier • Token ID #{position.tokenId}
               </p>
             </div>
@@ -292,25 +292,25 @@ function PositionCard({
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
           <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Position Value</p>
-            <p className="text-xl font-bold text-slate-900 dark:text-white mono-numbers">
+            <p className="text-sm text-gray-300 dark:text-gray-300 mb-1">Position Value</p>
+            <p className="text-xl font-bold text-white dark:text-white mono-numbers">
               ${position.currentValue.toLocaleString()}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Fees Earned</p>
+            <p className="text-sm text-gray-300 dark:text-gray-300 mb-1">Fees Earned</p>
             <p className="text-xl font-bold text-green-600 mono-numbers">
               ${position.feesEarned.usdValue.toLocaleString()}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">APY</p>
-            <p className="text-xl font-bold text-slate-900 dark:text-white mono-numbers">
+            <p className="text-sm text-gray-300 dark:text-gray-300 mb-1">APY</p>
+            <p className="text-xl font-bold text-white dark:text-white mono-numbers">
               {position.performance.apy.toFixed(1)}%
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">24h Change</p>
+            <p className="text-sm text-gray-300 dark:text-gray-300 mb-1">24h Change</p>
             <p className={`text-xl font-bold mono-numbers ${
               position.performance.change24h >= 0 ? 'text-green-600' : 'text-red-600'
             }`}>
@@ -320,10 +320,10 @@ function PositionCard({
         </div>
 
         {/* Price Range */}
-        <div className="bg-slate-50 dark:bg-dark-600 rounded-lg p-4 mb-6">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Price Range</span>
-            <span className="text-sm text-slate-600 dark:text-slate-400">
+            <span className="text-sm font-medium text-gray-200 dark:text-gray-200">Price Range</span>
+            <span className="text-sm text-gray-300 dark:text-gray-300">
               Current: ${position.priceRange.current.toLocaleString()}
             </span>
           </div>
@@ -343,7 +343,7 @@ function PositionCard({
                 }}
               />
             </div>
-            <div className="flex justify-between mt-1 text-xs text-slate-600 dark:text-slate-400">
+            <div className="flex justify-between mt-1 text-xs text-gray-300 dark:text-gray-300">
               <span>${position.priceRange.min.toLocaleString()}</span>
               <span>${position.priceRange.max.toLocaleString()}</span>
             </div>
@@ -385,32 +385,32 @@ function PositionCard({
 
       {/* Expandable Details */}
       {expanded && (
-        <div className="border-t border-slate-200 dark:border-white/10 p-6 bg-slate-50 dark:bg-dark-600">
+        <div className="border-t border-gray-400 dark:border-white/20 p-6 bg-gray-700 dark:bg-gray-800">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Position Details</h4>
+              <h4 className="font-semibold text-white dark:text-white mb-3">Position Details</h4>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">Liquidity</span>
-                  <span className="text-sm font-medium text-slate-900 dark:text-white mono-numbers">
+                  <span className="text-sm text-gray-300 dark:text-gray-300">Liquidity</span>
+                  <span className="text-sm font-medium text-white dark:text-white mono-numbers">
                     {parseFloat(position.liquidity).toExponential(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{position.pool.token0.symbol} Amount</span>
-                  <span className="text-sm font-medium text-slate-900 dark:text-white mono-numbers">
+                  <span className="text-sm text-gray-300 dark:text-gray-300">{position.pool.token0.symbol} Amount</span>
+                  <span className="text-sm font-medium text-white dark:text-white mono-numbers">
                     {position.amount0}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{position.pool.token1.symbol} Amount</span>
-                  <span className="text-sm font-medium text-slate-900 dark:text-white mono-numbers">
+                  <span className="text-sm text-gray-300 dark:text-gray-300">{position.pool.token1.symbol} Amount</span>
+                  <span className="text-sm font-medium text-white dark:text-white mono-numbers">
                     {position.amount1}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">Created</span>
-                  <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  <span className="text-sm text-gray-300 dark:text-gray-300">Created</span>
+                  <span className="text-sm font-medium text-white dark:text-white">
                     {new Date(position.createdAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -418,22 +418,22 @@ function PositionCard({
             </div>
             
             <div>
-              <h4 className="font-semibold text-slate-900 dark:text-white mb-3">Uncollected Fees</h4>
+              <h4 className="font-semibold text-white dark:text-white mb-3">Uncollected Fees</h4>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{position.pool.token0.symbol} Fees</span>
+                  <span className="text-sm text-gray-300 dark:text-gray-300">{position.pool.token0.symbol} Fees</span>
                   <span className="text-sm font-medium text-green-600 mono-numbers">
                     {position.feesEarned.amount0}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">{position.pool.token1.symbol} Fees</span>
+                  <span className="text-sm text-gray-300 dark:text-gray-300">{position.pool.token1.symbol} Fees</span>
                   <span className="text-sm font-medium text-green-600 mono-numbers">
                     {position.feesEarned.amount1}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-slate-600 dark:text-slate-400">Total Value</span>
+                  <span className="text-sm text-gray-300 dark:text-gray-300">Total Value</span>
                   <span className="text-sm font-bold text-green-600 mono-numbers">
                     ${position.feesEarned.usdValue.toLocaleString()}
                   </span>
@@ -447,7 +447,7 @@ function PositionCard({
       {/* Toggle Expand */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full py-3 border-t border-slate-200 dark:border-white/10 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+        className="w-full py-3 border-t border-gray-400 dark:border-white/20 text-sm text-gray-300 dark:text-gray-300 hover:text-white dark:hover:text-white transition-colors"
       >
         {expanded ? 'Show Less' : 'Show More Details'}
       </button>
@@ -514,14 +514,14 @@ function ManagePositionModal({
   if (isComplete) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-dark-700 rounded-xl p-8 max-w-md w-full mx-4 text-center">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-8 max-w-md w-full mx-4 text-center border-2 border-white">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+          <h3 className="text-xl font-bold text-white dark:text-white mb-2">
             Transaction Complete!
           </h3>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">
+          <p className="text-gray-300 dark:text-gray-300 mb-6">
             Your {action} transaction has been successfully processed.
           </p>
           <button
@@ -537,38 +537,38 @@ function ManagePositionModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-dark-700 rounded-xl p-6 max-w-md w-full mx-4">
+      <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 max-w-md w-full mx-4 border-2 border-white">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+          <h3 className="text-xl font-bold text-white dark:text-white">
             {config.title}
           </h3>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="text-gray-400 hover:text-white dark:hover:text-white"
           >
             ✕
           </button>
         </div>
 
-        <p className="text-slate-600 dark:text-slate-400 mb-6">
+        <p className="text-gray-300 dark:text-gray-300 mb-6">
           {config.description}
         </p>
 
         {/* Position Info */}
-        <div className="bg-slate-50 dark:bg-dark-600 rounded-lg p-4 mb-6">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-lg p-4 mb-6">
           <div className="flex items-center space-x-3 mb-2">
             <div className="flex items-center -space-x-1">
               <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary-600 rounded-full"></div>
               <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full"></div>
             </div>
-            <span className="font-medium text-slate-900 dark:text-white">
+            <span className="font-medium text-white dark:text-white">
               {position.pool.token0.symbol}/{position.pool.token1.symbol}
             </span>
           </div>
           {action === 'collect' && (
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">Available Fees</span>
+                <span className="text-gray-300 dark:text-gray-300">Available Fees</span>
                 <span className="font-medium text-green-600">
                   ${position.feesEarned.usdValue.toLocaleString()}
                 </span>
@@ -580,7 +580,7 @@ function ManagePositionModal({
         {/* Amount Input (for increase/decrease) */}
         {(action === 'increase' || action === 'decrease') && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-gray-200 dark:text-gray-200 mb-2">
               Amount
             </label>
             <input
@@ -588,7 +588,7 @@ function ManagePositionModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full px-4 py-3 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-dark-600 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent mono-numbers"
+              className="w-full px-4 py-3 border-2 border-white dark:border-white rounded-lg bg-gray-800 dark:bg-gray-900 text-white dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent mono-numbers"
             />
           </div>
         )}
@@ -615,7 +615,7 @@ function ManagePositionModal({
           <button
             onClick={onClose}
             disabled={isProcessing}
-            className="flex-1 bg-slate-100 dark:bg-dark-600 text-slate-900 dark:text-white py-3 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-dark-500 disabled:opacity-50 transition-colors"
+            className="flex-1 bg-gray-800 dark:bg-gray-800 text-white dark:text-white py-3 rounded-lg font-medium hover:bg-gray-700 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors border-2 border-white"
           >
             Cancel
           </button>

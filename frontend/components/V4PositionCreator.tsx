@@ -70,7 +70,7 @@ export function V4PositionCreator() {
       <div className="max-w-4xl mx-auto p-6">
         <div className="text-center py-12">
           <Wallet className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-bold text-white dark:text-white mb-2">
             Connect Your Wallet
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-6">
@@ -85,10 +85,10 @@ export function V4PositionCreator() {
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+        <h1 className="text-4xl font-bold text-white dark:text-white mb-2">
           Create V4 Position
         </h1>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-gray-300 dark:text-gray-300">
           Create and manage Uniswap V4 liquidity positions with AI-powered optimization
         </p>
       </div>
@@ -112,7 +112,7 @@ export function V4PositionCreator() {
                   ? 'bg-primary text-black' 
                   : isCompleted 
                     ? 'bg-green-500 text-white' 
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                    : 'bg-gray-800 dark:bg-gray-800 text-white dark:text-white'
               }`}>
                 <Icon className="w-4 h-4" />
                 <span className="text-sm font-medium">{stepItem.label}</span>
@@ -211,30 +211,30 @@ function PoolSuggestionsStep({
   return (
     <div className="space-y-6">
       {/* Wallet Summary */}
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
+      <div className="bg-gray-800 dark:bg-gray-900 rounded-lg p-6 border-2 border-white dark:border-white">
+        <h3 className="text-lg font-semibold text-white dark:text-white mb-3">
           Your Wallet
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Total Value</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+            <p className="text-sm text-gray-300 dark:text-gray-300">Total Value</p>
+            <p className="text-2xl font-bold text-white dark:text-white mono-numbers">
               ${totalValue.toLocaleString()}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Tokens</p>
+            <p className="text-sm text-gray-300 dark:text-gray-300">Tokens</p>
             <div className="flex items-center space-x-2 mt-1">
               {holdings.slice(0, 4).map((token) => (
                 <div key={token.symbol} className="flex items-center space-x-1">
                   <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary-600 rounded-full"></div>
-                  <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  <span className="text-sm font-medium text-white dark:text-white">
                     {token.symbol}
                   </span>
                 </div>
               ))}
               {holdings.length > 4 && (
-                <span className="text-sm text-slate-500">+{holdings.length - 4} more</span>
+                <span className="text-sm text-gray-400">+{holdings.length - 4} more</span>
               )}
             </div>
           </div>
@@ -250,7 +250,7 @@ function PoolSuggestionsStep({
             placeholder="Search pools by token..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green"
+            className="w-full pl-10 pr-4 py-2 border-2 border-white dark:border-white rounded-lg bg-gray-800 dark:bg-gray-900 text-white dark:text-white focus:shadow-brutal-green"
           />
         </div>
         <div className="flex space-x-2">
@@ -262,10 +262,10 @@ function PoolSuggestionsStep({
               <button
                 key={filterItem.key}
                 onClick={() => setFilter(filterItem.key)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors border-2 ${
                   isActive
-                    ? 'bg-primary text-black'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:shadow-brutal-sm'
+                    ? 'bg-primary text-black border-black'
+                    : 'bg-gray-800 dark:bg-gray-800 text-white dark:text-white border-white hover:shadow-brutal-sm'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -280,19 +280,19 @@ function PoolSuggestionsStep({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {isLoading ? (
           Array(6).fill(0).map((_, i) => (
-            <div key={i} className="bg-gray-100 dark:bg-gray-800 rounded-xl p-6 border-2 border-black dark:border-white animate-pulse">
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+            <div key={i} className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white dark:border-white animate-pulse">
+              <div className="h-6 bg-gray-600 dark:bg-gray-700 rounded mb-4"></div>
+              <div className="h-4 bg-gray-600 dark:bg-gray-700 rounded mb-2"></div>
+              <div className="h-4 bg-gray-600 dark:bg-gray-700 rounded w-2/3"></div>
             </div>
           ))
         ) : suggestions.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <Filter className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+            <h3 className="text-lg font-semibold text-white dark:text-white mb-2">
               No pools found
             </h3>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-gray-300 dark:text-gray-300">
               Try adjusting your filters or search query
             </p>
           </div>
@@ -324,7 +324,7 @@ function PoolCard({ pool, onClick }: { pool: PoolSuggestion; onClick: () => void
   return (
     <div 
       onClick={onClick}
-      className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border-2 border-black dark:border-white hover:shadow-brutal transition-all cursor-pointer group"
+      className="bg-gray-800 dark:bg-gray-900 rounded-lg p-6 border-2 border-white dark:border-white hover:shadow-brutal transition-all cursor-pointer group"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -334,10 +334,10 @@ function PoolCard({ pool, onClick }: { pool: PoolSuggestion; onClick: () => void
             <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full border-2 border-white dark:border-dark-700"></div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white dark:text-white">
               {pool.token0.symbol}/{pool.token1.symbol}
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-gray-300 dark:text-gray-300">
               {pool.feeTier}% Fee Tier
             </p>
           </div>
@@ -353,14 +353,14 @@ function PoolCard({ pool, onClick }: { pool: PoolSuggestion; onClick: () => void
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Est. APR</p>
+          <p className="text-sm text-gray-300 dark:text-gray-300">Est. APR</p>
           <p className="text-xl font-bold text-green-600 mono-numbers">
             {pool.estimatedApr.toFixed(1)}%
           </p>
         </div>
         <div>
-          <p className="text-sm text-slate-600 dark:text-slate-400">24h Volume</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white mono-numbers">
+          <p className="text-sm text-gray-300 dark:text-gray-300">24h Volume</p>
+          <p className="text-lg font-semibold text-white dark:text-white mono-numbers">
             ${(pool.volume24h / 1000000).toFixed(1)}M
           </p>
         </div>
@@ -395,7 +395,7 @@ function PoolCard({ pool, onClick }: { pool: PoolSuggestion; onClick: () => void
         {pool.reasons.slice(0, 2).map((reason, index) => (
           <div key={index} className="flex items-center space-x-2">
             <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-            <span className="text-sm text-slate-600 dark:text-slate-400">{reason}</span>
+            <span className="text-sm text-gray-300 dark:text-gray-300">{reason}</span>
           </div>
         ))}
       </div>
@@ -462,7 +462,7 @@ function ConfigurePositionStep({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          className="flex items-center space-x-2 text-gray-300 dark:text-gray-300 hover:text-white dark:hover:text-white"
         >
           <ChevronRight className="w-4 h-4 rotate-180" />
           <span>Back to pools</span>
@@ -470,8 +470,8 @@ function ConfigurePositionStep({
       </div>
 
       {/* Selected Pool Info */}
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
+      <div className="bg-gray-800 dark:bg-gray-900 rounded-lg p-6 border-2 border-white dark:border-white">
+        <h3 className="text-lg font-semibold text-white dark:text-white mb-3">
           Selected Pool
         </h3>
         <div className="flex items-center space-x-4">
@@ -480,10 +480,10 @@ function ConfigurePositionStep({
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full border-2 border-white dark:border-dark-700"></div>
           </div>
           <div>
-            <h4 className="text-xl font-bold text-slate-900 dark:text-white">
+            <h4 className="text-xl font-bold text-white dark:text-white">
               {pool.token0.symbol}/{pool.token1.symbol}
             </h4>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-gray-300 dark:text-gray-300">
               {pool.feeTier}% • Est. APR {pool.estimatedApr.toFixed(1)}%
             </p>
           </div>
@@ -493,17 +493,17 @@ function ConfigurePositionStep({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column - Token Amounts */}
         <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+          <h3 className="text-xl font-semibold text-white dark:text-white">
             Deposit Amounts
           </h3>
 
           {/* Token 0 Input */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-sm font-medium text-gray-200 dark:text-gray-200">
                 {pool.token0.symbol} Amount
               </label>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-gray-400">
                 Balance: {token0Holding?.balanceFormatted || '0.00'}
               </span>
             </div>
@@ -513,7 +513,7 @@ function ConfigurePositionStep({
                 value={amount0}
                 onChange={(e) => setAmount0(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers text-lg"
+                className="w-full px-4 py-3 border-2 border-white dark:border-white rounded-lg bg-gray-800 dark:bg-gray-900 text-white dark:text-white focus:shadow-brutal-green mono-numbers text-lg"
               />
               <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary text-sm font-medium hover:text-primary/80">
                 MAX
@@ -524,10 +524,10 @@ function ConfigurePositionStep({
           {/* Token 1 Input */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label className="text-sm font-medium text-gray-200 dark:text-gray-200">
                 {pool.token1.symbol} Amount
               </label>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-gray-400">
                 Balance: {token1Holding?.balanceFormatted || '0.00'}
               </span>
             </div>
@@ -537,7 +537,7 @@ function ConfigurePositionStep({
                 value={amount1}
                 onChange={(e) => setAmount1(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers text-lg"
+                className="w-full px-4 py-3 border-2 border-white dark:border-white rounded-lg bg-gray-800 dark:bg-gray-900 text-white dark:text-white focus:shadow-brutal-green mono-numbers text-lg"
               />
               <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary text-sm font-medium hover:text-primary/80">
                 MAX
@@ -548,18 +548,18 @@ function ConfigurePositionStep({
 
         {/* Right Column - Price Range & Settings */}
         <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+          <h3 className="text-xl font-semibold text-white dark:text-white">
             Price Range
           </h3>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="bg-blue-900 dark:bg-blue-900/20 border-2 border-blue-400 dark:border-blue-400 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
               <AlertCircle className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
+              <span className="text-sm font-medium text-blue-200 dark:text-blue-300">
                 Current Price: ${currentPrice.toLocaleString()}
               </span>
             </div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
+            <p className="text-xs text-blue-300 dark:text-blue-400">
               Set your price range carefully. Tokens will only earn fees when the price is within this range.
             </p>
           </div>
@@ -574,7 +574,7 @@ function ConfigurePositionStep({
               value={priceRange.min}
               onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers"
+              className="w-full px-4 py-3 border-2 border-white dark:border-white rounded-lg bg-gray-800 dark:bg-gray-900 text-white dark:text-white focus:shadow-brutal-green mono-numbers"
             />
           </div>
 
@@ -588,15 +588,15 @@ function ConfigurePositionStep({
               value={priceRange.max}
               onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers"
+              className="w-full px-4 py-3 border-2 border-white dark:border-white rounded-lg bg-gray-800 dark:bg-gray-900 text-white dark:text-white focus:shadow-brutal-green mono-numbers"
             />
           </div>
 
           {/* Auto-compound */}
-          <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-black dark:border-white">
+          <div className="flex items-center justify-between p-4 bg-gray-800 dark:bg-gray-900 rounded-lg border-2 border-white dark:border-white">
             <div>
-              <h4 className="font-medium text-slate-900 dark:text-white">Auto-compound</h4>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <h4 className="font-medium text-white dark:text-white">Auto-compound</h4>
+              <p className="text-sm text-gray-300 dark:text-gray-300">
                 Automatically reinvest earned fees
               </p>
             </div>
@@ -622,10 +622,10 @@ function ConfigurePositionStep({
                 <button
                   key={value}
                   onClick={() => setSlippage(value)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border-2 ${
                     slippage === value
-                      ? 'bg-primary text-black'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:shadow-brutal-sm'
+                      ? 'bg-primary text-black border-black'
+                      : 'bg-gray-800 dark:bg-gray-800 text-white dark:text-white border-white hover:shadow-brutal-sm'
                   }`}
                 >
                   {value}%
@@ -640,14 +640,14 @@ function ConfigurePositionStep({
       <div className="flex space-x-4">
         <button
           onClick={onBack}
-          className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg font-medium border-2 border-black dark:border-white hover:shadow-brutal transition-colors"
+          className="flex-1 bg-gray-800 dark:bg-gray-800 text-white dark:text-white py-3 rounded-lg font-medium border-2 border-white dark:border-white hover:shadow-brutal transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleNext}
           disabled={!isValid}
-          className="flex-1 bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 bg-primary text-black py-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border-2 border-black"
         >
           Review Position
         </button>
@@ -674,7 +674,7 @@ function ConfirmPositionStep({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          className="flex items-center space-x-2 text-gray-300 dark:text-gray-300 hover:text-white dark:hover:text-white"
         >
           <ChevronRight className="w-4 h-4 rotate-180" />
           <span>Back to configure</span>
@@ -682,21 +682,21 @@ function ConfirmPositionStep({
       </div>
 
       {/* Position Summary */}
-      <div className="bg-gray-50 dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg p-6">
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
+      <div className="bg-gray-800 dark:bg-gray-900 border-2 border-white dark:border-white rounded-lg p-6">
+        <h3 className="text-xl font-semibold text-white dark:text-white mb-6">
           Position Summary
         </h3>
 
         <div className="space-y-6">
           {/* Pool Info */}
           <div className="flex items-center justify-between">
-            <span className="text-slate-600 dark:text-slate-400">Pool</span>
+            <span className="text-gray-300 dark:text-gray-300">Pool</span>
             <div className="flex items-center space-x-2">
               <div className="flex items-center -space-x-1">
                 <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary-600 rounded-full"></div>
                 <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full"></div>
               </div>
-              <span className="font-medium text-slate-900 dark:text-white">
+              <span className="font-medium text-white dark:text-white">
                 {config.pool.token0.symbol}/{config.pool.token1.symbol}
               </span>
             </div>
@@ -705,13 +705,13 @@ function ConfirmPositionStep({
           {/* Deposit Amounts */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">{config.pool.token0.symbol} Deposit</span>
+              <span className="text-gray-300 dark:text-gray-300">{config.pool.token0.symbol} Deposit</span>
               <span className="font-medium text-slate-900 dark:text-white mono-numbers">
                 {parseFloat(config.amount0).toFixed(4)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">{config.pool.token1.symbol} Deposit</span>
+              <span className="text-gray-300 dark:text-gray-300">{config.pool.token1.symbol} Deposit</span>
               <span className="font-medium text-slate-900 dark:text-white mono-numbers">
                 {parseFloat(config.amount1).toFixed(2)}
               </span>
@@ -721,13 +721,13 @@ function ConfirmPositionStep({
           {/* Price Range */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Min Price</span>
+              <span className="text-gray-300 dark:text-gray-300">Min Price</span>
               <span className="font-medium text-slate-900 dark:text-white mono-numbers">
                 ${parseFloat(config.minPrice).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Max Price</span>
+              <span className="text-gray-300 dark:text-gray-300">Max Price</span>
               <span className="font-medium text-slate-900 dark:text-white mono-numbers">
                 ${parseFloat(config.maxPrice).toLocaleString()}
               </span>
@@ -735,21 +735,21 @@ function ConfirmPositionStep({
           </div>
 
           {/* Estimates */}
-          <div className="border-t border-slate-200 dark:border-white/10 pt-4 space-y-3">
+          <div className="border-t border-gray-400 dark:border-white/20 pt-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Total Value</span>
-              <span className="font-semibold text-slate-900 dark:text-white mono-numbers">
+              <span className="text-gray-300 dark:text-gray-300">Total Value</span>
+              <span className="font-semibold text-white dark:text-white mono-numbers">
                 ${estimatedValue.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Est. Daily Fees</span>
+              <span className="text-gray-300 dark:text-gray-300">Est. Daily Fees</span>
               <span className="font-medium text-green-600 mono-numbers">
                 ${estimatedFees.toFixed(2)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Est. APR</span>
+              <span className="text-gray-300 dark:text-gray-300">Est. APR</span>
               <span className="font-medium text-green-600 mono-numbers">
                 {config.pool.estimatedApr.toFixed(1)}%
               </span>
@@ -757,15 +757,15 @@ function ConfirmPositionStep({
           </div>
 
           {/* Settings */}
-          <div className="border-t border-slate-200 dark:border-white/10 pt-4 space-y-3">
+          <div className="border-t border-gray-400 dark:border-white/20 pt-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Auto-compound</span>
-              <span className="font-medium text-slate-900 dark:text-white">
+              <span className="text-gray-300 dark:text-gray-300">Auto-compound</span>
+              <span className="font-medium text-white dark:text-white">
                 {config.autoCompound ? 'Enabled' : 'Disabled'}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Slippage</span>
+              <span className="text-gray-300 dark:text-gray-300">Slippage</span>
               <span className="font-medium text-slate-900 dark:text-white mono-numbers">
                 {config.slippage}%
               </span>
@@ -775,14 +775,14 @@ function ConfirmPositionStep({
       </div>
 
       {/* Important Notice */}
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+      <div className="bg-yellow-900 dark:bg-yellow-900/20 border-2 border-yellow-400 dark:border-yellow-400 rounded-lg p-4">
         <div className="flex items-start space-x-3">
           <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
           <div>
-            <h4 className="font-medium text-yellow-800 dark:text-yellow-300 mb-1">
+            <h4 className="font-medium text-yellow-200 dark:text-yellow-300 mb-1">
               Important
             </h4>
-            <ul className="text-sm text-yellow-700 dark:text-yellow-400 space-y-1">
+            <ul className="text-sm text-yellow-300 dark:text-yellow-400 space-y-1">
               <li>• You will only earn fees when the price is within your specified range</li>
               <li>• This transaction will require multiple signatures for token approvals</li>
               <li>• Gas fees will be paid separately for the position creation</li>
@@ -795,7 +795,7 @@ function ConfirmPositionStep({
       <div className="flex space-x-4">
         <button
           onClick={onBack}
-          className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg font-medium border-2 border-black dark:border-white hover:shadow-brutal transition-colors"
+          className="flex-1 bg-gray-800 dark:bg-gray-800 text-white dark:text-white py-3 rounded-lg font-medium border-2 border-white dark:border-white hover:shadow-brutal transition-colors"
         >
           Back
         </button>
@@ -851,20 +851,20 @@ function DeployPositionStep({
         </div>
         
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-bold text-white dark:text-white mb-2">
             Position Created Successfully!
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">
+          <p className="text-gray-300 dark:text-gray-300">
             Your Uniswap V4 liquidity position has been deployed
           </p>
         </div>
 
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
+        <div className="bg-gray-800 dark:bg-gray-900 rounded-lg p-6 border-2 border-white dark:border-white">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Transaction Hash</span>
+              <span className="text-gray-300 dark:text-gray-300">Transaction Hash</span>
               <div className="flex items-center space-x-2">
-                <span className="font-mono text-sm text-slate-900 dark:text-white">
+                <span className="font-mono text-sm text-white dark:text-white">
                   {txHash.slice(0, 10)}...{txHash.slice(-8)}
                 </span>
                 <button className="text-primary hover:text-primary/80">
@@ -873,8 +873,8 @@ function DeployPositionStep({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Pool</span>
-              <span className="font-medium text-slate-900 dark:text-white">
+              <span className="text-gray-300 dark:text-gray-300">Pool</span>
+              <span className="font-medium text-white dark:text-white">
                 {config.pool.token0.symbol}/{config.pool.token1.symbol}
               </span>
             </div>
@@ -884,13 +884,13 @@ function DeployPositionStep({
         <div className="flex space-x-4">
           <button
             onClick={() => window.open(`https://basescan.org/tx/${txHash}`, '_blank')}
-            className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg font-medium border-2 border-black dark:border-white hover:shadow-brutal transition-colors"
+            className="flex-1 bg-gray-800 dark:bg-gray-800 text-white dark:text-white py-3 rounded-lg font-medium border-2 border-white dark:border-white hover:shadow-brutal transition-colors"
           >
             View Transaction
           </button>
           <button
             onClick={onComplete}
-            className="flex-1 bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            className="flex-1 bg-primary text-black py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors border-2 border-black"
           >
             Go to Dashboard
           </button>

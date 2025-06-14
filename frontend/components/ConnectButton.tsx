@@ -32,7 +32,7 @@ export function ConnectButton() {
         </button>
         
         {showConnectors && (
-          <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal z-50">
+          <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal z-[90]">
             <div className="p-3">
               <div className="px-3 py-2 border-b-2 border-black dark:border-white mb-3">
                 <span className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">
@@ -81,7 +81,7 @@ export function ConnectButton() {
       </button>
       
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal z-50">
+        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal z-[90]">
           <div className="p-3">
             <div className="px-3 py-2 border-b-2 border-black dark:border-white mb-3">
               <span className="text-sm font-bold text-black dark:text-white uppercase tracking-wider">

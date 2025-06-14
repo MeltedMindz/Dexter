@@ -32,7 +32,7 @@ export default function RootLayout({
         <Providers>
           <div className="flex flex-col h-full">
             {/* Fixed Header */}
-            <div className="fixed top-0 left-0 right-0 z-50">
+            <div className="fixed top-0 left-0 right-0 z-[100]">
               <Navbar />
             </div>
             
