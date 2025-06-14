@@ -198,7 +198,7 @@ export function V4PositionCreator() {
           Create V4 Position
         </h1>
         <p className="text-gray-300 text-lg">
-          Deploy advanced liquidity positions with Uniswap V4's revolutionary features
+          Deploy advanced liquidity positions with Uniswap V4&apos;s revolutionary features
         </p>
       </div>
 
