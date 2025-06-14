@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ExternalLink, Globe, Zap, Clock, Gas, TrendingUp } from 'lucide-react'
+import { ExternalLink, Globe, Zap, Clock, Fuel, TrendingUp } from 'lucide-react'
 
 interface BlockchainData {
   blockNumber: string
@@ -96,7 +96,7 @@ export function Footer() {
             </div>
             
             <div className="flex items-center space-x-1">
-              <Gas className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+              <Fuel className="w-3 h-3 text-slate-500 dark:text-slate-400" />
               <span className="text-slate-500 dark:text-slate-400">Gas:</span>
               <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
                 {blockchainData.gasPrice} gwei
