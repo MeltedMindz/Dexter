@@ -8,6 +8,7 @@ import { PositionsList } from './PositionsList'
 import { ConnectPrompt } from './ConnectPrompt'
 import { Analytics } from './Analytics'
 import { HistoricalChart, generateHistoricalData } from './HistoricalChart'
+import { TrendingTokensTable } from './TrendingTokensTable'
 import { BarChart3, ArrowRight } from 'lucide-react'
 
 export function Dashboard() {
@@ -74,6 +75,9 @@ export function Dashboard() {
             className="border-0 p-0 bg-transparent"
           />
         </div>
+        
+        {/* Trending Tokens Table */}
+        <TrendingTokensTable />
         
         {/* Positions List */}
         <PositionsList />

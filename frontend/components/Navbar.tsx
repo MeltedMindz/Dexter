@@ -6,11 +6,13 @@ import { ConnectButton } from './ConnectButton'
 import { ThemeToggle } from './ThemeToggle'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Menu, X } from 'lucide-react'
 
 export function Navbar() {
   const { isConnected } = useAccount()
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState('home')
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // Update active tab based on current pathname
@@ -39,28 +41,34 @@ export function Navbar() {
             </Link>
             
             {/* Navigation Links */}
-            {isConnected && (
-              <div className="hidden md:flex space-x-2">
-                {[
-                  { id: 'home', label: 'HOME', href: '/' },
-                  { id: 'create', label: 'CREATE V4', href: '/create' },
-                  { id: 'positions', label: 'POSITIONS', href: '/positions' },
-                  { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
-                ].map((tab) => (
-                  <Link
-                    key={tab.id}
-                    href={tab.href}
-                    className={`px-4 py-2 text-xs border-2 transition-all duration-100 text-brutal ${
-                      activeTab === tab.id
-                        ? 'text-black bg-primary border-black dark:border-white shadow-brutal'
-                        : 'text-black dark:text-white border-black dark:border-white hover:bg-primary hover:text-black'
-                    }`}
-                  >
-                    {tab.label}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <div className="hidden md:flex space-x-2">
+              {[
+                { id: 'home', label: 'HOME', href: '/' },
+                { id: 'create', label: 'CREATE V4', href: '/create' },
+                { id: 'positions', label: 'POSITIONS', href: '/positions' },
+                { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
+              ].map((tab) => (
+                <Link
+                  key={tab.id}
+                  href={tab.href}
+                  className={`px-4 py-2 text-xs border-2 transition-all duration-100 text-brutal ${
+                    activeTab === tab.id
+                      ? 'text-black bg-primary border-black dark:border-white shadow-brutal'
+                      : 'text-black dark:text-white border-black dark:border-white hover:bg-primary hover:text-black'
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-black dark:text-white border-2 border-black dark:border-white hover:bg-primary hover:text-black transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
 
           {/* Right Side Actions */}
@@ -69,6 +77,33 @@ export function Navbar() {
             <ConnectButton />
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t-2 border-black dark:border-white bg-white dark:bg-black">
+            <div className="px-6 py-4 space-y-2">
+              {[
+                { id: 'home', label: 'HOME', href: '/' },
+                { id: 'create', label: 'CREATE V4', href: '/create' },
+                { id: 'positions', label: 'POSITIONS', href: '/positions' },
+                { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
+              ].map((tab) => (
+                <Link
+                  key={tab.id}
+                  href={tab.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-3 text-sm border-2 transition-all duration-100 text-brutal ${
+                    activeTab === tab.id
+                      ? 'text-black bg-primary border-black dark:border-white shadow-brutal'
+                      : 'text-black dark:text-white border-black dark:border-white hover:bg-primary hover:text-black'
+                  }`}
+                >
+                  {tab.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   )
