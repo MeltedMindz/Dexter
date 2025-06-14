@@ -1,7 +1,7 @@
-import { CreatePosition } from '@/components/CreatePosition'
+import { V4PositionCreator } from '@/components/V4PositionCreator'
 
 export default function CreatePositionPage() {
   return (
-    <CreatePosition />
+    <V4PositionCreator />
   )
 }
