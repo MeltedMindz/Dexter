@@ -16,7 +16,7 @@ export interface SEOConfig {
 
 const defaultSEO: SEOConfig = {
   title: 'Dexter Protocol - AI-Powered Liquidity Management for DeFi',
-  description: 'Maximize your DeFi yields with Dexter Protocol\'s AI-powered liquidity management. Auto-compound Uniswap V3 positions, optimize fee earnings, and manage risk across Base Network with institutional-grade algorithms.',
+  description: 'AI-POWERED LIQUIDITY MANAGEMENT - Maximize your DeFi yields with automated Uniswap V3 position management on Base Network.',
   keywords: [
     'DeFi',
     'Uniswap V3',
@@ -35,7 +35,7 @@ const defaultSEO: SEOConfig = {
     'Ethereum',
     'Trading Bot'
   ],
-  image: '/images/og-image.png',
+  image: 'https://via.placeholder.com/1200x630/000000/00FF88?text=DEXTER+PROTOCOL+%7C+AI-POWERED+LIQUIDITY+MANAGEMENT',
   url: 'https://www.dexteragent.com',
   type: 'website'
 }
