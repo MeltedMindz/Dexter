@@ -52,9 +52,9 @@ export function PositionCard({ position }: PositionCardProps) {
   const apr = position.apr || Math.random() * 50
 
   return (
-    <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md dark:hover:shadow-xl transition-all duration-200 overflow-hidden group">
+    <div className="bg-white dark:bg-black rounded-xl border-brutal shadow-brutal hover:shadow-brutal-lg transition-all duration-200 overflow-hidden group">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
+      <div className="px-6 py-4 border-b-2 border-black dark:border-white flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-primary-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
             <span className="text-white font-bold text-sm">🔷</span>
@@ -77,12 +77,12 @@ export function PositionCard({ position }: PositionCardProps) {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <div className="text-sm text-slate-600 dark:text-slate-400">Position Value</div>
-            <div className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">
               {formatCurrency(position.value)}
             </div>
             <div className="flex items-center space-x-2">
-              <TrendingUp className="w-4 h-4 text-success" />
-              <span className="text-sm font-medium text-success mono-numbers">
+              <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-medium text-green-600 dark:text-green-400 font-mono">
                 +{formatCurrency(position.change24h.amount)} ({formatPercentage(position.change24h.percentage)})
               </span>
             </div>
@@ -99,15 +99,15 @@ export function PositionCard({ position }: PositionCardProps) {
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 bg-slate-50 dark:bg-dark-600 rounded-lg">
+          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
             <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Volume 24h</div>
-            <div className="text-lg font-bold text-slate-900 dark:text-white mono-numbers">
+            <div className="text-lg font-bold text-slate-900 dark:text-white font-mono">
               {volume24h >= 1000000 ? `$${(volume24h / 1000000).toFixed(1)}M` : `$${(volume24h / 1000).toFixed(0)}K`}
             </div>
           </div>
-          <div className="p-3 bg-slate-50 dark:bg-dark-600 rounded-lg">
+          <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
             <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">APR</div>
-            <div className="text-lg font-bold text-success mono-numbers">
+            <div className="text-lg font-bold text-green-600 dark:text-green-400 font-mono">
               {apr.toFixed(1)}%
             </div>
           </div>
@@ -117,7 +117,7 @@ export function PositionCard({ position }: PositionCardProps) {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-600 dark:text-slate-400">Range:</span>
-            <span className="text-sm text-slate-700 dark:text-slate-300 mono-numbers">
+            <span className="text-sm text-slate-700 dark:text-slate-300 font-mono">
               {formatRange(position.range.min, position.range.max, position.range.current)}
             </span>
           </div>
@@ -130,45 +130,45 @@ export function PositionCard({ position }: PositionCardProps) {
         </div>
 
         {/* Fees Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-dark-600 dark:to-dark-500 rounded-lg">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
           <div className="text-center">
             <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Fees Earned</div>
-            <div className="text-sm font-semibold text-slate-900 dark:text-white mono-numbers">
+            <div className="text-sm font-semibold text-slate-900 dark:text-white font-mono">
               {formatCurrency(position.fees.earned)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Compounded</div>
-            <div className="text-sm font-semibold text-success mono-numbers">
+            <div className="text-sm font-semibold text-green-600 dark:text-green-400 font-mono">
               {formatCurrency(position.fees.compounded)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protocol Fee</div>
-            <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mono-numbers">
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 font-mono">
               {formatCurrency(position.fees.protocolFee)} (8%)
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Total Profit</div>
-            <div className="text-sm font-semibold text-success mono-numbers">
+            <div className="text-sm font-semibold text-green-600 dark:text-green-400 font-mono">
               {formatCurrency(position.fees.totalProfit)}
             </div>
           </div>
         </div>
 
         {/* Status */}
-        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-dark-600 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
           <div className="flex items-center space-x-2">
             {position.isActive ? (
               <>
-                <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-success">Auto-Compound Active</span>
+                <div className="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-green-600 dark:text-green-400">Auto-Compound Active</span>
               </>
             ) : (
               <>
-                <div className="w-2 h-2 bg-warning rounded-full"></div>
-                <span className="text-sm font-medium text-warning">Paused</span>
+                <div className="w-2 h-2 bg-yellow-600 dark:bg-yellow-400 rounded-full"></div>
+                <span className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Paused</span>
               </>
             )}
           </div>
@@ -180,19 +180,19 @@ export function PositionCard({ position }: PositionCardProps) {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-2 pt-2">
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-900 dark:text-white bg-white dark:bg-black hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg border-brutal shadow-brutal-sm hover:shadow-brutal transition-all duration-200">
             {position.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             <span>{position.isActive ? 'Pause' : 'Resume'}</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-900 dark:text-white bg-white dark:bg-black hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg border-brutal shadow-brutal-sm hover:shadow-brutal transition-all duration-200">
             <Download className="w-4 h-4" />
             <span>Withdraw</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-900 dark:text-white bg-white dark:bg-black hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg border-brutal shadow-brutal-sm hover:shadow-brutal transition-all duration-200">
             <Settings className="w-4 h-4" />
             <span>Settings</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-900 dark:text-white bg-white dark:bg-black hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg border-brutal shadow-brutal-sm hover:shadow-brutal transition-all duration-200">
             <BarChart3 className="w-4 h-4" />
             <span>Analytics</span>
           </button>

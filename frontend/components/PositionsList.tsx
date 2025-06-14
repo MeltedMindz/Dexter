@@ -23,7 +23,8 @@ export function PositionsList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-white flex items-center space-x-2">
-          <span>📈 Your Positions</span>
+          <span className="text-2xl">📈</span>
+          <span>Your Positions</span>
           {positions.length > 0 && (
             <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
               ({positions.length})
@@ -39,7 +40,7 @@ export function PositionsList() {
           <button
             onClick={refreshData}
             disabled={isLoading}
-            className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-white bg-white dark:bg-black hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg border-brutal shadow-brutal-sm hover:shadow-brutal transition-all duration-200 disabled:opacity-50"
           >
             <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
             <span>{isLoading ? 'Updating...' : 'Refresh'}</span>
@@ -50,7 +51,7 @@ export function PositionsList() {
       {isLoading && positions.length === 0 ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 animate-pulse">
+            <div key={i} className="bg-white dark:bg-black rounded-xl border-brutal shadow-brutal p-6 animate-pulse">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-slate-300 dark:bg-dark-600 rounded-lg"></div>
                 <div className="flex-1">
