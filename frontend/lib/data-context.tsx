@@ -163,6 +163,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [positions, setPositions] = useState<Position[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
+  const [mounted, setMounted] = useState(false)
 
   const refreshData = useCallback(() => {
     setIsLoading(true)
@@ -204,17 +205,20 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   // Initial data load
   useEffect(() => {
+    setMounted(true)
     refreshData()
   }, [refreshData])
 
   // Subscribe to real-time updates
   useEffect(() => {
-    const unsubscribe = mockDataService.subscribe(() => {
-      refreshData()
-    })
+    if (mounted) {
+      const unsubscribe = mockDataService.subscribe(() => {
+        refreshData()
+      })
 
-    return unsubscribe
-  }, [refreshData])
+      return unsubscribe
+    }
+  }, [refreshData, mounted])
 
   return (
     <DataContext.Provider value={{
