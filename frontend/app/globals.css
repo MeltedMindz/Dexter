@@ -5,27 +5,79 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Light theme variables */
+  --background: 248 250 252;
+  --foreground: 15 23 42;
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  --primary: 99 102 241;
+  --primary-foreground: 255 255 255;
+  --secondary: 241 245 249;
+  --secondary-foreground: 15 23 42;
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+  --accent: 241 245 249;
+  --accent-foreground: 15 23 42;
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 99 102 241;
+  
+  /* Success colors */
+  --success: 16 185 129;
+  --success-foreground: 255 255 255;
+  
+  /* Warning colors */
+  --warning: 245 158 11;
+  --warning-foreground: 255 255 255;
+  
+  /* Error colors */
+  --error: 239 68 68;
+  --error-foreground: 255 255 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.dark {
+  /* Dark theme variables - matching Revert Finance */
+  --background: 10 10 10;
+  --foreground: 255 255 255;
+  --card: 20 20 20;
+  --card-foreground: 255 255 255;
+  --primary: 99 102 241;
+  --primary-foreground: 255 255 255;
+  --secondary: 31 31 31;
+  --secondary-foreground: 255 255 255;
+  --muted: 42 42 42;
+  --muted-foreground: 156 163 175;
+  --accent: 31 31 31;
+  --accent-foreground: 255 255 255;
+  --border: 42 42 42;
+  --input: 42 42 42;
+  --ring: 99 102 241;
+  
+  /* Success colors for dark mode */
+  --success: 16 185 129;
+  --success-foreground: 10 10 10;
+  
+  /* Warning colors for dark mode */
+  --warning: 245 158 11;
+  --warning-foreground: 10 10 10;
+  
+  /* Error colors for dark mode */
+  --error: 239 68 68;
+  --error-foreground: 255 255 255;
+}
+
+* {
+  border-color: rgb(var(--border));
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0A0A0A 0%, #141414 100%);
 }
 
 /* Custom scrollbar */
@@ -34,20 +86,100 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: rgb(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: rgb(var(--muted-foreground));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgb(var(--accent-foreground));
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #525252;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 /* Number formatting */
 .mono-numbers {
   font-family: 'JetBrains Mono', monospace;
   font-variant-numeric: tabular-nums;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Chart styles */
+.chart-line {
+  stroke: rgb(var(--success));
+  stroke-width: 2;
+  fill: none;
+}
+
+.dark .chart-line {
+  stroke: #10B981;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }

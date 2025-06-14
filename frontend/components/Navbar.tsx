@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from './ConnectButton'
+import { ThemeToggle } from './ThemeToggle'
 import Link from 'next/link'
 
 export function Navbar() {
@@ -10,34 +11,35 @@ export function Navbar() {
   const [activeTab, setActiveTab] = useState('portfolio')
 
   return (
-    <nav className="bg-white shadow-sm border-b border-slate-200">
+    <nav className="bg-white/80 dark:bg-dark-900/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <div className="relative w-8 h-8 bg-gradient-to-br from-primary to-primary-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
                 <span className="text-white font-bold text-lg">D</span>
+                <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <span className="text-xl font-bold text-slate-900">Dexter</span>
+              <span className="text-xl font-bold text-slate-900 dark:text-white transition-colors">Dexter</span>
             </Link>
             
             {/* Navigation Links */}
             {isConnected && (
-              <div className="hidden md:flex space-x-6">
+              <div className="hidden md:flex space-x-2">
                 {[
-                  { id: 'portfolio', label: 'Portfolio', href: '/' },
-                  { id: 'positions', label: 'Positions', href: '/' },
-                  { id: 'stake', label: 'Stake', href: '/stake' },
-                  { id: 'about', label: 'About', href: '/about' },
+                  { id: 'portfolio', label: 'DASHBOARD', href: '/' },
+                  { id: 'positions', label: 'POSITIONS', href: '/' },
+                  { id: 'stake', label: 'STAKE', href: '/stake' },
+                  { id: 'about', label: 'ABOUT', href: '/about' },
                 ].map((tab) => (
                   <Link
                     key={tab.id}
                     href={tab.href}
-                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`px-4 py-2 text-xs font-bold tracking-wider rounded-lg transition-all duration-200 ${
                       activeTab === tab.id
-                        ? 'text-primary bg-primary/10'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'text-white bg-primary shadow-lg shadow-primary/25'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`}
                     onClick={() => setActiveTab(tab.id)}
                   >
@@ -48,8 +50,11 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Connect Wallet Button */}
-          <ConnectButton />
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-3">
+            <ThemeToggle />
+            <ConnectButton />
+          </div>
         </div>
       </div>
     </nav>

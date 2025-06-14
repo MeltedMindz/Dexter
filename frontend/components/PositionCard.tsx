@@ -1,6 +1,7 @@
 'use client'
 
-import { Pause, Download, Settings, BarChart3, Play, Clock } from 'lucide-react'
+import { Pause, Download, Settings, BarChart3, Play, Clock, TrendingUp } from 'lucide-react'
+import { MiniChart, generateSampleData } from './MiniChart'
 
 interface Position {
   id: number
@@ -17,6 +18,9 @@ interface Position {
   }
   isActive: boolean
   nextCheck: string
+  volume24h?: number
+  apr?: number
+  chartData?: number[]
 }
 
 interface PositionCardProps {
@@ -42,77 +46,111 @@ export function PositionCard({ position }: PositionCardProps) {
     return `${formatCurrency(min, 0)} - ${formatCurrency(max, 0)} (Current: ${formatCurrency(current, 0)})`
   }
 
+  // Generate sample chart data if not provided
+  const chartData = position.chartData || generateSampleData(30, 'up')
+  const volume24h = position.volume24h || Math.random() * 1000000
+  const apr = position.apr || Math.random() * 50
+
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md dark:hover:shadow-xl transition-all duration-200 overflow-hidden group">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+          <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-primary-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
             <span className="text-white font-bold text-sm">🔷</span>
+            <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">{position.pair} Pool</h3>
-            <span className="text-sm text-slate-500">Last Compound: 2h ago</span>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{position.pair} Pool</h3>
+            <span className="text-sm text-slate-500 dark:text-slate-400">Last Compound: 2h ago</span>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-sm text-slate-500">Next Check</div>
-          <div className="text-sm font-medium text-slate-700">{position.nextCheck}</div>
+          <div className="text-sm text-slate-500 dark:text-slate-400">Next Check</div>
+          <div className="text-sm font-medium text-slate-700 dark:text-slate-300">{position.nextCheck}</div>
         </div>
       </div>
 
       {/* Content */}
       <div className="px-6 py-4 space-y-4">
-        {/* Position Value & Change */}
+        {/* Position Value & Chart */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="text-sm text-slate-600 dark:text-slate-400">Position Value</div>
+            <div className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+              {formatCurrency(position.value)}
+            </div>
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="w-4 h-4 text-success" />
+              <span className="text-sm font-medium text-success mono-numbers">
+                +{formatCurrency(position.change24h.amount)} ({formatPercentage(position.change24h.percentage)})
+              </span>
+            </div>
+          </div>
+          <div className="text-right">
+            <MiniChart 
+              data={chartData} 
+              width={120} 
+              height={60}
+              color={position.change24h.percentage >= 0 ? '#10B981' : '#EF4444'}
+            />
+          </div>
+        </div>
+
+        {/* Key Metrics Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-3 bg-slate-50 dark:bg-dark-600 rounded-lg">
+            <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Volume 24h</div>
+            <div className="text-lg font-bold text-slate-900 dark:text-white mono-numbers">
+              {volume24h >= 1000000 ? `$${(volume24h / 1000000).toFixed(1)}M` : `$${(volume24h / 1000).toFixed(0)}K`}
+            </div>
+          </div>
+          <div className="p-3 bg-slate-50 dark:bg-dark-600 rounded-lg">
+            <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">APR</div>
+            <div className="text-lg font-bold text-success mono-numbers">
+              {apr.toFixed(1)}%
+            </div>
+          </div>
+        </div>
+
+        {/* Position Details */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-600">Position Value:</span>
-            <span className="text-xl font-bold text-slate-900 mono-numbers">
-              {formatCurrency(position.value)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-600">24h Change:</span>
-            <span className="text-sm font-medium text-success mono-numbers">
-              +{formatCurrency(position.change24h.amount)} ({formatPercentage(position.change24h.percentage)})
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-600">Range:</span>
-            <span className="text-sm text-slate-700 mono-numbers">
+            <span className="text-sm text-slate-600 dark:text-slate-400">Range:</span>
+            <span className="text-sm text-slate-700 dark:text-slate-300 mono-numbers">
               {formatRange(position.range.min, position.range.max, position.range.current)}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-600">Fee Tier:</span>
-            <span className="text-sm font-medium text-slate-700">
+            <span className="text-sm text-slate-600 dark:text-slate-400">Fee Tier:</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               {position.feeTier}%
             </span>
           </div>
         </div>
 
         {/* Fees Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-lg">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-dark-600 dark:to-dark-500 rounded-lg">
           <div className="text-center">
-            <div className="text-xs text-slate-600 mb-1">Fees Earned</div>
-            <div className="text-sm font-semibold text-slate-900 mono-numbers">
+            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Fees Earned</div>
+            <div className="text-sm font-semibold text-slate-900 dark:text-white mono-numbers">
               {formatCurrency(position.fees.earned)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-slate-600 mb-1">Compounded</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Compounded</div>
             <div className="text-sm font-semibold text-success mono-numbers">
               {formatCurrency(position.fees.compounded)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-slate-600 mb-1">Protocol Fee</div>
-            <div className="text-sm font-semibold text-slate-700 mono-numbers">
+            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Protocol Fee</div>
+            <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mono-numbers">
               {formatCurrency(position.fees.protocolFee)} (8%)
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-slate-600 mb-1">Total Profit</div>
+            <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Total Profit</div>
             <div className="text-sm font-semibold text-success mono-numbers">
               {formatCurrency(position.fees.totalProfit)}
             </div>
@@ -120,11 +158,11 @@ export function PositionCard({ position }: PositionCardProps) {
         </div>
 
         {/* Status */}
-        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-dark-600 rounded-lg">
           <div className="flex items-center space-x-2">
             {position.isActive ? (
               <>
-                <div className="w-2 h-2 bg-success rounded-full"></div>
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-success">Auto-Compound Active</span>
               </>
             ) : (
@@ -134,7 +172,7 @@ export function PositionCard({ position }: PositionCardProps) {
               </>
             )}
           </div>
-          <div className="flex items-center space-x-1 text-xs text-slate-500">
+          <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400">
             <Clock className="w-3 h-3" />
             <span>Next Check: {position.nextCheck}</span>
           </div>
@@ -142,19 +180,19 @@ export function PositionCard({ position }: PositionCardProps) {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-2 pt-2">
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
             {position.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             <span>{position.isActive ? 'Pause' : 'Resume'}</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
             <Download className="w-4 h-4" />
             <span>Withdraw</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
             <Settings className="w-4 h-4" />
             <span>Settings</span>
           </button>
-          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+          <button className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-dark-600 hover:bg-slate-200 dark:hover:bg-dark-500 rounded-lg transition-colors">
             <BarChart3 className="w-4 h-4" />
             <span>Analytics</span>
           </button>
