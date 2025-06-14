@@ -29,9 +29,9 @@ export function Navbar() {
               <div className="hidden md:flex space-x-2">
                 {[
                   { id: 'home', label: 'HOME', href: '/' },
+                  { id: 'create', label: 'CREATE', href: '/create' },
                   { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
                   { id: 'positions', label: 'POSITIONS', href: '/about' },
-                  { id: 'stake', label: 'STAKE', href: '/stake' },
                 ].map((tab) => (
                   <Link
                     key={tab.id}
