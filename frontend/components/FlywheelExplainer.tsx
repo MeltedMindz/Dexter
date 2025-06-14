@@ -7,297 +7,131 @@ export function FlywheelExplainer() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
       <div className="text-center space-y-6 mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-900">
-          The Dexter Protocol Flywheel
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
+          AI-Powered Liquidity Management
         </h1>
-        <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-          A self-reinforcing growth engine where liquidity providers earn more, 
-          $DEX stakers collect 100% of protocol fees, and the ecosystem grows stronger together.
+        <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
+          Auto-compound your Uniswap V3 positions with performance-based fees. 
+          Only pay when you profit with advanced AI optimization.
         </p>
+        <div className="flex flex-wrap justify-center gap-4 mt-8">
+          <button className="bg-primary hover:bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            Get Started
+          </button>
+          <button className="border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 px-8 py-3 rounded-lg font-semibold transition-colors">
+            Learn More
+          </button>
+        </div>
       </div>
 
-      {/* Visual Flywheel */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mb-16">
-        <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">
-          🔄 How the Flywheel Works
+      {/* How It Works */}
+      <div className="bg-white dark:bg-dark-700 rounded-3xl border border-slate-200 dark:border-white/10 shadow-lg dark:shadow-xl p-8 mb-16">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-12">
+          How Dexter Works
         </h2>
         
-        <div className="grid md:grid-cols-4 gap-8 relative">
-          {/* Step 1: Liquidity Providers */}
-          <div className="text-center space-y-4 relative">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <Users className="w-8 h-8 text-primary" />
+        <div className="grid md:grid-cols-3 gap-8 relative">
+          {/* Step 1: Auto-Compound */}
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+              <Zap className="w-8 h-8 text-primary" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-slate-900">Liquidity Providers</h3>
-              <p className="text-sm text-slate-600">
-                Deposit ANY Uniswap V3 positions for auto-compounding
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Auto-Compound</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                AI optimizes compounding timing for maximum returns
               </p>
-            </div>
-            {/* Arrow */}
-            <div className="hidden md:block absolute -right-4 top-8">
-              <ArrowRight className="w-6 h-6 text-slate-400" />
             </div>
           </div>
 
-          {/* Step 2: Auto-Compound */}
-          <div className="text-center space-y-4 relative">
-            <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto">
-              <Zap className="w-8 h-8 text-success" />
+          {/* Step 2: Performance Fees */}
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-success/10 dark:bg-success/20 rounded-full flex items-center justify-center mx-auto">
+              <TrendingUp className="w-8 h-8 text-success" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-slate-900">Auto-Compound</h3>
-              <p className="text-sm text-slate-600">
-                AI optimizes timing, 92% reinvested, 8% performance fee
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Performance Based</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Only pay 8% fee on profits - no fees on losses
               </p>
-            </div>
-            {/* Arrow */}
-            <div className="hidden md:block absolute -right-4 top-8">
-              <ArrowRight className="w-6 h-6 text-slate-400" />
             </div>
           </div>
 
-          {/* Step 3: Fees to Stakers */}
-          <div className="text-center space-y-4 relative">
-            <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto">
+          {/* Step 3: Staker Rewards */}
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-warning/10 dark:bg-warning/20 rounded-full flex items-center justify-center mx-auto">
               <Coins className="w-8 h-8 text-warning" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-slate-900">100% to Stakers</h3>
-              <p className="text-sm text-slate-600">
-                All fees converted to WETH, distributed to $DEX stakers
-              </p>
-            </div>
-            {/* Arrow */}
-            <div className="hidden md:block absolute -right-4 top-8">
-              <ArrowRight className="w-6 h-6 text-slate-400" />
-            </div>
-          </div>
-
-          {/* Step 4: Growth */}
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <TrendingUp className="w-8 h-8 text-primary" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-slate-900">Ecosystem Growth</h3>
-              <p className="text-sm text-slate-600">
-                Higher $DEX value attracts more LPs, creating more fees
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Return arrow */}
-        <div className="flex justify-center mt-12">
-          <div className="flex items-center space-x-2 px-6 py-3 bg-slate-100 rounded-full">
-            <TrendingUp className="w-5 h-5 text-slate-600" />
-            <span className="text-sm font-medium text-slate-700">Growth Loop Continues</span>
-            <TrendingUp className="w-5 h-5 text-slate-600" />
-          </div>
-        </div>
-      </div>
-
-      {/* Tokenomics Breakdown */}
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        {/* $DEX Token Utility */}
-        <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center space-x-2">
-            <span>💎</span>
-            <span>$DEX Token Utility</span>
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-success/10 rounded-full flex items-center justify-center mt-1">
-                <Coins className="w-3 h-3 text-success" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">Revenue Sharing</h4>
-                <p className="text-sm text-slate-600">
-                  Stake $DEX to earn 100% of protocol fees in WETH
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center mt-1">
-                <Shield className="w-3 h-3 text-primary" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">Governance Rights</h4>
-                <p className="text-sm text-slate-600">
-                  Vote on protocol parameters and upgrades
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-warning/10 rounded-full flex items-center justify-center mt-1">
-                <Target className="w-3 h-3 text-warning" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900">Aligned Incentives</h4>
-                <p className="text-sm text-slate-600">
-                  Token value grows with protocol success
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Revenue Distribution */}
-        <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center space-x-2">
-            <span>💰</span>
-            <span>Revenue Distribution</span>
-          </h3>
-          
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-slate-700">Performance Fee</span>
-                <span className="text-sm font-bold text-slate-900">8%</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-primary h-2 rounded-full" style={{ width: '8%' }}></div>
-              </div>
-              <p className="text-xs text-slate-600 mt-1">Only charged on profits</p>
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-slate-700">LP Reinvestment</span>
-                <span className="text-sm font-bold text-slate-900">92%</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2">
-                <div className="bg-success h-2 rounded-full" style={{ width: '92%' }}></div>
-              </div>
-              <p className="text-xs text-slate-600 mt-1">Auto-compounded back to position</p>
-            </div>
-            
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-              <h4 className="font-semibold text-primary mb-2">Key Insight</h4>
-              <p className="text-sm text-slate-700">
-                <strong>100% of fees</strong> go to $DEX stakers as WETH rewards. 
-                No team allocation, no treasury cuts.
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Staker Rewards</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                100% of protocol fees go to $DEX token stakers
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Staking Mechanism */}
-      <div className="bg-gradient-to-r from-primary/5 to-success/5 rounded-2xl border border-primary/20 p-8 mb-16">
-        <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
-          📊 Staking Mechanism
-        </h3>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <Coins className="w-8 h-8 text-primary" />
-            </div>
-            <h4 className="text-lg font-semibold text-slate-900">Stake $DEX</h4>
-            <p className="text-sm text-slate-600">
-              Lock your $DEX tokens to start earning. No minimum amount, no lock-up period.
-            </p>
+      {/* Features Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 shadow-sm dark:shadow-xl">
+          <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center mb-4">
+            <Zap className="w-6 h-6 text-primary" />
           </div>
-          
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <BarChart3 className="w-8 h-8 text-success" />
-            </div>
-            <h4 className="text-lg font-semibold text-slate-900">Earn Pro-Rata</h4>
-            <p className="text-sm text-slate-600">
-              Your share of WETH rewards equals your % of total staked $DEX.
-            </p>
-          </div>
-          
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <TrendingUp className="w-8 h-8 text-warning" />
-            </div>
-            <h4 className="text-lg font-semibold text-slate-900">Compound Returns</h4>
-            <p className="text-sm text-slate-600">
-              More protocol usage = more fees = higher staking yields = higher token value.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Growth Metrics */}
-      <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
-        <h3 className="text-xl font-bold text-slate-900 text-center mb-8">
-          🎯 Why This Model Works
-        </h3>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-slate-900">For Liquidity Providers:</h4>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-success/20 rounded-full flex items-center justify-center mt-0.5">
-                  <span className="text-xs text-success">✓</span>
-                </div>
-                <span className="text-sm text-slate-700">Higher returns through AI-optimized compounding</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-success/20 rounded-full flex items-center justify-center mt-0.5">
-                  <span className="text-xs text-success">✓</span>
-                </div>
-                <span className="text-sm text-slate-700">No management hassle - fully automated</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-success/20 rounded-full flex items-center justify-center mt-0.5">
-                  <span className="text-xs text-success">✓</span>
-                </div>
-                <span className="text-sm text-slate-700">Performance-based fees (only pay when profitable)</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-slate-900">For $DEX Stakers:</h4>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
-                  <span className="text-xs text-primary">✓</span>
-                </div>
-                <span className="text-sm text-slate-700">Earn WETH (blue-chip asset) not random tokens</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
-                  <span className="text-xs text-primary">✓</span>
-                </div>
-                <span className="text-sm text-slate-700">Revenue scales with protocol growth</span>
-              </li>
-              <li className="flex items-start space-x-3">
-                <div className="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
-                  <span className="text-xs text-primary">✓</span>
-                </div>
-                <span className="text-sm text-slate-700">Sustainable yield from real usage</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Call to Action */}
-      <div className="text-center mt-16">
-        <div className="bg-gradient-to-r from-primary to-success text-white rounded-2xl p-8">
-          <h3 className="text-2xl font-bold mb-4">Ready to Join the Flywheel?</h3>
-          <p className="text-lg opacity-90 mb-6">
-            Connect your wallet to start earning with Dexter Protocol
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">AI Optimization</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Advanced algorithms optimize compounding timing for maximum returns
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
-              Add Liquidity Position
-            </button>
-            <button className="bg-primary-600 bg-opacity-20 border border-white border-opacity-30 text-white px-8 py-3 rounded-lg font-semibold hover:bg-opacity-30 transition-colors">
-              Stake $DEX Tokens
-            </button>
+        </div>
+
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 shadow-sm dark:shadow-xl">
+          <div className="w-12 h-12 bg-success/10 dark:bg-success/20 rounded-lg flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-success" />
           </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Performance Based</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Only pay fees when you profit - no losses, no fees
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 shadow-sm dark:shadow-xl">
+          <div className="w-12 h-12 bg-warning/10 dark:bg-warning/20 rounded-lg flex items-center justify-center mb-4">
+            <BarChart3 className="w-6 h-6 text-warning" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Real-time Analytics</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Track performance with detailed charts and metrics
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 shadow-sm dark:shadow-xl">
+          <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Any V3 Position</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Works with any Uniswap V3 position across all supported pairs
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 shadow-sm dark:shadow-xl">
+          <div className="w-12 h-12 bg-success/10 dark:bg-success/20 rounded-lg flex items-center justify-center mb-4">
+            <Target className="w-6 h-6 text-success" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Gas Optimized</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Efficient batch operations minimize gas costs for all users
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 shadow-sm dark:shadow-xl">
+          <div className="w-12 h-12 bg-warning/10 dark:bg-warning/20 rounded-lg flex items-center justify-center mb-4">
+            <Users className="w-6 h-6 text-warning" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Community Driven</h3>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            100% of fees go to $DEX stakers - truly community owned
+          </p>
         </div>
       </div>
     </div>

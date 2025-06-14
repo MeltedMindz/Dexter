@@ -28,10 +28,10 @@ export function Navbar() {
             {isConnected && (
               <div className="hidden md:flex space-x-2">
                 {[
-                  { id: 'portfolio', label: 'DASHBOARD', href: '/' },
-                  { id: 'positions', label: 'POSITIONS', href: '/' },
+                  { id: 'home', label: 'HOME', href: '/' },
+                  { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
+                  { id: 'positions', label: 'POSITIONS', href: '/about' },
                   { id: 'stake', label: 'STAKE', href: '/stake' },
-                  { id: 'about', label: 'ABOUT', href: '/about' },
                 ].map((tab) => (
                   <Link
                     key={tab.id}
