@@ -1,35 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
+import { AssetTransfersCategory, TokenBalanceSuccess, AssetTransfersWithMetadataResult } from 'alchemy-sdk'
 import { getTokenBalances, getTokenMetadata, getAssetTransfers, getNftsForOwner } from '../alchemy'
 
-export interface TokenBalance {
+export interface EnhancedTokenBalance {
   contractAddress: string
   tokenBalance: string
   metadata?: {
-    name?: string
-    symbol?: string
-    decimals?: number
-    logo?: string
-  }
-}
-
-export interface AssetTransfer {
-  blockNum: string
-  hash: string
-  from: string
-  to: string
-  value: number
-  asset: string
-  category: string
-  rawContract: {
-    address: string
-    decimal: number
+    name?: string | null
+    symbol?: string | null
+    decimals?: number | null
+    logo?: string | null
   }
 }
 
 export const useAlchemyTokenBalances = (network: 'base' | 'mainnet' = 'base') => {
   const { address } = useAccount()
-  const [balances, setBalances] = useState<TokenBalance[]>([])
+  const [balances, setBalances] = useState<EnhancedTokenBalance[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -46,12 +33,13 @@ export const useAlchemyTokenBalances = (network: 'base' | 'mainnet' = 'base') =>
         // Enhance with metadata
         const enhancedBalances = await Promise.all(
           result.tokenBalances
-            .filter(token => token.tokenBalance !== '0x0')
+            .filter(token => token.tokenBalance && token.tokenBalance !== '0x0')
             .map(async (token) => {
               try {
                 const metadata = await getTokenMetadata(token.contractAddress, network)
                 return {
-                  ...token,
+                  contractAddress: token.contractAddress,
+                  tokenBalance: token.tokenBalance || '0',
                   metadata: {
                     name: metadata.name,
                     symbol: metadata.symbol,
@@ -60,7 +48,11 @@ export const useAlchemyTokenBalances = (network: 'base' | 'mainnet' = 'base') =>
                   }
                 }
               } catch {
-                return token
+                return {
+                  contractAddress: token.contractAddress,
+                  tokenBalance: token.tokenBalance || '0',
+                  metadata: undefined
+                }
               }
             })
         )
@@ -86,7 +78,7 @@ export const useAlchemyTokenBalances = (network: 'base' | 'mainnet' = 'base') =>
 
 export const useAlchemyTransactionHistory = (network: 'base' | 'mainnet' = 'base') => {
   const { address } = useAccount()
-  const [transactions, setTransactions] = useState<AssetTransfer[]>([])
+  const [transactions, setTransactions] = useState<AssetTransfersWithMetadataResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -99,7 +91,12 @@ export const useAlchemyTransactionHistory = (network: 'base' | 'mainnet' = 'base
       
       try {
         const result = await getAssetTransfers(address, network, {
-          category: ['external', 'token', 'erc20', 'erc721', 'erc1155']
+          category: [
+            AssetTransfersCategory.EXTERNAL, 
+            AssetTransfersCategory.ERC20, 
+            AssetTransfersCategory.ERC721, 
+            AssetTransfersCategory.ERC1155
+          ]
         })
         
         setTransactions(result.transfers)

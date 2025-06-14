@@ -238,14 +238,9 @@ export function EnhancedPortfolioOverview() {
               <div key={token.address} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   {token.logoURI && (
-                    <img 
-                      src={token.logoURI} 
-                      alt={token.symbol}
-                      className="w-8 h-8 rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
+                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
+                      {token.symbol.slice(0, 2)}
+                    </div>
                   )}
                   <div>
                     <div className="font-medium text-slate-900 dark:text-white">

@@ -13,14 +13,14 @@ export interface EnhancedTokenHolding {
   balance: string
   balanceFormatted: string
   decimals: number
-  logoURI?: string
+  logoURI?: string | null
   usdValue?: number
   priceChange24h?: number
   metadata?: {
-    name?: string
-    symbol?: string
-    logo?: string
-    decimals?: number
+    name?: string | null
+    symbol?: string | null
+    logo?: string | null
+    decimals?: number | null
   }
 }
 

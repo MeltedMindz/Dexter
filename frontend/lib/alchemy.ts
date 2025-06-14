@@ -1,4 +1,4 @@
-import { Alchemy, Network, AlchemySettings } from 'alchemy-sdk'
+import { Alchemy, Network, AlchemySettings, AssetTransfersCategory } from 'alchemy-sdk'
 
 const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || 'ory0F2cLFNIXsovAmrtJj'
 
@@ -42,13 +42,16 @@ export const getAssetTransfers = async (
   options?: {
     fromBlock?: string
     toBlock?: string
-    category?: string[]
+    category?: AssetTransfersCategory[]
   }
 ) => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
   return await alchemy.core.getAssetTransfers({
     fromAddress: address,
-    ...options
+    category: options?.category || [AssetTransfersCategory.EXTERNAL, AssetTransfersCategory.ERC20],
+    fromBlock: options?.fromBlock,
+    toBlock: options?.toBlock,
+    withMetadata: true
   })
 }
 
@@ -82,4 +85,5 @@ export const createWebSocketConnection = (network: 'base' | 'mainnet' = 'base') 
   return alchemy.ws
 }
 
-export default { alchemyBase, alchemyMainnet }
+const alchemyExports = { alchemyBase, alchemyMainnet }
+export default alchemyExports
