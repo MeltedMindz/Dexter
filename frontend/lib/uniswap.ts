@@ -34,7 +34,7 @@ const SUBGRAPH_URLS = {
 }
 
 // Popular tokens for each network
-export const POPULAR_TOKENS = {
+export const POPULAR_TOKENS: Record<keyof typeof SUBGRAPH_URLS, Token[]> = {
   ethereum: [
     { address: '0x0000000000000000000000000000000000000000', symbol: 'ETH', decimals: 18, name: 'Ethereum' },
     { address: '0xA0b86a33E6441986F82F5D8E58E3F7E8C2C2C6C7', symbol: 'USDC', decimals: 6, name: 'USD Coin' },
