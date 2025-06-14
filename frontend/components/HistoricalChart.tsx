@@ -28,7 +28,7 @@ const timeframes = [
 ]
 
 const metrics = [
-  { id: 'value', label: 'Position Value', icon: BarChart3, color: '#6366F1' },
+  { id: 'value', label: 'Position Value', icon: BarChart3, color: '#3B82F6' },
   { id: 'volume', label: 'Volume', icon: Activity, color: '#10B981' },
   { id: 'fees', label: 'Fees Earned', icon: TrendingUp, color: '#F59E0B' },
   { id: 'apr', label: 'APR', icon: LineChart, color: '#EF4444' }

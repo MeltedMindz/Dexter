@@ -114,7 +114,7 @@ export function FeeTierSelector({ selectedTier = 0.05, onTierSelect }: FeeTierSe
                 data={tier.data} 
                 width={100} 
                 height={30}
-                color={selected === tier.percentage ? '#6366F1' : '#10B981'}
+                color={selected === tier.percentage ? '#3B82F6' : '#10B981'}
               />
             </div>
             

@@ -24,7 +24,7 @@ const metricsData: AnalyticsMetric[] = [
     change: 12.34,
     changeType: 'increase',
     icon: DollarSign,
-    color: '#6366F1',
+    color: '#3B82F6',
     chartData: generateSampleData(30, 'up')
   },
   {
