@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+// Fixed: Using Fuel instead of Gas icon (Gas doesn't exist in Lucide React)
 import { ExternalLink, Globe, Zap, Clock, Fuel, TrendingUp } from 'lucide-react'
 
 interface BlockchainData {
