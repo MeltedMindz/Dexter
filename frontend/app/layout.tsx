@@ -4,6 +4,8 @@ import './globals.css'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ['latin'],
@@ -44,6 +46,10 @@ export default function RootLayout({
             {/* Fixed Footer */}
             <Footer />
           </div>
+          
+          {/* Vercel Analytics & Speed Insights */}
+          <Analytics />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>
