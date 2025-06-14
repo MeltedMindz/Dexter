@@ -13,6 +13,12 @@ export const config = createConfig({
     }),
     walletConnect({ 
       projectId,
+      metadata: {
+        name: 'Dexter Protocol',
+        description: 'AI-Powered Liquidity Management',
+        url: 'https://dexteragent.com',
+        icons: ['https://dexteragent.com/favicon.ico']
+      }
     }),
   ],
   transports: {
