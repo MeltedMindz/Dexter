@@ -5,12 +5,13 @@ import { useAccount } from 'wagmi'
 import { ConnectButton } from './ConnectButton'
 import { ThemeToggle } from './ThemeToggle'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 
 export function Navbar() {
   const { isConnected } = useAccount()
   const pathname = usePathname()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('home')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [debugMode, setDebugMode] = useState(false)
@@ -27,6 +28,12 @@ export function Navbar() {
       setActiveTab('dashboard')
     }
   }, [pathname])
+
+  // Manual navigation handler as fallback
+  const handleNavigation = (href: string, tabId: string) => {
+    console.log(`🚀 MANUAL NAV: Navigating to ${href} (${tabId})`)
+    router.push(href)
+  }
 
   // Debug function to log navbar clicks
   const handleNavClick = (href: string, label: string) => {
@@ -70,7 +77,14 @@ export function Navbar() {
                 <Link
                   key={tab.id}
                   href={tab.href}
-                  onClick={() => handleNavClick(tab.href, tab.label)}
+                  onClick={(e) => {
+                    handleNavClick(tab.href, tab.label)
+                    // Force navigation on create page using router.push
+                    if (pathname === '/create') {
+                      e.preventDefault()
+                      handleNavigation(tab.href, tab.id)
+                    }
+                  }}
                   className={`px-4 py-2 text-xs border-2 transition-all duration-100 text-brutal relative ${
                     activeTab === tab.id
                       ? 'text-black bg-primary border-black dark:border-white shadow-brutal'
@@ -120,9 +134,14 @@ export function Navbar() {
                 <Link
                   key={tab.id}
                   href={tab.href}
-                  onClick={() => {
+                  onClick={(e) => {
                     handleNavClick(tab.href, tab.label)
                     setIsMobileMenuOpen(false)
+                    // Force navigation on create page using router.push
+                    if (pathname === '/create') {
+                      e.preventDefault()
+                      handleNavigation(tab.href, tab.id)
+                    }
                   }}
                   className={`block px-4 py-3 text-sm border-2 transition-all duration-100 text-brutal ${
                     activeTab === tab.id
