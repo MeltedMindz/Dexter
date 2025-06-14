@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 from dataclasses import dataclass
 from scipy import stats
 import pandas as pd
@@ -8,6 +8,7 @@ import logging
 from utils.error_handler import ErrorHandler, DataError
 from utils.memory_monitor import MemoryMonitor
 from utils.parallel_processor import ParallelDataProcessor
+from .volatility import MarketRegime
 
 error_handler = ErrorHandler()
 memory_monitor = MemoryMonitor()

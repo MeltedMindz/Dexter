@@ -109,10 +109,10 @@ export function V4PositionCreator() {
             <React.Fragment key={stepItem.key}>
               <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                 isActive 
-                  ? 'bg-primary text-white' 
+                  ? 'bg-primary text-black' 
                   : isCompleted 
                     ? 'bg-green-500 text-white' 
-                    : 'bg-slate-100 dark:bg-dark-600 text-slate-600 dark:text-slate-400'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
               }`}>
                 <Icon className="w-4 h-4" />
                 <span className="text-sm font-medium">{stepItem.label}</span>
@@ -211,7 +211,7 @@ function PoolSuggestionsStep({
   return (
     <div className="space-y-6">
       {/* Wallet Summary */}
-      <div className="bg-slate-50 dark:bg-dark-700 rounded-xl p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
           Your Wallet
         </h3>
@@ -250,7 +250,7 @@ function PoolSuggestionsStep({
             placeholder="Search pools by token..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-dark-600 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green"
           />
         </div>
         <div className="flex space-x-2">
@@ -264,8 +264,8 @@ function PoolSuggestionsStep({
                 onClick={() => setFilter(filterItem.key)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-primary text-white'
-                    : 'bg-slate-100 dark:bg-dark-600 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-dark-500'
+                    ? 'bg-primary text-black'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:shadow-brutal-sm'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -280,10 +280,10 @@ function PoolSuggestionsStep({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {isLoading ? (
           Array(6).fill(0).map((_, i) => (
-            <div key={i} className="bg-white dark:bg-dark-700 rounded-xl p-6 border border-slate-200 dark:border-white/10 animate-pulse">
-              <div className="h-6 bg-slate-200 dark:bg-dark-600 rounded mb-4"></div>
-              <div className="h-4 bg-slate-200 dark:bg-dark-600 rounded mb-2"></div>
-              <div className="h-4 bg-slate-200 dark:bg-dark-600 rounded w-2/3"></div>
+            <div key={i} className="bg-gray-100 dark:bg-gray-800 rounded-xl p-6 border-2 border-black dark:border-white animate-pulse">
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
             </div>
           ))
         ) : suggestions.length === 0 ? (
@@ -317,14 +317,14 @@ function PoolCard({ pool, onClick }: { pool: PoolSuggestion; onClick: () => void
       case 'LOW': return 'text-green-600 bg-green-50 dark:bg-green-900/20'
       case 'MEDIUM': return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20'
       case 'HIGH': return 'text-red-600 bg-red-50 dark:bg-red-900/20'
-      default: return 'text-slate-600 bg-slate-50 dark:bg-slate-900/20'
+      default: return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20'
     }
   }
 
   return (
     <div 
       onClick={onClick}
-      className="bg-white dark:bg-dark-700 rounded-xl p-6 border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all cursor-pointer group"
+      className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border-2 border-black dark:border-white hover:shadow-brutal transition-all cursor-pointer group"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -470,7 +470,7 @@ function ConfigurePositionStep({
       </div>
 
       {/* Selected Pool Info */}
-      <div className="bg-slate-50 dark:bg-dark-700 rounded-xl p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
           Selected Pool
         </h3>
@@ -513,7 +513,7 @@ function ConfigurePositionStep({
                 value={amount0}
                 onChange={(e) => setAmount0(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-3 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-dark-600 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent mono-numbers text-lg"
+                className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers text-lg"
               />
               <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary text-sm font-medium hover:text-primary/80">
                 MAX
@@ -537,7 +537,7 @@ function ConfigurePositionStep({
                 value={amount1}
                 onChange={(e) => setAmount1(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-3 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-dark-600 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent mono-numbers text-lg"
+                className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers text-lg"
               />
               <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary text-sm font-medium hover:text-primary/80">
                 MAX
@@ -574,7 +574,7 @@ function ConfigurePositionStep({
               value={priceRange.min}
               onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-3 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-dark-600 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent mono-numbers"
+              className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers"
             />
           </div>
 
@@ -588,12 +588,12 @@ function ConfigurePositionStep({
               value={priceRange.max}
               onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
               placeholder="0.00"
-              className="w-full px-4 py-3 border border-slate-200 dark:border-white/10 rounded-lg bg-white dark:bg-dark-600 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent mono-numbers"
+              className="w-full px-4 py-3 border-2 border-black dark:border-white rounded-lg bg-white dark:bg-gray-900 text-black dark:text-white focus:shadow-brutal-green mono-numbers"
             />
           </div>
 
           {/* Auto-compound */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-dark-600 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-black dark:border-white">
             <div>
               <h4 className="font-medium text-slate-900 dark:text-white">Auto-compound</h4>
               <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -624,8 +624,8 @@ function ConfigurePositionStep({
                   onClick={() => setSlippage(value)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     slippage === value
-                      ? 'bg-primary text-white'
-                      : 'bg-slate-100 dark:bg-dark-600 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-dark-500'
+                      ? 'bg-primary text-black'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:shadow-brutal-sm'
                   }`}
                 >
                   {value}%
@@ -640,7 +640,7 @@ function ConfigurePositionStep({
       <div className="flex space-x-4">
         <button
           onClick={onBack}
-          className="flex-1 bg-slate-100 dark:bg-dark-600 text-slate-900 dark:text-white py-3 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors"
+          className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg font-medium border-2 border-black dark:border-white hover:shadow-brutal transition-colors"
         >
           Back
         </button>
@@ -682,7 +682,7 @@ function ConfirmPositionStep({
       </div>
 
       {/* Position Summary */}
-      <div className="bg-white dark:bg-dark-700 border border-slate-200 dark:border-white/10 rounded-xl p-6">
+      <div className="bg-gray-50 dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg p-6">
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">
           Position Summary
         </h3>
@@ -795,7 +795,7 @@ function ConfirmPositionStep({
       <div className="flex space-x-4">
         <button
           onClick={onBack}
-          className="flex-1 bg-slate-100 dark:bg-dark-600 text-slate-900 dark:text-white py-3 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors"
+          className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg font-medium border-2 border-black dark:border-white hover:shadow-brutal transition-colors"
         >
           Back
         </button>
@@ -859,7 +859,7 @@ function DeployPositionStep({
           </p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-dark-700 rounded-xl p-6">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400">Transaction Hash</span>
@@ -884,7 +884,7 @@ function DeployPositionStep({
         <div className="flex space-x-4">
           <button
             onClick={() => window.open(`https://basescan.org/tx/${txHash}`, '_blank')}
-            className="flex-1 bg-slate-100 dark:bg-dark-600 text-slate-900 dark:text-white py-3 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors"
+            className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg font-medium border-2 border-black dark:border-white hover:shadow-brutal transition-colors"
           >
             View Transaction
           </button>
@@ -917,7 +917,7 @@ function DeployPositionStep({
         </p>
       </div>
 
-      <div className="bg-slate-50 dark:bg-dark-700 rounded-xl p-6">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-black dark:border-white">
         <div className="space-y-4">
           <div className={`flex items-center space-x-3 ${step === 'approving' ? 'text-primary' : 'text-green-600'}`}>
             {step === 'approving' ? (

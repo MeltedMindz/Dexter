@@ -1,14 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from './ConnectButton'
 import { ThemeToggle } from './ThemeToggle'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export function Navbar() {
   const { isConnected } = useAccount()
-  const [activeTab, setActiveTab] = useState('portfolio')
+  const pathname = usePathname()
+  const [activeTab, setActiveTab] = useState('home')
+
+  useEffect(() => {
+    // Update active tab based on current pathname
+    if (pathname === '/') {
+      setActiveTab('home')
+    } else if (pathname === '/create') {
+      setActiveTab('create')
+    } else if (pathname === '/positions') {
+      setActiveTab('positions')
+    } else if (pathname === '/dashboard') {
+      setActiveTab('dashboard')
+    }
+  }, [pathname])
 
   return (
     <nav className="bg-white dark:bg-black border-b-2 border-black dark:border-white transition-colors">
@@ -40,7 +55,6 @@ export function Navbar() {
                         ? 'text-black bg-primary border-black dark:border-white shadow-brutal'
                         : 'text-black dark:text-white border-black dark:border-white hover:bg-primary hover:text-black'
                     }`}
-                    onClick={() => setActiveTab(tab.id)}
                   >
                     {tab.label}
                   </Link>

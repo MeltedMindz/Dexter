@@ -2,7 +2,11 @@ import asyncio
 import json
 from typing import Dict, List, Optional, Tuple
 from web3 import Web3
-from web3.middleware import async_cache_middleware
+# Note: async_cache_middleware may not be available in newer web3 versions
+try:
+    from web3.middleware import async_cache_middleware
+except ImportError:
+    async_cache_middleware = None
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 import aiohttp
