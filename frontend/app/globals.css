@@ -158,6 +158,23 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Navbar fix for create page */
+nav {
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+nav a {
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Debug styles - only visible in development */
+.debug-navbar-clickable {
+  outline: 2px dashed red !important;
+  background: rgba(255, 0, 0, 0.1) !important;
+}
+
 /* Print styles */
 @media print {
   * {

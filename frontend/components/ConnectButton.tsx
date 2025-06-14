@@ -1,7 +1,7 @@
 'use client'
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, Wallet, LogOut, Copy, ExternalLink } from 'lucide-react'
 
 export function ConnectButton() {
@@ -10,6 +10,17 @@ export function ConnectButton() {
   const { disconnect } = useDisconnect()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showConnectors, setShowConnectors] = useState(false)
+
+  // Debug effect for create page
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.pathname === '/create') {
+      console.log('🔍 DEBUG: ConnectButton state on /create page:', { 
+        isConnected, 
+        showDropdown, 
+        showConnectors 
+      })
+    }
+  }, [isConnected, showDropdown, showConnectors])
 
   const formatAddress = (addr: string) => 
     `${addr.slice(0, 6)}...${addr.slice(-4)}`

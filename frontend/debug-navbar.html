@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Navbar Debug Test</title>
+    <style>
+        .navbar-test {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: red;
+            padding: 10px;
+        }
+        
+        .navbar-test a {
+            color: white;
+            padding: 10px;
+            margin: 5px;
+            background: blue;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .content-test {
+            margin-top: 100px;
+            background: green;
+            height: 2000px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .overlay-test {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+            z-index: 50;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar-test">
+        <a href="#" onclick="alert('Link 1 clicked')">Link 1</a>
+        <a href="#" onclick="alert('Link 2 clicked')">Link 2</a>
+        <a href="#" onclick="alert('Link 3 clicked')">Link 3</a>
+    </div>
+    
+    <div class="overlay-test"></div>
+    
+    <div class="content-test">
+        <h1>Content Area</h1>
+        <p>This tests if the navbar links are clickable with various z-index configurations.</p>
+        <button onclick="alert('Content button clicked')">Content Button</button>
+    </div>
+    
+    <script>
+        // Test z-index detection
+        setTimeout(() => {
+            const navbar = document.querySelector('.navbar-test');
+            const links = document.querySelectorAll('.navbar-test a');
+            
+            console.log('Navbar z-index:', window.getComputedStyle(navbar).zIndex);
+            
+            links.forEach((link, i) => {
+                const style = window.getComputedStyle(link);
+                console.log(`Link ${i} - z-index: ${style.zIndex}, pointer-events: ${style.pointerEvents}`);
+            });
+        }, 1000);
+    </script>
+</body>
+</html>
