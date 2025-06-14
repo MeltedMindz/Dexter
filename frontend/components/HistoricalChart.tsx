@@ -136,21 +136,21 @@ export function HistoricalChart({
   }
 
   return (
-    <div className={`bg-white dark:bg-dark-700 rounded-xl border border-slate-200 dark:border-white/10 p-6 ${className}`}>
+    <div className={`${className}`}>
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 space-y-4 lg:space-y-0">
         <div>
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{title}</h3>
           {stats && (
             <div className="flex items-center space-x-4">
-              <div className="text-2xl font-bold text-slate-900 dark:text-white mono-numbers">
+              <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">
                 {formatValue(stats.current)}
               </div>
               <div className={`flex items-center space-x-1 text-sm font-medium ${
-                isPositive ? 'text-success' : 'text-error'
+                isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
               }`}>
                 {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                <span className="mono-numbers">
+                <span className="font-mono">
                   {isPositive ? '+' : ''}{formatValue(stats.change)} ({stats.changePercent.toFixed(2)}%)
                 </span>
               </div>
@@ -160,7 +160,7 @@ export function HistoricalChart({
         
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Metric Selector */}
-          <div className="flex bg-slate-100 dark:bg-dark-600 rounded-lg p-1">
+          <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
             {metrics.map((m) => {
               const Icon = m.icon
               return (
@@ -169,7 +169,7 @@ export function HistoricalChart({
                   onClick={() => setSelectedMetric(m.id as 'value' | 'volume' | 'fees' | 'apr')}
                   className={`flex items-center space-x-1 px-3 py-2 text-xs font-medium rounded-md transition-all ${
                     selectedMetric === m.id
-                      ? 'bg-white dark:bg-dark-700 text-slate-900 dark:text-white shadow-sm'
+                      ? 'bg-white dark:bg-black text-slate-900 dark:text-white shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -181,7 +181,7 @@ export function HistoricalChart({
           </div>
           
           {/* Timeframe Selector */}
-          <div className="flex bg-slate-100 dark:bg-dark-600 rounded-lg p-1">
+          <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-1">
             {timeframes.map((tf) => (
               <button
                 key={tf.id}
@@ -191,7 +191,7 @@ export function HistoricalChart({
                 }}
                 className={`px-3 py-2 text-xs font-medium rounded-md transition-all ${
                   selectedTimeframe === tf.id
-                    ? 'bg-white dark:bg-dark-700 text-slate-900 dark:text-white shadow-sm'
+                    ? 'bg-white dark:bg-black text-slate-900 dark:text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -267,7 +267,7 @@ export function HistoricalChart({
         
         {/* Tooltip */}
         {hoveredPoint && (
-          <div className="absolute top-4 right-4 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-slate-200 dark:border-white/10 p-3 min-w-48">
+          <div className="absolute top-4 right-4 bg-white dark:bg-black rounded-lg border-brutal shadow-brutal p-3 min-w-48">
             <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
               {formatDate(hoveredPoint.timestamp)}
             </div>
@@ -283,22 +283,22 @@ export function HistoricalChart({
 
       {/* Stats Summary */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200 dark:border-white/10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t-2 border-black dark:border-white">
           <div className="text-center">
             <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">High</div>
-            <div className="text-sm font-semibold text-slate-900 dark:text-white mono-numbers">
+            <div className="text-sm font-semibold text-slate-900 dark:text-white font-mono">
               {formatValue(stats.max)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Low</div>
-            <div className="text-sm font-semibold text-slate-900 dark:text-white mono-numbers">
+            <div className="text-sm font-semibold text-slate-900 dark:text-white font-mono">
               {formatValue(stats.min)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Average</div>
-            <div className="text-sm font-semibold text-slate-900 dark:text-white mono-numbers">
+            <div className="text-sm font-semibold text-slate-900 dark:text-white font-mono">
               {formatValue(stats.avg)}
             </div>
           </div>
