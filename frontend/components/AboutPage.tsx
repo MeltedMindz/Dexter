@@ -8,7 +8,7 @@ export function AboutPage() {
     <div className="min-h-screen bg-white dark:bg-black font-mono">
       {/* Hero Section */}
       <section className="border-b-2 border-black dark:border-white bg-grid">
-        <div className="max-w-6xl mx-auto px-6 py-20">
+        <div className="max-w-6xl mx-auto px-6 py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-6xl font-bold text-black dark:text-white mb-6 text-brutal">

@@ -37,7 +37,7 @@ export default function RootLayout({
             </div>
             
             {/* Main Content with padding for fixed header/footer */}
-            <main className="flex-1 pt-16 pb-12 overflow-y-auto">
+            <main className="flex-1 pt-20 pb-16 overflow-y-auto">
               {children}
             </main>
             
