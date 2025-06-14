@@ -51,62 +51,62 @@ export function PortfolioOverview() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Value */}
-        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white shadow-brutal hover:shadow-brutal-hover transition-all duration-200">
+        <div className="bg-white dark:bg-black rounded-xl p-6 border-brutal shadow-brutal hover:shadow-brutal-lg transition-all duration-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-white">Total Value</span>
-            <DollarSign className="w-4 h-4 text-white" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">Total Value</span>
+            <DollarSign className="w-4 h-4 text-slate-900 dark:text-white" />
           </div>
-          <div className="text-2xl font-bold text-white mono-numbers">
+          <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">
             {formatCurrency(portfolioStats.totalValue)}
           </div>
           <div className={`flex items-center space-x-1 text-sm mt-2 ${
-            isPositive ? 'text-success' : 'text-error'
+            isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
           }`}>
             {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-            <span className="mono-numbers">
+            <span className="font-mono">
               {formatCurrency(portfolioStats.change24h.amount)} ({formatPercentage(portfolioStats.change24h.percentage)})
             </span>
           </div>
         </div>
 
         {/* Total Fees */}
-        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white shadow-brutal hover:shadow-brutal-hover transition-all duration-200">
+        <div className="bg-white dark:bg-black rounded-xl p-6 border-brutal shadow-brutal hover:shadow-brutal-lg transition-all duration-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-white">Fees Earned</span>
-            <TrendingUp className="w-4 h-4 text-success" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">Fees Earned</span>
+            <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
           </div>
-          <div className="text-2xl font-bold text-success mono-numbers">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400 font-mono">
             {formatCurrency(portfolioStats.totalFees)}
           </div>
-          <div className="text-xs text-gray-300 mt-2">
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-2">
             All-time earnings
           </div>
         </div>
 
         {/* Total Profit */}
-        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white shadow-brutal hover:shadow-brutal-hover transition-all duration-200">
+        <div className="bg-white dark:bg-black rounded-xl p-6 border-brutal shadow-brutal hover:shadow-brutal-lg transition-all duration-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-white">Total Profit</span>
-            <DollarSign className="w-4 h-4 text-white" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">Total Profit</span>
+            <DollarSign className="w-4 h-4 text-slate-900 dark:text-white" />
           </div>
-          <div className="text-2xl font-bold text-white mono-numbers">
+          <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">
             {formatCurrency(portfolioStats.totalProfit)}
           </div>
-          <div className="text-xs text-gray-300 mt-2">
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-2">
             Including compounding
           </div>
         </div>
 
         {/* Active Positions & APR */}
-        <div className="bg-gray-800 dark:bg-gray-900 rounded-xl p-6 border-2 border-white shadow-brutal hover:shadow-brutal-hover transition-all duration-200">
+        <div className="bg-white dark:bg-black rounded-xl p-6 border-brutal shadow-brutal hover:shadow-brutal-lg transition-all duration-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-white">Avg APR</span>
-            <Target className="w-4 h-4 text-white" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">Avg APR</span>
+            <Target className="w-4 h-4 text-slate-900 dark:text-white" />
           </div>
-          <div className="text-2xl font-bold text-success mono-numbers">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400 font-mono">
             {portfolioStats.avgApr.toFixed(1)}%
           </div>
-          <div className="text-xs text-gray-300 mt-2">
+          <div className="text-xs text-slate-600 dark:text-slate-400 mt-2">
             {portfolioStats.activePositions} active positions
           </div>
         </div>

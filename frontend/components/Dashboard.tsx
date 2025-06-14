@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { PortfolioOverview } from './PortfolioOverview'
+import { EnhancedPortfolioOverview } from './EnhancedPortfolioOverview'
 import { QuickActions } from './QuickActions'
 import { PositionsList } from './PositionsList'
 import { ConnectPrompt } from './ConnectPrompt'
@@ -14,6 +15,7 @@ import { BarChart3, ArrowRight } from 'lucide-react'
 export function Dashboard() {
   const { isConnected } = useAccount()
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [useEnhancedPortfolio, setUseEnhancedPortfolio] = useState(true)
 
   if (!isConnected) {
     return <ConnectPrompt />
@@ -42,7 +44,7 @@ export function Dashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="space-y-8">
         {/* Portfolio Overview */}
-        <PortfolioOverview />
+        {useEnhancedPortfolio ? <EnhancedPortfolioOverview /> : <PortfolioOverview />}
         
         {/* Quick Actions */}
         <QuickActions />

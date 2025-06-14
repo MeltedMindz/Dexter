@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { generateSEOMetadata, generateJsonLd } from '@/lib/seo'
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ['latin'],
@@ -18,10 +19,7 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: '--font-ibm-plex-mono'
 })
 
-export const metadata: Metadata = {
-  title: 'Dexter Protocol - AI-Powered Liquidity Management',
-  description: 'Auto-compound your Uniswap V3 positions with performance-based fees',
-}
+export const metadata: Metadata = generateSEOMetadata()
 
 export default function RootLayout({
   children,
@@ -30,6 +28,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateJsonLd('WebSite'))
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateJsonLd('Organization'))
+          }}
+        />
+      </head>
       <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans h-full bg-white dark:bg-black transition-colors`}>
         <Providers>
           <div className="flex flex-col h-full">
