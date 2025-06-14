@@ -45,92 +45,6 @@ export function V4PositionCreator() {
   const [searchQuery, setSearchQuery] = useState('')
   const [config, setConfig] = useState<PositionConfig | null>(null)
 
-  // Debug effect to check for z-index issues
-  useEffect(() => {
-    console.log('🔍 DEBUG: V4PositionCreator mounted on /create page')
-    
-    // Function to debug navbar clicking issues
-    const debugNavbar = () => {
-      const navbar = document.querySelector('nav')
-      const navbarLinks = document.querySelectorAll('nav a')
-      
-      if (navbar) {
-        const navbarStyle = window.getComputedStyle(navbar)
-        const navbarRect = navbar.getBoundingClientRect()
-        console.log('🔍 DEBUG: Navbar z-index:', navbarStyle.zIndex)
-        console.log('🔍 DEBUG: Navbar position:', navbarStyle.position)
-        console.log('🔍 DEBUG: Navbar pointer-events:', navbarStyle.pointerEvents)
-        console.log('🔍 DEBUG: Navbar bounding rect:', navbarRect)
-      }
-      
-      navbarLinks.forEach((link, index) => {
-        const linkStyle = window.getComputedStyle(link)
-        const linkRect = link.getBoundingClientRect()
-        console.log(`🔍 DEBUG: Navbar link ${index}:`, {
-          href: link.getAttribute('href'),
-          pointerEvents: linkStyle.pointerEvents,
-          zIndex: linkStyle.zIndex,
-          position: linkStyle.position,
-          rect: linkRect
-        })
-      })
-
-      // Check for any elements with high z-index that might be blocking
-      const allElements = document.querySelectorAll('*')
-      const highZIndexElements = Array.from(allElements).filter(el => {
-        const style = window.getComputedStyle(el)
-        const zIndex = parseInt(style.zIndex)
-        return zIndex > 100
-      })
-      
-      if (highZIndexElements.length > 0) {
-        console.log('🔍 DEBUG: Elements with z-index > 100:', highZIndexElements.map(el => ({
-          element: el.tagName,
-          className: el.className,
-          zIndex: window.getComputedStyle(el).zIndex,
-          rect: el.getBoundingClientRect()
-        })))
-      }
-
-      // Check for overlapping elements at navbar position
-      const navbarRect = navbar?.getBoundingClientRect()
-      if (navbarRect) {
-        const centerX = navbarRect.left + navbarRect.width / 2
-        const centerY = navbarRect.top + navbarRect.height / 2
-        const elementAtPoint = document.elementFromPoint(centerX, centerY)
-        
-        console.log('🔍 DEBUG: Element at navbar center point:', {
-          element: elementAtPoint?.tagName,
-          className: elementAtPoint?.className,
-          isNavbar: elementAtPoint === navbar,
-          isNavbarChild: navbar?.contains(elementAtPoint!)
-        })
-      }
-    }
-
-    // Run debug after a short delay to ensure DOM is fully rendered
-    const timer = setTimeout(debugNavbar, 1000)
-    
-    // Add click event listener to detect intercepted clicks
-    const handleDocumentClick = (event: MouseEvent) => {
-      const target = event.target as Element
-      if (target?.closest('nav')) {
-        console.log('🔍 DEBUG: Click detected in navbar area:', {
-          target: target.tagName,
-          className: target.className,
-          href: target.getAttribute('href'),
-          intercepted: event.defaultPrevented
-        })
-      }
-    }
-    
-    document.addEventListener('click', handleDocumentClick, true)
-    
-    return () => {
-      clearTimeout(timer)
-      document.removeEventListener('click', handleDocumentClick, true)
-    }
-  }, [])
 
   // Filter suggestions based on user selections
   const filteredSuggestions = suggestions.filter(pool => {
@@ -169,8 +83,7 @@ export function V4PositionCreator() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6" 
-         style={{ position: 'relative', zIndex: 1 }}>
+    <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white dark:text-white mb-2">
@@ -179,19 +92,6 @@ export function V4PositionCreator() {
         <p className="text-gray-300 dark:text-gray-300">
           Create and manage Uniswap V4 liquidity positions with AI-powered optimization
         </p>
-        
-        {/* Debug Button - Only visible in development */}
-        {process.env.NODE_ENV === 'development' && (
-          <button 
-            onClick={() => {
-              console.log('🔍 DEBUG: Test button clicked on create page')
-              alert('Test button clicked! JavaScript events are working on this page.')
-            }}
-            className="mt-4 px-4 py-2 bg-red-500 text-white border-2 border-black hover:bg-red-600"
-          >
-            🔍 Debug: Test Click Event
-          </button>
-        )}
       </div>
 
       {/* Progress Steps */}

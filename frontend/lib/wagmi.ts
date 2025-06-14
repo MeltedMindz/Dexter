@@ -17,8 +17,8 @@ export const config = createConfig({
       metadata: {
         name: 'Dexter Protocol',
         description: 'AI-Powered Liquidity Management',
-        url: 'https://dexteragent.com',
-        icons: ['https://dexteragent.com/favicon.ico']
+        url: 'https://www.dexteragent.com',
+        icons: ['https://www.dexteragent.com/favicon.ico']
       }
     }),
   ],
