@@ -79,7 +79,7 @@ export function Footer() {
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-dark-900/80 backdrop-blur-md border-t border-slate-200 dark:border-white/10 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-6 lg:px-12">
         <div className="flex items-center justify-between h-12 text-xs">
           {/* Left side - Blockchain data */}
           <div className="flex items-center space-x-6">
@@ -124,12 +124,12 @@ export function Footer() {
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
               <a
-                href="https://docs.base.org"
+                href="https://github.com/MeltedMindz/Dexter"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
               >
-                <span>Docs</span>
+                <span>GitHub</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
               
@@ -144,7 +144,7 @@ export function Footer() {
               </a>
               
               <a
-                href="https://twitter.com/dexter_protocol"
+                href="https://x.com/Dexter_AI_"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
@@ -154,12 +154,12 @@ export function Footer() {
               </a>
               
               <a
-                href="https://discord.gg/dexter"
+                href="https://t.me/+VELgzJret51mYzkx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
               >
-                <span>Discord</span>
+                <span>Telegram</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>

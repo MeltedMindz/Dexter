@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowRight, Users, Zap, TrendingUp, Coins, Shield, Target, BarChart3 } from 'lucide-react'
+import Link from 'next/link'
 
 export function FlywheelExplainer() {
   return (
@@ -15,12 +16,18 @@ export function FlywheelExplainer() {
           Only pay when you profit with advanced AI optimization.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-8">
-          <button className="bg-primary hover:bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+          <Link 
+            href="/create"
+            className="bg-primary hover:bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-block"
+          >
             Get Started
-          </button>
-          <button className="border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 px-8 py-3 rounded-lg font-semibold transition-colors">
+          </Link>
+          <Link 
+            href="/about"
+            className="border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 px-8 py-3 rounded-lg font-semibold transition-colors inline-block"
+          >
             Learn More
-          </button>
+          </Link>
         </div>
       </div>
 
