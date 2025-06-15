@@ -24,6 +24,35 @@ services:
         reservations:
           memory: 1G
 
+  dexbrain-api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.api
+    ports:
+      - "8080:8080"
+    env_file: .env
+    volumes:
+      - ../backend/knowledge_base:/app/knowledge_base
+      - ./logs:/app/logs
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    networks:
+      - dexter-network
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8080
+      - DATABASE_URL=${DATABASE_URL:-postgresql://dexter:dexter@db:5432/dexter}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-dexter}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
   db:
     image: postgres:13
     environment:
