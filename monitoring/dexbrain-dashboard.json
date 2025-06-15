@@ -1,0 +1,222 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "DexBrain Intelligence Network",
+    "tags": ["dexbrain", "public"],
+    "timezone": "browser",
+    "refresh": "5s",
+    "schemaVersion": 30,
+    "version": 1,
+    "time": {
+      "from": "now-30m",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "🧠 DexBrain Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"dexbrain-api\"}",
+            "legendFormat": "API Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "mappings": [
+              {"options": {"0": {"text": "OFFLINE"}}, "type": "value"},
+              {"options": {"1": {"text": "ONLINE"}}, "type": "value"}
+            ]
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "🤖 Active Agents",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "dexbrain_active_agents_total",
+            "legendFormat": "Active Agents"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "📡 API Requests/min",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[1m]) * 60",
+            "legendFormat": "Requests/min"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "💾 Data Submissions",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "dexbrain_data_submissions_total",
+            "legendFormat": "Total Submissions"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "🌐 Network Activity",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m]) * 60",
+            "legendFormat": "API Requests/min"
+          },
+          {
+            "expr": "rate(dexbrain_data_submissions_total[5m]) * 60",
+            "legendFormat": "Data Submissions/min"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 20
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+      },
+      {
+        "id": 6,
+        "title": "📊 Intelligence Quality",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "dexbrain_data_quality_score",
+            "legendFormat": "Avg Quality Score"
+          },
+          {
+            "expr": "dexbrain_agent_performance_score",
+            "legendFormat": "Avg Performance Score"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+      },
+      {
+        "id": 7,
+        "title": "🔗 Blockchain Coverage",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "dexbrain_agents_by_blockchain",
+            "legendFormat": "{{blockchain}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              }
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 12}
+      },
+      {
+        "id": 8,
+        "title": "💹 Performance Metrics",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "dexbrain_top_agents_by_performance",
+            "legendFormat": "{{agent_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 50},
+                {"color": "green", "value": 80}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 12}
+      },
+      {
+        "id": 9,
+        "title": "⚡ System Health",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+            "legendFormat": "Memory Usage %"
+          },
+          {
+            "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "CPU Usage %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 12}
+      }
+    ]
+  }
+}

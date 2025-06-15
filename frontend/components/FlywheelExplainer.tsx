@@ -2,6 +2,7 @@
 
 import { ArrowRight, Users, Zap, TrendingUp, Coins, Shield, Target, BarChart3 } from 'lucide-react'
 import Link from 'next/link'
+import { BrainWindow } from './BrainWindow'
 
 export function FlywheelExplainer() {
   return (
@@ -77,6 +78,9 @@ export function FlywheelExplainer() {
           </div>
         </div>
       </section>
+
+      {/* Brain Window */}
+      <BrainWindow />
 
       {/* Features Grid */}
       <section className="py-16">
