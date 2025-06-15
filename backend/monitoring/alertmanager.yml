@@ -25,7 +25,7 @@ receivers:
 
   - name: 'critical-alerts'
     email_configs:
-      - to: 'admin@dexteragent.com'
+      - to: 'meltedmindz1@gmail.com'
         subject: '🚨 CRITICAL: DexBrain Alert - {{ .GroupLabels.alertname }}'
         body: |
           **CRITICAL ALERT**
@@ -59,7 +59,7 @@ receivers:
 
   - name: 'warning-alerts'
     email_configs:
-      - to: 'alerts@dexteragent.com'
+      - to: 'meltedmindz1@gmail.com'
         subject: '⚠️ WARNING: DexBrain Alert - {{ .GroupLabels.alertname }}'
         body: |
           **WARNING ALERT**
