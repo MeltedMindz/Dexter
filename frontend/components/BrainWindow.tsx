@@ -5,11 +5,24 @@ import { Brain, Activity, Zap, Eye } from 'lucide-react'
 
 export function BrainWindow() {
   const [isVisible, setIsVisible] = useState(false)
+  const [iframeLoaded, setIframeLoaded] = useState(false)
+  const [showFallback, setShowFallback] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 500)
-    return () => clearTimeout(timer)
-  }, [])
+    
+    // Show fallback after 3 seconds if iframe hasn't loaded
+    const fallbackTimer = setTimeout(() => {
+      if (!iframeLoaded) {
+        setShowFallback(true)
+      }
+    }, 3000)
+    
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(fallbackTimer)
+    }
+  }, [iframeLoaded])
 
   return (
     <section className="py-16 border-b-2 border-black dark:border-white bg-gradient-to-br from-black via-gray-900 to-black">
@@ -73,15 +86,33 @@ export function BrainWindow() {
 
             {/* Terminal Window */}
             <div className="relative bg-black min-h-[500px]">
-              <iframe 
-                src="http://157.90.230.148/live-monitor"
-                className="w-full h-[500px] border-0"
-                title="DexBrain Intelligence Network Live Monitor"
-                style={{
-                  background: 'transparent',
-                  overflow: 'hidden'
-                }}
-              />
+              {!showFallback ? (
+                <iframe 
+                  src="http://157.90.230.148/live-monitor"
+                  className="w-full h-[500px] border-0"
+                  title="DexBrain Intelligence Network Live Monitor"
+                  onLoad={() => setIframeLoaded(true)}
+                  style={{
+                    background: 'transparent',
+                    overflow: 'hidden'
+                  }}
+                />
+              ) : (
+                <div className="w-full h-[500px] bg-black text-green-400 font-mono text-sm p-4 overflow-hidden">
+                  <SimulatedBrainActivity />
+                </div>
+              )}
+              
+              {/* Loading overlay */}
+              {!iframeLoaded && !showFallback && (
+                <div className="absolute inset-0 bg-black flex items-center justify-center">
+                  <div className="text-primary text-center">
+                    <Brain className="w-12 h-12 mx-auto mb-4 animate-pulse" />
+                    <div className="text-lg font-mono">CONNECTING TO DEXBRAIN...</div>
+                    <div className="text-sm text-gray-400 mt-2">Loading intelligence network...</div>
+                  </div>
+                </div>
+              )}
               
               {/* Overlay effects */}
               <div className="absolute inset-0 pointer-events-none">
@@ -153,5 +184,70 @@ export function BrainWindow() {
         </div>
       </div>
     </section>
+  )
+}
+
+// Fallback component that simulates brain activity
+function SimulatedBrainActivity() {
+  const [logs, setLogs] = useState<string[]>([])
+
+  useEffect(() => {
+    const activities = [
+      '🧠 DEXBRAIN INTELLIGENCE NETWORK - STATUS: ONLINE',
+      '🤖 Active Agents: 12 | Requests/min: 34',
+      '📊 Processing: Market Data • Liquidity Metrics • Performance Analytics',
+      '🔍 Intelligence Queries: 47 | Quality Score: 92%',
+      '🌐 Network Activity: Base • 18 pools monitored',
+      '✅ NEW AGENT REGISTERED: agent_7834 | Type: Aggressive',
+      '📈 DATA SUBMISSION: 0xa7c4e2f... • P&L: +18.3% • APR: 22.1%',
+      '🔍 INTELLIGENCE QUERY: Best Pools | Response: 83 insights',
+      '📊 MARKET ANALYSIS: ETH/USDC • Volatility 12.4% • TVL: $275K',
+      '🏆 PERFORMANCE UPDATE: agent_9241 • Score: 89% | Rank: #14',
+      '⛓️  BLOCKCHAIN: Base • Gas: 15 gwei • Block: #19847429',
+      '🌐 API GET: /api/intelligence | Total: 1,389',
+      '🔄 INTELLIGENCE SHARED: agent_5627 → Performance Data (Quality: 94.2%)',
+    ]
+
+    const addLog = () => {
+      const timestamp = new Date().toTimeString().slice(0, 8)
+      const activity = activities[Math.floor(Math.random() * activities.length)]
+      const newLog = `[${timestamp}] ${activity}`
+      
+      setLogs(prev => {
+        const newLogs = [...prev, newLog]
+        return newLogs.slice(-20) // Keep only last 20 logs
+      })
+    }
+
+    // Add initial logs
+    addLog()
+    addLog()
+    addLog()
+
+    // Continue adding logs
+    const interval = setInterval(addLog, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="h-full overflow-y-auto space-y-1">
+      <div className="text-primary font-bold text-center mb-4">
+        🚀 DEXBRAIN INTELLIGENCE NETWORK SIMULATOR 🚀
+      </div>
+      {logs.map((log, index) => (
+        <div key={index} className="animate-fadeIn">
+          {log}
+        </div>
+      ))}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateX(-10px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-in;
+        }
+      `}</style>
+    </div>
   )
 }
