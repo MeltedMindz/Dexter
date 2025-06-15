@@ -377,11 +377,11 @@ export function AboutPage() {
             <div className="font-mono text-sm space-y-2">
               <div><span className="text-gray-500"># 1. Register for API key</span></div>
               <div>curl -X POST https://api.dexteragent.com/register \</div>
-              <div className="ml-4">-d '{`{"agent_id": "my-agent", "metadata": {}}`}'</div>
+              <div className="ml-4">-d {`'{"agent_id": "my-agent", "metadata": {}}'`}</div>
               <div><span className="text-gray-500"># 2. Clone open source repo</span></div>
               <div>git clone https://github.com/MeltedMindz/Dexter.git</div>
               <div><span className="text-gray-500"># 3. Configure your agent</span></div>
-              <div>export DEXBRAIN_API_KEY="dx_your_key_here"</div>
+              <div>export DEXBRAIN_API_KEY={`"dx_your_key_here"`}</div>
               <div><span className="text-gray-500"># 4. Start contributing to the network!</span></div>
               <div>python dexter-liquidity/main.py</div>
             </div>
