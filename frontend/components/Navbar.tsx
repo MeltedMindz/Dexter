@@ -24,6 +24,8 @@ export function Navbar() {
       setActiveTab('positions')
     } else if (pathname === '/dashboard') {
       setActiveTab('dashboard')
+    } else if (pathname === '/docs') {
+      setActiveTab('docs')
     }
   }, [pathname])
 
@@ -50,6 +52,7 @@ export function Navbar() {
                 { id: 'create', label: 'CREATE V4', href: '/create' },
                 { id: 'positions', label: 'POSITIONS', href: '/positions' },
                 { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
+                { id: 'docs', label: 'API DOCS', href: '/docs' },
               ].map((tab) => (
                 <Link
                   key={tab.id}
@@ -90,6 +93,7 @@ export function Navbar() {
                 { id: 'create', label: 'CREATE V4', href: '/create' },
                 { id: 'positions', label: 'POSITIONS', href: '/positions' },
                 { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
+                { id: 'docs', label: 'API DOCS', href: '/docs' },
               ].map((tab) => (
                 <Link
                   key={tab.id}
