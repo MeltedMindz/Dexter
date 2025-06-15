@@ -1,0 +1,170 @@
+groups:
+  - name: dexbrain-alerts
+    rules:
+      # System Health Alerts
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 10 minutes on {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% for more than 10 minutes on {{ $labels.instance }}"
+
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk space is below 10% on {{ $labels.instance }}"
+
+      # DexBrain API Alerts
+      - alert: DexBrainAPIDown
+        expr: up{job="dexbrain-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "DexBrain API is down"
+          description: "DexBrain API server has been down for more than 2 minutes"
+
+      - alert: HighAPIErrorRate
+        expr: rate(dexbrain_api_errors_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is above 10% for the last 5 minutes"
+
+      - alert: SlowAPIResponse
+        expr: histogram_quantile(0.95, rate(dexbrain_api_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow API responses"
+          description: "95th percentile API response time is above 2 seconds"
+
+      # Database Alerts
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been down for more than 2 minutes"
+
+      - alert: HighDatabaseConnections
+        expr: pg_stat_database_numbackends / pg_settings_max_connections * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connection usage"
+          description: "Database connection usage is above 80%"
+
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_database_tup_fetched[5m]) / rate(pg_stat_database_tup_returned[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database slow queries detected"
+          description: "Database query performance has degraded"
+
+      # Container Alerts
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} high CPU usage"
+          description: "Container CPU usage is above 80% for more than 10 minutes"
+
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} high memory usage"
+          description: "Container memory usage is above 90%"
+
+      - alert: ContainerRestarting
+        expr: rate(container_last_seen[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.name }} restarting"
+          description: "Container has restarted within the last 5 minutes"
+
+      # DexBrain Business Logic Alerts
+      - alert: LowAgentActivity
+        expr: dexbrain_active_agents < 5
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low agent activity"
+          description: "Number of active agents is below 5 for more than 15 minutes"
+
+      - alert: HighDataQualityIssues
+        expr: rate(dexbrain_data_quality_failures[5m]) > 0.2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High data quality failure rate"
+          description: "Data quality failure rate is above 20% for the last 10 minutes"
+
+      - alert: NetworkIntelligenceStale
+        expr: time() - dexbrain_last_intelligence_update > 300
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Network intelligence data is stale"
+          description: "No intelligence updates received for more than 5 minutes"
+
+      # Frontend Alerts
+      - alert: FrontendDown
+        expr: up{job="dexter-frontend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Dexter frontend is down"
+          description: "Frontend application has been down for more than 2 minutes"
+
+      - alert: HighFrontendErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High frontend error rate"
+          description: "Frontend error rate is above 5% for the last 5 minutes"
