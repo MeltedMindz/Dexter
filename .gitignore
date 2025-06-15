@@ -5,6 +5,11 @@ DEXTER_TOKEN_FLOW.md
 DEXTER_DAPP_ARCHITECTURE.md
 IMPLEMENTATION_PLAN.md
 
+# Deployment secrets (keep configs public, hide secrets)
+.env.production
+.env.staging
+**/secrets.yaml
+
 # Environment files
 .env
 .env.local

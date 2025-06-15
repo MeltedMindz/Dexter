@@ -1,0 +1,50 @@
+name: dexbrain-api
+region: nyc
+
+services:
+- name: dexbrain-api
+  source_dir: backend
+  github:
+    repo: MeltedMindz/Dexter
+    branch: main
+    deploy_on_push: true
+  dockerfile_path: backend/Dockerfile.api
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  
+  health_check:
+    http_path: "/health"
+    initial_delay_seconds: 60
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+
+  envs:
+  - key: API_HOST
+    value: "0.0.0.0"
+  - key: API_PORT  
+    value: "8080"
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    type: SECRET
+  - key: REDIS_URL
+    scope: RUN_TIME
+    type: SECRET
+  - key: LOG_LEVEL
+    value: "INFO"
+  - key: RATE_LIMIT_PER_MINUTE
+    value: "100"
+  - key: DATA_QUALITY_THRESHOLD
+    value: "60.0"
+
+databases:
+- name: dexter-postgres
+  engine: PG
+  version: "13"
+  size: basic-xxs
+  
+- name: dexter-redis
+  engine: REDIS
+  version: "6"

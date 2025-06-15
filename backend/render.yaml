@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: dexbrain-api
+    env: python
+    repo: https://github.com/MeltedMindz/Dexter.git
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && python -m dexbrain.api_server"
+    healthCheckPath: /health
+    plan: starter
+    
+    envVars:
+      - key: API_HOST
+        value: "0.0.0.0"
+      - key: API_PORT
+        value: "8080"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dexter-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromDatabase:
+          name: dexter-redis
+          property: connectionString
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+databases:
+  - name: dexter-postgres
+    databaseName: dexter
+    user: dexter
+    plan: starter
+    
+  - name: dexter-redis
+    plan: starter
