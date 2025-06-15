@@ -35,6 +35,9 @@ export function FlywheelExplainer() {
         </div>
       </section>
 
+      {/* Brain Window - Prominently placed after hero */}
+      <BrainWindow />
+
       {/* How It Works */}
       <section className="py-16 border-b-2 border-black dark:border-white">
         <div className="max-w-6xl mx-auto px-6">
@@ -78,9 +81,6 @@ export function FlywheelExplainer() {
           </div>
         </div>
       </section>
-
-      {/* Brain Window */}
-      <BrainWindow />
 
       {/* Features Grid */}
       <section className="py-16">
