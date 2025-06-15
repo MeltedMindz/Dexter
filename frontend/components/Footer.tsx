@@ -24,12 +24,51 @@ export function Footer() {
     try {
       setIsLoading(true)
       
-      // Use mock data for now to avoid CORS issues
-      // In production, these calls would go through your API routes
+      // Get Base network data using Alchemy API
+      const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL
+      
+      // Fetch latest block from Base network
+      const blockResponse = await fetch(baseRpcUrl!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'eth_blockNumber',
+          params: [],
+          id: 1
+        })
+      })
+      
+      const blockData = await blockResponse.json()
+      const blockNumber = parseInt(blockData.result, 16)
+      
+      // Fetch gas price from Base network
+      const gasResponse = await fetch(baseRpcUrl!, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'eth_gasPrice',
+          params: [],
+          id: 2
+        })
+      })
+      
+      const gasData = await gasResponse.json()
+      const gasPrice = (parseInt(gasData.result, 16) / 1e9).toFixed(1) // Convert wei to gwei
+      
+      // Fetch ETH price from CoinGecko (this should work from server-side)
+      const ethPriceResponse = await fetch('/api/eth-price')
+      const ethPriceData = await ethPriceResponse.json()
+      
       setBlockchainData({
-        blockNumber: (19847293 + Math.floor(Math.random() * 100)).toLocaleString(),
-        gasPrice: (Math.random() * 30 + 5).toFixed(1),
-        ethPrice: (3240 + Math.random() * 200 - 100).toLocaleString(),
+        blockNumber: blockNumber.toLocaleString(),
+        gasPrice,
+        ethPrice: ethPriceData.price ? ethPriceData.price.toLocaleString() : '3,240',
         lastUpdated: Date.now()
       })
     } catch (error) {
