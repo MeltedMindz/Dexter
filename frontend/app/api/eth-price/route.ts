@@ -26,17 +26,19 @@ export async function GET() {
     }
 
     return NextResponse.json({ 
-      price: Math.round(ethPrice),
-      timestamp: Date.now()
+      price: ethPrice, // Keep raw price, round in frontend
+      timestamp: Date.now(),
+      success: true
     })
   } catch (error) {
     console.error('Error fetching ETH price:', error)
     
     // Return fallback price
     return NextResponse.json({ 
-      price: 3240,
+      price: 2514,
       timestamp: Date.now(),
-      error: 'Using fallback price'
+      error: 'Using fallback price',
+      success: false
     }, { status: 200 })
   }
 }

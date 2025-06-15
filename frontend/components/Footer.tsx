@@ -61,14 +61,20 @@ export function Footer() {
       const gasData = await gasResponse.json()
       const gasPrice = (parseInt(gasData.result, 16) / 1e9).toFixed(1) // Convert wei to gwei
       
-      // Fetch ETH price from CoinGecko (this should work from server-side)
-      const ethPriceResponse = await fetch('/api/eth-price')
+      // Fetch ETH price from our API route
+      const ethPriceResponse = await fetch('/api/eth-price', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      })
       const ethPriceData = await ethPriceResponse.json()
+      console.log('ETH Price API Response:', ethPriceData) // Debug log
       
       setBlockchainData({
         blockNumber: blockNumber.toLocaleString(),
         gasPrice,
-        ethPrice: ethPriceData.price ? ethPriceData.price.toLocaleString() : '3,240',
+        ethPrice: ethPriceData.price ? Math.round(ethPriceData.price).toLocaleString() : '2,514',
         lastUpdated: Date.now()
       })
     } catch (error) {
@@ -77,7 +83,7 @@ export function Footer() {
       setBlockchainData({
         blockNumber: '21,567,123',
         gasPrice: '12',
-        ethPrice: '3,245',
+        ethPrice: '2,514',
         lastUpdated: Date.now()
       })
     } finally {
