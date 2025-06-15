@@ -112,7 +112,7 @@ export function AboutPage() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-primary mt-3 flex-shrink-0"></div>
                   <p className="text-gray-300 dark:text-gray-600">
-                    <span className="font-bold text-white dark:text-black">Free agent framework</span> - anyone can deploy liquidity management bots
+                    <span className="font-bold text-white dark:text-black">Open source agent framework</span> - anyone can deploy liquidity management bots
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
