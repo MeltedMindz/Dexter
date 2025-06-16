@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           user.id,
           sessionToken,
           expiresAt,
-          request.ip || request.headers.get('x-forwarded-for'),
+          request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
           request.headers.get('user-agent')
         ]
       )
