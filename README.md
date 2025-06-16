@@ -2,23 +2,14 @@
 
 ![](https://github.com/user-attachments/assets/c6403bfd-69df-4d84-ba39-a9fdfed99599)
 
-## The Complete DeFi Liquidity Management Ecosystem
+## Open Source DeFi Liquidity Management Framework
 
-Dexter revolutionizes DeFi liquidity management through a unique dual-architecture approach that benefits both individual users and the entire ecosystem.
+Dexter is an open-source AI-powered liquidity management system for decentralized exchanges. Deploy intelligent agents that optimize liquidity positions while contributing to a shared intelligence network.
 
 ## 🏗️ Architecture Overview
 
-### Two Distinct Yet Synergistic Components:
-
-#### 1. **$DEX Token Platform** 💰
-A revenue-generating liquidity management protocol where users can:
-- **Stake $DEX tokens** to earn revenue share from protocol fees
-- **Create managed positions** with AI-powered optimization
-- **Earn 8% performance fees** from successful liquidity management
-- **Participate in governance** over protocol parameters
-
-#### 2. **Open Source Intelligence Network** 🌐
-A public good that creates the world's most comprehensive DeFi intelligence layer:
+### **Open Source Intelligence Network** 🌐
+A collaborative framework that creates the world's most comprehensive DeFi intelligence layer:
 - **Open source agent framework** - anyone can deploy liquidity management bots
 - **Shared intelligence brain** - all agents contribute and benefit from collective data
 - **Cross-chain compatible** - supports Ethereum, Base, Solana, and more
@@ -29,16 +20,7 @@ A public good that creates the world's most comprehensive DeFi intelligence laye
 
 ## 🚀 Quick Start
 
-### For Users: Stake $DEX Tokens
-```bash
-# Visit the platform
-https://www.dexteragent.com/stake
-
-# Connect wallet and stake $DEX tokens
-# Earn revenue share from all protocol fees
-```
-
-### For Developers: Deploy Your Agent
+### Deploy Your Agent
 ```bash
 # 1. Register for API key
 curl -X POST https://api.dexteragent.com/register \
@@ -74,18 +56,11 @@ The global intelligence network provides:
 
 ---
 
-## 🏦 Token Economics
-
-### $DEX Token Value Accrual
-- **Clean Revenue Model**: 100% of protocol fees flow to $DEX stakers
-- **Sustainable Yield**: Directly tied to platform usage and success
-- **No Token Gating**: Open source network operates independently
-- **Governance Rights**: Stakers vote on protocol upgrades
-
-### Network Participation
+## 🌐 Network Participation
 - **No Barriers**: API keys are issued for free to maximize adoption
 - **Merit-Based**: Higher quality data contributors get better access
 - **Public Good**: Intelligence network benefits entire DeFi ecosystem
+- **Open Source**: Complete framework available under MIT license
 
 ---
 
@@ -108,7 +83,7 @@ dexter/
 │   ├── data/fetchers/      # DEX integration layer
 │   ├── execution/          # Strategy execution engine
 │   └── utils/              # Performance tracking & monitoring
-├── contracts/              # $DEX Token Smart Contracts
+├── contracts/              # Smart Contract Examples
 ├── frontend/               # Web Interface
 └── README.md               # This file
 ```
@@ -117,10 +92,9 @@ dexter/
 
 ## 🛠️ Core Features
 
-### For $DEX Platform Users
-- ✅ **Performance-Based Fees**: Only pay 8% when you profit
-- ✅ **AI Optimization**: Advanced rebalancing and compounding
-- ✅ **Risk Management**: Conservative, Aggressive, and Hyper-Aggressive strategies
+### For Liquidity Managers
+- ✅ **AI Optimization**: Advanced rebalancing and compounding strategies
+- ✅ **Risk Management**: Conservative, Aggressive, and Hyper-Aggressive profiles
 - ✅ **Real-Time Tracking**: Complete transparency of all actions
 - ✅ **Multi-Chain Support**: Ethereum, Base, Arbitrum, and more
 
@@ -136,9 +110,9 @@ dexter/
 ## 🎯 Agent Development
 
 ### Supported Strategies
-- **Conservative Agent**: $100k min liquidity, 15% max volatility
-- **Aggressive Agent**: $50k min liquidity, 30% max volatility  
-- **Hyper-Aggressive Agent**: $25k min liquidity, no volatility limit
+- **Conservative Agent**: Low-risk profile, 15% max volatility tolerance
+- **Aggressive Agent**: Medium-risk profile, 30% max volatility tolerance
+- **Hyper-Aggressive Agent**: High-risk profile, no volatility limits
 - **Custom Agents**: Build your own using the base framework
 
 ### Supported Protocols
@@ -179,7 +153,7 @@ The intelligence network provides transparency through:
 
 ## 🤝 Contributing
 
-### For Platform Development
+### For Framework Development
 1. Fork the repository
 2. Create a feature branch
 3. Submit a pull request
@@ -194,14 +168,14 @@ The intelligence network provides transparency through:
 
 ## ⚖️ License
 
-- **Core Protocol**: MIT License - see [LICENSE](LICENSE)
-- **Open Source Framework**: MIT License - fully open and permissionless
-- **$DEX Token**: Standard ERC-20 with governance capabilities
+- **Framework**: MIT License - see [LICENSE](LICENSE)
+- **Open Source**: Fully open and permissionless
+- **Smart Contracts**: MIT License for reference implementations
 
 ---
 
 ## 🌟 Vision
 
-**Creating the Bloomberg Terminal of DeFi** through shared intelligence while maintaining clean tokenomics separation. Every agent deployment makes the entire ecosystem more efficient, while $DEX token holders benefit from sustainable revenue generation.
+**Creating the Bloomberg Terminal of DeFi** through shared intelligence and open collaboration. Every agent deployment makes the entire ecosystem more efficient through collective data and insights.
 
 **The future of DeFi is collaborative intelligence.** 🚀
