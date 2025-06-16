@@ -1,0 +1,78 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'meltedmindz1@gmail.com'
+  smtp_auth_username: 'meltedmindz1@gmail.com'
+  smtp_auth_password: 'Superman420!'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: 'web.hook'
+  routes:
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+
+receivers:
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://127.0.0.1:5001/'
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'meltedmindz1@gmail.com'
+        from: 'meltedmindz1@gmail.com'
+        subject: '🚨 CRITICAL: DexBrain Alert - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>🚨 CRITICAL ALERT</h2>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Status:</strong> {{ .Status }}</p>
+          {{ range .Alerts }}
+          <h3>{{ .Annotations.summary }}</h3>
+          <p>{{ .Annotations.description }}</p>
+          <p><strong>Labels:</strong></p>
+          <ul>
+          {{ range .Labels.SortedPairs }}
+          <li>{{ .Name }}: {{ .Value }}</li>
+          {{ end }}
+          </ul>
+          <p><strong>Started:</strong> {{ .StartsAt }}</p>
+          {{ if .EndsAt }}<p><strong>Ended:</strong> {{ .EndsAt }}</p>{{ end }}
+          {{ end }}
+          <p><a href="http://157.90.230.148:3001">View in Grafana</a> | <a href="http://157.90.230.148:9090">View in Prometheus</a></p>
+
+  - name: 'warning-alerts'
+    email_configs:
+      - to: 'meltedmindz1@gmail.com'
+        from: 'meltedmindz1@gmail.com'
+        subject: '⚠️ WARNING: DexBrain Alert - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>⚠️ WARNING ALERT</h2>
+          <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>Status:</strong> {{ .Status }}</p>
+          {{ range .Alerts }}
+          <h3>{{ .Annotations.summary }}</h3>
+          <p>{{ .Annotations.description }}</p>
+          <p><strong>Labels:</strong></p>
+          <ul>
+          {{ range .Labels.SortedPairs }}
+          <li>{{ .Name }}: {{ .Value }}</li>
+          {{ end }}
+          </ul>
+          <p><strong>Started:</strong> {{ .StartsAt }}</p>
+          {{ if .EndsAt }}<p><strong>Ended:</strong> {{ .EndsAt }}</p>{{ end }}
+          {{ end }}
+          <p><a href="http://157.90.230.148:3001">View in Grafana</a></p>
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

@@ -31,7 +31,7 @@ scp -r backend/monitoring/* ${VPS_USER}@${VPS_IP}:/opt/dexbrain-monitoring/
 echo "⚙️ Creating environment configuration..."
 ssh ${VPS_USER}@${VPS_IP} "cat > /opt/dexbrain-monitoring/.env << 'EOF'
 SMTP_USER=${EMAIL}
-SMTP_PASSWORD=your-gmail-app-password-here
+SMTP_PASSWORD=Solid420!
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 DATABASE_URL=postgresql://postgres:password@localhost:5432/dexter_db
 DEXBRAIN_API_URL=http://localhost:8080

@@ -6,8 +6,8 @@
 set -e
 
 # Configuration
-HETZNER_API_TOKEN="WSR7DB4CThdJEWKRL8LIZpHPTWFaBDVFbka16XxmR28OO3WBW5TfPCBW1Egla80L"
-SERVER_IP="157.90.230.148"
+HETZNER_API_TOKEN="${HETZNER_API_TOKEN:-}"
+SERVER_IP="${SERVER_IP:-}"
 SSH_KEY_PATH="$HOME/.ssh/id_rsa"
 
 echo "🚀 Starting DexBrain API deployment to Hetzner VPS..."

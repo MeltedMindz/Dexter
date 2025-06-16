@@ -1,6 +1,6 @@
 import { Alchemy, Network, AlchemySettings, AssetTransfersCategory } from 'alchemy-sdk'
 
-const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || 'ory0F2cLFNIXsovAmrtJj'
+const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || ''
 
 // Base Network Alchemy instance
 const baseSettings: AlchemySettings = {

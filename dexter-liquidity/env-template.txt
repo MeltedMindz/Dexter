@@ -1,5 +1,5 @@
 # API Keys
-ALCHEMY_API_KEY=rwgz4HtlJXqsyNqJrwd2oiBnUY85ymaP
+ALCHEMY_API_KEY=your_alchemy_api_key_here
 BASESCAN_API_KEY=your_basescan_key
 
 # Network RPC URLs
