@@ -96,7 +96,7 @@ export default function RegisterPage() {
               REGISTRATION SUCCESSFUL!
             </h1>
             <p className="text-black font-mono mb-4">
-              Your account has been created and you're being redirected to the dashboard.
+              Your account has been created and you&apos;re being redirected to the dashboard.
             </p>
             <div className="animate-pulse text-black font-bold">
               Redirecting...
