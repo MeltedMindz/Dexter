@@ -71,9 +71,10 @@ export async function GET() {
         } catch (error) {
           console.error('Error connecting to VPS:', error);
           const encoder = new TextEncoder();
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({
             type: 'error',
-            message: `Failed to connect to agent: ${error.message}`,
+            message: `Failed to connect to agent: ${errorMessage}`,
             timestamp: new Date().toISOString()
           })}\n\n`));
           
