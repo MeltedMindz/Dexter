@@ -67,8 +67,13 @@ export function BrainWindow() {
   }, [])
 
   useEffect(() => {
-    if (autoScroll) {
-      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (autoScroll && logsEndRef.current) {
+      // Use scrollIntoView with block: 'nearest' to prevent full page scroll
+      logsEndRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      })
     }
   }, [logs, autoScroll])
 
@@ -124,9 +129,22 @@ export function BrainWindow() {
                     DEXBRAIN_INTELLIGENCE_NETWORK.exe
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-black animate-pulse" />
-                  <span className="text-black font-bold text-xs font-mono">LIVE</span>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setAutoScroll(!autoScroll)}
+                    className={`flex items-center gap-2 px-2 py-1 rounded border ${
+                      autoScroll 
+                        ? 'bg-green-500 border-green-700 text-black' 
+                        : 'bg-gray-500 border-gray-700 text-white'
+                    } font-bold text-xs font-mono transition-colors`}
+                    title={autoScroll ? 'Auto-scroll is ON' : 'Auto-scroll is OFF'}
+                  >
+                    {autoScroll ? '▼ AUTO' : '|| MANUAL'}
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-black animate-pulse" />
+                    <span className="text-black font-bold text-xs font-mono">LIVE</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,7 +171,11 @@ export function BrainWindow() {
 
             {/* Terminal Window */}
             <div className="relative bg-black h-[500px] overflow-hidden">
-              <div className="h-full overflow-y-auto p-4 font-mono text-xs">
+              <div 
+                className="h-full overflow-y-auto p-4 font-mono text-xs"
+                onWheel={(e) => e.stopPropagation()}
+                onScroll={(e) => e.stopPropagation()}
+                style={{ overscrollBehavior: 'contain' }}>
                 {logs.length === 0 ? (
                   <div className="text-center py-20">
                     <Brain className="w-12 h-12 text-primary mx-auto mb-4 animate-pulse" />
