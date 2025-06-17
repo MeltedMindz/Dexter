@@ -27,8 +27,13 @@ export function Footer() {
       // Get Base network data using Alchemy API
       const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL
       
+      if (!baseRpcUrl) {
+        console.warn('NEXT_PUBLIC_BASE_RPC_URL not configured, using fallback data')
+        throw new Error('RPC URL not configured')
+      }
+      
       // Fetch latest block from Base network
-      const blockResponse = await fetch(baseRpcUrl!, {
+      const blockResponse = await fetch(baseRpcUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +50,7 @@ export function Footer() {
       const blockNumber = parseInt(blockData.result, 16)
       
       // Fetch gas price from Base network
-      const gasResponse = await fetch(baseRpcUrl!, {
+      const gasResponse = await fetch(baseRpcUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
