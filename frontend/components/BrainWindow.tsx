@@ -23,44 +23,41 @@ export function BrainWindow() {
   }, [])
 
   useEffect(() => {
-    // Connect to WebSocket server
-    const connectWebSocket = () => {
+    // Connect to Server-Sent Events stream
+    const connectSSE = () => {
       try {
-        const ws = new WebSocket('wss://5.78.71.231')
-        wsRef.current = ws
+        const eventSource = new EventSource('http://5.78.71.231:3002/logs')
+        wsRef.current = eventSource
 
-        ws.onopen = () => {
-          console.log('Connected to Dexter agent log streamer')
+        eventSource.onopen = () => {
+          console.log('Connected to Dexter agent log streamer (SSE)')
           setIsConnected(true)
         }
 
-        ws.onmessage = (event) => {
+        eventSource.onmessage = (event) => {
           const message = JSON.parse(event.data)
           if (message.type !== 'heartbeat') {
             setLogs(prev => [...prev, {
               ...message,
-              timestamp: new Date()
+              timestamp: new Date(message.timestamp)
             }].slice(-50)) // Keep last 50 entries for performance
           }
         }
 
-        ws.onerror = (error) => {
-          console.error('WebSocket error:', error)
-        }
-
-        ws.onclose = () => {
-          console.log('Disconnected from log streamer')
+        eventSource.onerror = (error) => {
+          console.error('SSE error:', error)
           setIsConnected(false)
+          eventSource.close()
           // Reconnect after 5 seconds
-          setTimeout(connectWebSocket, 5000)
+          setTimeout(connectSSE, 5000)
         }
       } catch (error) {
         console.error('Failed to connect:', error)
-        setTimeout(connectWebSocket, 5000)
+        setTimeout(connectSSE, 5000)
       }
     }
 
-    connectWebSocket()
+    connectSSE()
 
     return () => {
       if (wsRef.current) {
