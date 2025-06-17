@@ -15,7 +15,7 @@ export function BrainWindow() {
   const [isConnected, setIsConnected] = useState(false)
   const [autoScroll, setAutoScroll] = useState(true)
   const logsEndRef = useRef<HTMLDivElement>(null)
-  const wsRef = useRef<WebSocket | null>(null)
+  const wsRef = useRef<EventSource | null>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 500)
