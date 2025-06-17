@@ -14,7 +14,7 @@ export async function GET() {
       // Connect to the VPS SSE stream
       const connectToVPS = async () => {
         try {
-          const response = await fetch('http://5.78.71.231:3002/logs', {
+          const response = await fetch('http://5.78.71.231:3003/logs', {
             method: 'GET',
             headers: {
               'Accept': 'text/event-stream',
