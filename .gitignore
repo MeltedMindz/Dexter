@@ -57,8 +57,9 @@ coverage/
 *.lcov
 
 # Logs
-logs
 *.log
+logs/
+!frontend/app/api/logs/
 
 # Database
 *.sqlite
