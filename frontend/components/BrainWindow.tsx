@@ -26,7 +26,7 @@ export function BrainWindow() {
     // Connect to Server-Sent Events stream
     const connectSSE = () => {
       try {
-        const eventSource = new EventSource('https://5.78.71.231:8443/logs')
+        const eventSource = new EventSource('/api/logs')
         wsRef.current = eventSource
 
         eventSource.onopen = () => {
