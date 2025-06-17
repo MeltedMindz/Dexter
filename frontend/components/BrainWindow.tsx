@@ -1,28 +1,96 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Brain, Activity, Zap, Eye } from 'lucide-react'
+
+interface LogEntry {
+  type: 'log' | 'error' | 'history' | 'heartbeat';
+  data?: string;
+  timestamp: Date;
+}
 
 export function BrainWindow() {
   const [isVisible, setIsVisible] = useState(false)
-  const [iframeLoaded, setIframeLoaded] = useState(false)
-  const [showFallback, setShowFallback] = useState(false)
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [isConnected, setIsConnected] = useState(false)
+  const [autoScroll, setAutoScroll] = useState(true)
+  const logsEndRef = useRef<HTMLDivElement>(null)
+  const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 500)
-    
-    // Show fallback after 3 seconds if iframe hasn't loaded
-    const fallbackTimer = setTimeout(() => {
-      if (!iframeLoaded) {
-        setShowFallback(true)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    // Connect to WebSocket server
+    const connectWebSocket = () => {
+      try {
+        const ws = new WebSocket('ws://5.78.71.231')
+        wsRef.current = ws
+
+        ws.onopen = () => {
+          console.log('Connected to Dexter agent log streamer')
+          setIsConnected(true)
+        }
+
+        ws.onmessage = (event) => {
+          const message = JSON.parse(event.data)
+          if (message.type !== 'heartbeat') {
+            setLogs(prev => [...prev, {
+              ...message,
+              timestamp: new Date()
+            }].slice(-50)) // Keep last 50 entries for performance
+          }
+        }
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error)
+        }
+
+        ws.onclose = () => {
+          console.log('Disconnected from log streamer')
+          setIsConnected(false)
+          // Reconnect after 5 seconds
+          setTimeout(connectWebSocket, 5000)
+        }
+      } catch (error) {
+        console.error('Failed to connect:', error)
+        setTimeout(connectWebSocket, 5000)
       }
-    }, 3000)
-    
-    return () => {
-      clearTimeout(timer)
-      clearTimeout(fallbackTimer)
     }
-  }, [iframeLoaded])
+
+    connectWebSocket()
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close()
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (autoScroll) {
+      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [logs, autoScroll])
+
+  const formatLogLine = (line: string) => {
+    // Remove ANSI color codes if present
+    const cleanLine = line.replace(/\x1b\[[0-9;]*m/g, '')
+    
+    // Highlight different log types
+    if (cleanLine.includes('ERROR') || cleanLine.includes('error')) {
+      return <span className="text-red-400">{cleanLine}</span>
+    } else if (cleanLine.includes('WARN') || cleanLine.includes('warning')) {
+      return <span className="text-yellow-400">{cleanLine}</span>
+    } else if (cleanLine.includes('INFO') || cleanLine.includes('Starting')) {
+      return <span className="text-cyan-400">{cleanLine}</span>
+    } else if (cleanLine.includes('Success') || cleanLine.includes('✓')) {
+      return <span className="text-green-400">{cleanLine}</span>
+    }
+    return <span className="text-green-400">{cleanLine}</span>
+  }
 
   return (
     <section className="py-16 border-b-2 border-black dark:border-white bg-gradient-to-br from-black via-gray-900 to-black">
@@ -70,49 +138,46 @@ export function BrainWindow() {
             <div className="bg-gradient-to-r from-gray-900 to-black p-3 border-b border-gray-700">
               <div className="flex items-center justify-center gap-6 text-sm font-mono">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-400">NETWORK: ONLINE</span>
+                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+                  <span className={isConnected ? 'text-green-400' : 'text-red-400'}>
+                    NETWORK: {isConnected ? 'ONLINE' : 'CONNECTING...'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="w-3 h-3 text-yellow-400" />
-                  <span className="text-yellow-400">157.90.230.148</span>
+                  <span className="text-yellow-400">5.78.71.231</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                  <span className="text-cyan-400">AGENTS: ACTIVE</span>
+                  <span className="text-cyan-400">DEXTER: ACTIVE</span>
                 </div>
               </div>
             </div>
 
             {/* Terminal Window */}
-            <div className="relative bg-black min-h-[500px]">
-              {!showFallback ? (
-                <iframe 
-                  src="http://157.90.230.148/live-monitor"
-                  className="w-full h-[500px] border-0"
-                  title="DexBrain Intelligence Network Live Monitor"
-                  onLoad={() => setIframeLoaded(true)}
-                  style={{
-                    background: 'transparent',
-                    overflow: 'hidden'
-                  }}
-                />
-              ) : (
-                <div className="w-full h-[500px] bg-black text-green-400 font-mono text-sm p-4 overflow-hidden">
-                  <SimulatedBrainActivity />
-                </div>
-              )}
-              
-              {/* Loading overlay */}
-              {!iframeLoaded && !showFallback && (
-                <div className="absolute inset-0 bg-black flex items-center justify-center">
-                  <div className="text-primary text-center">
-                    <Brain className="w-12 h-12 mx-auto mb-4 animate-pulse" />
-                    <div className="text-lg font-mono">CONNECTING TO DEXBRAIN...</div>
-                    <div className="text-sm text-gray-400 mt-2">Loading intelligence network...</div>
+            <div className="relative bg-black h-[500px] overflow-hidden">
+              <div className="h-full overflow-y-auto p-4 font-mono text-xs">
+                {logs.length === 0 ? (
+                  <div className="text-center py-20">
+                    <Brain className="w-12 h-12 text-primary mx-auto mb-4 animate-pulse" />
+                    <div className="text-primary">CONNECTING TO DEXTER AGENT...</div>
+                    <div className="text-gray-400 text-xs mt-2">Establishing secure connection to AI brain...</div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <>
+                    {logs.map((log, index) => (
+                      <div key={index} className="mb-1">
+                        {log.data?.split('\n').map((line, i) => (
+                          <div key={i} className="leading-relaxed">
+                            {formatLogLine(line)}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                    <div ref={logsEndRef} />
+                  </>
+                )}
+              </div>
               
               {/* Overlay effects */}
               <div className="absolute inset-0 pointer-events-none">
@@ -184,70 +249,5 @@ export function BrainWindow() {
         </div>
       </div>
     </section>
-  )
-}
-
-// Fallback component that simulates brain activity
-function SimulatedBrainActivity() {
-  const [logs, setLogs] = useState<string[]>([])
-
-  useEffect(() => {
-    const activities = [
-      '🧠 DEXBRAIN INTELLIGENCE NETWORK - STATUS: ONLINE',
-      '🤖 Active Agents: 12 | Requests/min: 34',
-      '📊 Processing: Market Data • Liquidity Metrics • Performance Analytics',
-      '🔍 Intelligence Queries: 47 | Quality Score: 92%',
-      '🌐 Network Activity: Base • 18 pools monitored',
-      '✅ NEW AGENT REGISTERED: agent_7834 | Type: Aggressive',
-      '📈 DATA SUBMISSION: 0xa7c4e2f... • P&L: +18.3% • APR: 22.1%',
-      '🔍 INTELLIGENCE QUERY: Best Pools | Response: 83 insights',
-      '📊 MARKET ANALYSIS: ETH/USDC • Volatility 12.4% • TVL: $275K',
-      '🏆 PERFORMANCE UPDATE: agent_9241 • Score: 89% | Rank: #14',
-      '⛓️  BLOCKCHAIN: Base • Gas: 15 gwei • Block: #19847429',
-      '🌐 API GET: /api/intelligence | Total: 1,389',
-      '🔄 INTELLIGENCE SHARED: agent_5627 → Performance Data (Quality: 94.2%)',
-    ]
-
-    const addLog = () => {
-      const timestamp = new Date().toTimeString().slice(0, 8)
-      const activity = activities[Math.floor(Math.random() * activities.length)]
-      const newLog = `[${timestamp}] ${activity}`
-      
-      setLogs(prev => {
-        const newLogs = [...prev, newLog]
-        return newLogs.slice(-20) // Keep only last 20 logs
-      })
-    }
-
-    // Add initial logs
-    addLog()
-    addLog()
-    addLog()
-
-    // Continue adding logs
-    const interval = setInterval(addLog, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
-  return (
-    <div className="h-full overflow-y-auto space-y-1">
-      <div className="text-primary font-bold text-center mb-4">
-        🚀 DEXBRAIN INTELLIGENCE NETWORK SIMULATOR 🚀
-      </div>
-      {logs.map((log, index) => (
-        <div key={index} className="animate-fadeIn">
-          {log}
-        </div>
-      ))}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateX(-10px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-in;
-        }
-      `}</style>
-    </div>
   )
 }

@@ -101,3 +101,7 @@ venv.bak/
 # Temporary files
 *.tmp
 *.temp
+
+# ElizaOS Framework
+eliza/
+.eliza/
