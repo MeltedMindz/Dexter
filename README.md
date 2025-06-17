@@ -119,9 +119,9 @@ dexter/
 ## 🎯 Target Metrics
 
 ### **TVL Growth Objectives**
-- **Phase 1**: $10M TVL within 6 months
-- **Phase 2**: $100M TVL within 12 months  
-- **Phase 3**: $500M+ TVL as a leading DeFi platform
+- **Phase 1**: $5M TVL within 6 months
+- **Phase 2**: $25M TVL within 12 months  
+- **Phase 3**: $100M+ TVL within 36 months
 
 ### **Performance Targets**
 - **Conservative Strategy**: 15-25% APR with <10% maximum drawdown
