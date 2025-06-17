@@ -26,7 +26,7 @@ export function BrainWindow() {
     // Connect to WebSocket server
     const connectWebSocket = () => {
       try {
-        const ws = new WebSocket('ws://5.78.71.231')
+        const ws = new WebSocket('wss://5.78.71.231')
         wsRef.current = ws
 
         ws.onopen = () => {
