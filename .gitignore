@@ -105,3 +105,14 @@ venv.bak/
 # ElizaOS Framework
 eliza/
 .eliza/
+
+# Temporary and test files from development
+monitoring-configs/
+docs/temp/
+*.test.local
+test-*.md
+temp-*
+.temp/
+
+# Git housekeeping
+.git/gc.log
