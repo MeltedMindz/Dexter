@@ -15,7 +15,7 @@ export function BrainWindow() {
   const [isConnected, setIsConnected] = useState(false)
   const [autoScroll, setAutoScroll] = useState(true)
   const logsEndRef = useRef<HTMLDivElement>(null)
-  const wsRef = useRef<EventSource | null>(null)
+  const pollRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 500)
@@ -23,47 +23,97 @@ export function BrainWindow() {
   }, [])
 
   useEffect(() => {
-    // Connect to Server-Sent Events stream
-    const connectSSE = () => {
+    let pollInterval: NodeJS.Timeout;
+    
+    // Use HTTP polling instead of SSE
+    const fetchLogs = async () => {
       try {
-        const eventSource = new EventSource('/api/logs')
-        wsRef.current = eventSource
-
-        eventSource.onopen = () => {
-          console.log('Connected to Dexter agent log streamer (SSE)')
-          setIsConnected(true)
+        const response = await fetch('/api/logs', {
+          method: 'GET',
+          cache: 'no-store'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
-
-        eventSource.onmessage = (event) => {
-          const message = JSON.parse(event.data)
-          if (message.type !== 'heartbeat') {
-            setLogs(prev => [...prev, {
-              ...message,
-              timestamp: new Date(message.timestamp)
-            }].slice(-50)) // Keep last 50 entries for performance
+        
+        const data = await response.json();
+        
+        console.log('API Response:', data); // Debug log
+        
+        if (data.success && data.logs && Array.isArray(data.logs)) {
+          console.log('✅ Fetched logs from Dexter agent:', data.logs.length, 'entries');
+          setIsConnected(true);
+          
+          // Transform logs to expected format
+          const transformedLogs = data.logs.map((log: any) => ({
+            type: log.type || 'log',
+            data: log.data || log.message || 'No data',
+            timestamp: new Date(log.timestamp || new Date())
+          }));
+          
+          setLogs(transformedLogs.slice(-50)); // Keep last 50 entries
+        } else {
+          console.warn('❌ Failed to fetch logs or invalid format:', data.error || 'Unknown error');
+          setIsConnected(false);
+          
+          // Use fallback logs if provided
+          if (data.logs && Array.isArray(data.logs) && data.logs.length > 0) {
+            console.log('📋 Using fallback logs:', data.logs.length, 'entries');
+            const fallbackLogs = data.logs.map((log: any) => ({
+              type: log.type || 'log',
+              data: log.data || log.message || 'No data',
+              timestamp: new Date(log.timestamp || new Date())
+            }));
+            setLogs(fallbackLogs.slice(-50));
+          } else {
+            // Only show connection status if no real data available
+            console.log('📝 No real data available, showing connection status');
+            setLogs([
+              {
+                type: 'error',
+                data: '[Network] Unable to connect to Dexter AI agents on VPS',
+                timestamp: new Date()
+              },
+              {
+                type: 'log',
+                data: '[System] Attempting to reconnect to real trading data...',
+                timestamp: new Date(Date.now() - 3000)
+              }
+            ]);
           }
         }
-
-        eventSource.onerror = (error) => {
-          console.error('SSE error:', error)
-          setIsConnected(false)
-          eventSource.close()
-          // Reconnect after 5 seconds
-          setTimeout(connectSSE, 5000)
-        }
       } catch (error) {
-        console.error('Failed to connect:', error)
-        setTimeout(connectSSE, 5000)
+        console.error('🚨 Failed to fetch logs:', error);
+        setIsConnected(false);
+        
+        // Show error state with connection info only
+        setLogs([
+          {
+            type: 'error',
+            data: '[Network] Connection to VPS failed - retrying...',
+            timestamp: new Date()
+          },
+          {
+            type: 'log',
+            data: '[System] Attempting to reconnect to live trading agents',
+            timestamp: new Date(Date.now() - 3000)
+          }
+        ]);
       }
-    }
+    };
 
-    connectSSE()
+    // Initial fetch
+    fetchLogs();
+    
+    // Set up polling every 3 seconds
+    pollInterval = setInterval(fetchLogs, 3000);
 
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close()
+      if (pollInterval) {
+        clearInterval(pollInterval);
       }
-    }
+    };
   }, [])
 
   useEffect(() => {
