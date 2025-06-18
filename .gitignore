@@ -1,9 +1,18 @@
-# Private Marketing & Strategy Documents
+# Private folders - all sensitive documents
+private/
+.private/
+
+# Legacy private documents (if any remain in root)
 DEXTER_FUNDING_PITCH.md
 DEXTER_ONE_PAGER.md
 DEXTER_TOKEN_FLOW.md
 DEXTER_DAPP_ARCHITECTURE.md
 IMPLEMENTATION_PLAN.md
+DEXTER_PITCH_DECK.md
+PITCH_DECK_NOTES.md
+CLAUDE_VPS.md
+DEPLOYMENT_SUCCESS.md
+BRAINWINDOW_FIX_SUMMARY.md
 
 # Deployment secrets (keep configs public, hide secrets)
 .env.production
