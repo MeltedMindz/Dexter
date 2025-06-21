@@ -16,26 +16,40 @@ export interface SEOConfig {
 
 const defaultSEO: SEOConfig = {
   title: 'Dexter Protocol - AI-Powered Liquidity Management for DeFi',
-  description: 'AI-POWERED LIQUIDITY MANAGEMENT - Maximize your DeFi yields with automated Uniswap V3 position management on Base Network.',
+  description: 'Maximize your DeFi yields with Dexter Protocol\'s AI-powered liquidity management. Automated Uniswap V3 position optimization, ML-driven strategies, and institutional-grade risk management on Base Network.',
   keywords: [
-    'DeFi',
-    'Uniswap V3',
-    'Liquidity Management',
-    'AI Trading',
-    'Yield Farming',
-    'Base Network',
-    'Automated Market Making',
-    'DEX Trading',
-    'Crypto Portfolio Management',
-    'Decentralized Finance',
-    'LP Tokens',
-    'Auto-compounding',
-    'Smart Contracts',
-    'Web3',
-    'Ethereum',
-    'Trading Bot'
+    'AI DeFi trading',
+    'Uniswap V3 automation',
+    'liquidity management',
+    'yield optimization',
+    'Base Network DeFi',
+    'automated market making',
+    'ML trading strategies',
+    'DeFi portfolio management',
+    'Uniswap V4 integration',
+    'decentralized finance',
+    'LP token optimization',
+    'auto-compounding yields',
+    'smart contract automation',
+    'institutional DeFi',
+    'algorithmic trading',
+    'concentrated liquidity',
+    'impermanent loss protection',
+    'fee tier optimization',
+    'Range orders',
+    'DeFi analytics',
+    'Web3 trading bot',
+    'Ethereum scaling',
+    'Layer 2 DeFi',
+    'DEX aggregation',
+    'yield farming automation',
+    'crypto asset management',
+    'DeFi infrastructure',
+    'on-chain analytics',
+    'MEV protection',
+    'gas optimization'
   ],
-  image: 'https://via.placeholder.com/1200x630/000000/00FF88?text=DEXTER+PROTOCOL+%7C+AI-POWERED+LIQUIDITY+MANAGEMENT',
+  image: '/dexter.png',
   url: 'https://www.dexteragent.com',
   type: 'website'
 }
@@ -68,10 +82,10 @@ export function generateSEOMetadata(config: SEOConfig = {}): Metadata {
       siteName: 'Dexter Protocol',
       images: [
         {
-          url: seo.image || '/images/og-image.png',
+          url: seo.image || '/dexter.png',
           width: 1200,
           height: 630,
-          alt: 'Dexter Protocol - AI-Powered Liquidity Management',
+          alt: 'Dexter Protocol - AI-Powered DeFi Liquidity Management on Base Network',
         }
       ],
       locale: 'en_US',
@@ -88,7 +102,7 @@ export function generateSEOMetadata(config: SEOConfig = {}): Metadata {
       card: 'summary_large_image',
       title: fullTitle,
       description: seo.description,
-      images: [seo.image || '/images/og-image.png'],
+      images: [seo.image || '/dexter.png'],
       creator: '@DexterProtocol',
       site: '@DexterProtocol',
     },
@@ -146,8 +160,8 @@ export function generateSEOMetadata(config: SEOConfig = {}): Metadata {
 export const pageSEO = {
   home: {
     title: 'AI-Powered Liquidity Management for DeFi',
-    description: 'Maximize your DeFi yields with Dexter Protocol\'s AI-powered liquidity management. Auto-compound Uniswap V3 positions and optimize fee earnings on Base Network.',
-    keywords: ['DeFi yield optimization', 'Uniswap V3 automation', 'AI trading bot', 'liquidity management']
+    description: 'Maximize your DeFi yields with Dexter Protocol\'s AI-powered liquidity management. Auto-compound Uniswap V3 positions, ML-driven range optimization, and institutional-grade risk management on Base Network.',
+    keywords: ['AI DeFi yield optimization', 'Uniswap V3 automation', 'ML trading bot', 'automated liquidity management', 'Base Network DeFi', 'concentrated liquidity optimization']
   },
   
   dashboard: {

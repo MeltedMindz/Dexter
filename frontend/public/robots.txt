@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.dexteragent.com/sitemap.xml
+
+# Block crawling of API routes and internal pages
+Disallow: /api/
+Disallow: /_next/
+Disallow: /.well-known/
+
+# Allow specific important pages
+Allow: /
+Allow: /dashboard
+Allow: /create
+Allow: /positions
+Allow: /analytics
+Allow: /stake
+Allow: /about
+Allow: /docs
+
+# Crawl delay
+Crawl-delay: 1

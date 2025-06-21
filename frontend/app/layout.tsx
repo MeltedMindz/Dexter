@@ -29,18 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <head>
-        {/* Additional Social Media Meta Tags */}
-        <meta property="og:title" content="Dexter Protocol - AI-Powered Liquidity Management" />
-        <meta property="og:description" content="AI-POWERED LIQUIDITY MANAGEMENT - Maximize your DeFi yields with automated Uniswap V3 position management on Base Network." />
-        <meta property="og:image" content="https://via.placeholder.com/1200x630/000000/00FF88?text=DEXTER+PROTOCOL+%7C+AI-POWERED+LIQUIDITY+MANAGEMENT" />
-        <meta property="og:url" content="https://www.dexteragent.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Dexter Protocol" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Dexter Protocol - AI-Powered Liquidity Management" />
-        <meta name="twitter:description" content="AI-POWERED LIQUIDITY MANAGEMENT - Maximize your DeFi yields with automated Uniswap V3 position management on Base Network." />
-        <meta name="twitter:image" content="https://via.placeholder.com/1200x630/000000/00FF88?text=DEXTER+PROTOCOL+%7C+AI-POWERED+LIQUIDITY+MANAGEMENT" />
-        
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -51,6 +40,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(generateJsonLd('Organization'))
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateJsonLd('Product'))
           }}
         />
       </head>
