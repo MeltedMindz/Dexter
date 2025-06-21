@@ -20,6 +20,8 @@ export function Navbar() {
       setActiveTab('home')
     } else if (pathname === '/create') {
       setActiveTab('create')
+    } else if (pathname.startsWith('/vaults')) {
+      setActiveTab('vaults')
     } else if (pathname === '/positions') {
       setActiveTab('positions')
     } else if (pathname === '/dashboard') {
@@ -49,7 +51,8 @@ export function Navbar() {
             <div className="hidden md:flex space-x-2">
               {[
                 { id: 'home', label: 'HOME', href: '/' },
-                { id: 'create', label: 'CREATE V4', href: '/create' },
+                { id: 'vaults', label: 'VAULTS', href: '/vaults' },
+                { id: 'create', label: 'CREATE', href: '/create' },
                 { id: 'positions', label: 'POSITIONS', href: '/positions' },
                 { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
                 { id: 'docs', label: 'API DOCS', href: '/docs' },
@@ -90,7 +93,8 @@ export function Navbar() {
             <div className="px-6 py-4 space-y-2">
               {[
                 { id: 'home', label: 'HOME', href: '/' },
-                { id: 'create', label: 'CREATE V4', href: '/create' },
+                { id: 'vaults', label: 'VAULTS', href: '/vaults' },
+                { id: 'create', label: 'CREATE', href: '/create' },
                 { id: 'positions', label: 'POSITIONS', href: '/positions' },
                 { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
                 { id: 'docs', label: 'API DOCS', href: '/docs' },

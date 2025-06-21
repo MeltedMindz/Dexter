@@ -15,14 +15,14 @@ export function FlywheelExplainer() {
               AI-POWERED LIQUIDITY MANAGEMENT
             </h1>
             <p className="text-xl text-black dark:text-white max-w-4xl mx-auto font-mono">
-              AUTO-COMPOUND YOUR UNISWAP V3 POSITIONS WITH PERFORMANCE-BASED FEES. ONLY PAY WHEN YOU PROFIT WITH ADVANCED AI OPTIMIZATION.
+              AUTO-COMPOUND YOUR DEX POSITIONS WITH PERFORMANCE-BASED FEES. ONLY PAY WHEN YOU PROFIT WITH ADVANCED AI OPTIMIZATION.
             </p>
             <div className="flex flex-wrap justify-center gap-6 mt-12">
               <Link 
-                href="/create"
+                href="/vaults"
                 className="bg-primary text-black px-12 py-4 border-2 border-black dark:border-white shadow-brutal hover:shadow-brutal-lg transition-all duration-100 text-brutal inline-block"
               >
-                GET STARTED
+                EXPLORE VAULTS
               </Link>
               <Link 
                 href="/about"
@@ -123,9 +123,9 @@ export function FlywheelExplainer() {
               <div className="w-12 h-12 bg-accent-magenta border-2 border-black dark:border-white flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-black" />
               </div>
-              <h3 className="text-lg font-bold text-black dark:text-white mb-3 text-brutal">ANY V3 POSITION</h3>
+              <h3 className="text-lg font-bold text-black dark:text-white mb-3 text-brutal">ANY DEX POSITION</h3>
               <p className="text-black dark:text-white text-sm font-mono">
-                WORKS WITH ANY UNISWAP V3 POSITION ACROSS ALL SUPPORTED PAIRS
+                WORKS WITH CONCENTRATED LIQUIDITY POSITIONS ACROSS ALL SUPPORTED PAIRS
               </p>
             </div>
 
