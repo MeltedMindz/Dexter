@@ -39,7 +39,7 @@ echo ""
 echo "4. Dashboard Access Info:"
 echo "  🌐 URL: http://$(curl -s ifconfig.me):3000/d/dexter-ai-main"
 echo "  👤 Username: admin"
-echo "  🔑 Password: dexteradmin123"
+echo "  🔑 Password: \${GRAFANA_ADMIN_PASSWORD:-changeme123}"
 
 echo ""
 echo "5. Troubleshooting:"

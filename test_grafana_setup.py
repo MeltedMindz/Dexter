@@ -53,8 +53,8 @@ def test_grafana_api():
             print(f"  ❌ Grafana health check failed: {response.status_code}")
             return False
         
-        # Test datasources (basic auth admin:dexteradmin123)
-        auth = ('admin', 'dexteradmin123')
+        # Test datasources (basic auth admin:changeme123)
+        auth = ('admin', 'changeme123')
         response = requests.get("http://localhost:3000/api/datasources", auth=auth, timeout=10)
         if response.status_code == 200:
             datasources = response.json()
@@ -154,7 +154,7 @@ def main():
         print("\n🎉 All tests passed! Grafana setup is ready.")
         print("\n📋 Next Steps:")
         print("  1. Access Grafana at: http://YOUR_VPS_IP:3000")
-        print("  2. Login with: admin / dexteradmin123")
+        print("  2. Login with: admin / changeme123")
         print("  3. Navigate to 'Dexter AI - Comprehensive Dashboard'")
         print("  4. Verify metrics are displaying correctly")
     else:

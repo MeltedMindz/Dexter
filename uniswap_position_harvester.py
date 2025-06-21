@@ -34,9 +34,12 @@ class UniswapPositionHarvester:
     """
     
     def __init__(self):
-        # API configurations
-        self.alchemy_api_key = "ory0F2cLFNIXsovAmrtJj"
-        self.graph_api_key = "c6f241c1dd5aea81977a63b2614af70d"
+        # API configurations - use environment variables
+        self.alchemy_api_key = os.getenv('ALCHEMY_API_KEY')
+        self.graph_api_key = os.getenv('GRAPH_API_KEY')
+        
+        if not self.alchemy_api_key or not self.graph_api_key:
+            raise ValueError("Missing required environment variables: ALCHEMY_API_KEY, GRAPH_API_KEY")
         
         # Web3 setup
         self.w3 = Web3(Web3.HTTPProvider(f"https://base-mainnet.g.alchemy.com/v2/{self.alchemy_api_key}"))
