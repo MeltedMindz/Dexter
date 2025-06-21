@@ -140,5 +140,8 @@ temp-*
 *_harvester.py
 *_service.py
 
+# Reference repositories for study
+reference/
+
 # Git housekeeping
 .git/gc.log

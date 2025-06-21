@@ -12,11 +12,14 @@ import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
 import "@uniswap/v3-periphery/contracts/libraries/LiquidityAmounts.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "../libraries/TWAPOracle.sol";
+import "../governance/EmergencyAdmin.sol";
 
 /**
  * @title DexterCompoundor
  * @notice AI-powered auto-compounding system for Uniswap V3 positions
  * @dev Based on Revert Finance's compounding architecture with AI enhancements
+ *      Includes advanced TWAP protection against MEV attacks
  */
 contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multicall {
     using SafeERC20 for IERC20;
@@ -26,17 +29,33 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
     uint128 constant Q96 = 2**96;
     uint64 constant public MAX_REWARD_X64 = uint64(Q64 / 50); // 2% max reward
     uint32 constant public MAX_POSITIONS_PER_ADDRESS = 200; // Higher limit for AI management
+    uint256 constant public MAX_GAS_PER_COMPOUND = 300000; // Max gas per compound operation
+    uint256 constant public GAS_BUFFER = 50000; // Gas buffer for safety checks
 
     // Configuration variables
     uint64 public totalRewardX64 = MAX_REWARD_X64; // 2%
     uint64 public compounderRewardX64 = MAX_REWARD_X64 / 2; // 1%
     uint32 public maxTWAPTickDifference = 100; // 1%
     uint32 public TWAPSeconds = 60;
+    
+    // TWAP Protection
+    using TWAPOracle for IUniswapV3Pool;
+    bool public twapProtectionEnabled = true;
 
     // Dexter-specific configurations
     uint64 public aiOptimizerRewardX64 = MAX_REWARD_X64 / 4; // 0.5% for AI optimizer
     address public aiAgent; // Address that can trigger AI-optimized compounds
     bool public aiOptimizationEnabled = true;
+    
+    // Emergency controls
+    EmergencyAdmin public emergencyAdmin;
+    bool public emergencyPaused = false;
+    
+    // Gas safety tracking
+    mapping(address => uint256) public accountPositionCount;
+    mapping(address => uint256) public lastOperationTimestamp;
+    uint256 public minOperationInterval = 1 minutes; // Min time between operations
+    bool public gasLimitingEnabled = true;
 
     // Core addresses
     address public immutable weth;
@@ -71,6 +90,12 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
     event TWAPConfigUpdated(address indexed account, uint32 maxTWAPTickDifference, uint32 TWAPSeconds);
     event AIAgentUpdated(address indexed oldAgent, address indexed newAgent);
     event AIOptimizationToggled(bool enabled);
+    event TWAPProtectionToggled(bool enabled);
+    event EmergencyAdminUpdated(address indexed emergencyAdmin);
+    event EmergencyPaused(address indexed by);
+    event EmergencyUnpaused(address indexed by);
+    event TokenRecovered(address indexed token, uint256 amount, address indexed to);
+    event GasLimitingUpdated(bool enabled, uint256 minInterval);
 
     /// @notice Reward conversion options
     enum RewardConversion { NONE, TOKEN_0, TOKEN_1, AI_OPTIMIZED }
@@ -98,12 +123,14 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
         address _weth,
         IUniswapV3Factory _factory,
         INonfungiblePositionManager _nonfungiblePositionManager,
-        ISwapRouter _swapRouter
+        ISwapRouter _swapRouter,
+        EmergencyAdmin _emergencyAdmin
     ) {
         weth = _weth;
         factory = _factory;
         nonfungiblePositionManager = _nonfungiblePositionManager;
         swapRouter = _swapRouter;
+        emergencyAdmin = _emergencyAdmin;
     }
 
     /**
@@ -134,9 +161,19 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
      * @param _TWAPSeconds TWAP calculation period
      */
     function setTWAPConfig(uint32 _maxTWAPTickDifference, uint32 _TWAPSeconds) external onlyOwner {
+        require(_TWAPSeconds >= TWAPOracle.MIN_TWAP_SECONDS, "TWAP period too short");
         maxTWAPTickDifference = _maxTWAPTickDifference;
         TWAPSeconds = _TWAPSeconds;
         emit TWAPConfigUpdated(msg.sender, _maxTWAPTickDifference, _TWAPSeconds);
+    }
+    
+    /**
+     * @notice Toggle TWAP protection (only owner)
+     * @param _enabled Whether TWAP protection is enabled
+     */
+    function toggleTWAPProtection(bool _enabled) external onlyOwner {
+        twapProtectionEnabled = _enabled;
+        emit TWAPProtectionToggled(_enabled);
     }
 
     /**
@@ -156,6 +193,133 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
     function toggleAIOptimization(bool _enabled) external onlyOwner {
         aiOptimizationEnabled = _enabled;
         emit AIOptimizationToggled(_enabled);
+    }
+    
+    /**
+     * @notice Set emergency admin contract (only owner)
+     * @param _emergencyAdmin New emergency admin contract
+     */
+    function setEmergencyAdmin(EmergencyAdmin _emergencyAdmin) external onlyOwner {
+        emergencyAdmin = _emergencyAdmin;
+        emit EmergencyAdminUpdated(address(_emergencyAdmin));
+    }
+    
+    /**
+     * @notice Emergency pause function (only emergency admin)
+     */
+    function emergencyPause() external {
+        require(
+            address(emergencyAdmin) != address(0) && 
+            emergencyAdmin.hasRole(emergencyAdmin.EMERGENCY_ADMIN_ROLE(), msg.sender),
+            "Not emergency admin"
+        );
+        emergencyPaused = true;
+        emit EmergencyPaused(msg.sender);
+    }
+    
+    /**
+     * @notice Emergency unpause function (only owner or emergency admin)
+     */
+    function emergencyUnpause() external {
+        require(
+            msg.sender == owner() || 
+            (address(emergencyAdmin) != address(0) && 
+             emergencyAdmin.hasRole(emergencyAdmin.EMERGENCY_ADMIN_ROLE(), msg.sender)),
+            "Not authorized"
+        );
+        emergencyPaused = false;
+        emit EmergencyUnpaused(msg.sender);
+    }
+    
+    /**
+     * @notice Emergency token recovery (only emergency admin)
+     * @param token Token address
+     * @param amount Amount to recover
+     * @param to Recipient address
+     */
+    function emergencyRecoverToken(address token, uint256 amount, address to) external {
+        require(
+            address(emergencyAdmin) != address(0) && 
+            emergencyAdmin.hasRole(emergencyAdmin.EMERGENCY_ADMIN_ROLE(), msg.sender),
+            "Not emergency admin"
+        );
+        IERC20(token).safeTransfer(to, amount);
+        emit TokenRecovered(token, amount, to);
+    }
+    
+    /**
+     * @notice Set gas limiting configuration (only owner)
+     * @param _enabled Whether gas limiting is enabled
+     * @param _minInterval Minimum interval between operations
+     */
+    function setGasLimiting(bool _enabled, uint256 _minInterval) external onlyOwner {
+        gasLimitingEnabled = _enabled;
+        minOperationInterval = _minInterval;
+        emit GasLimitingUpdated(_enabled, _minInterval);
+    }
+    
+    /**
+     * @notice Check if operation is within gas limits
+     * @param user User address
+     * @return allowed Whether operation is allowed
+     * @return reason Reason if not allowed
+     */
+    function checkGasLimits(address user) external view returns (bool allowed, string memory reason) {
+        if (!gasLimitingEnabled) {
+            return (true, "");
+        }
+        
+        // Check position count limit
+        if (accountPositionCount[user] >= MAX_POSITIONS_PER_ADDRESS) {
+            return (false, "Too many positions");
+        }
+        
+        // Check operation interval
+        if (block.timestamp < lastOperationTimestamp[user] + minOperationInterval) {
+            return (false, "Operation too frequent");
+        }
+        
+        // Check available gas
+        if (gasleft() < MAX_GAS_PER_COMPOUND + GAS_BUFFER) {
+            return (false, "Insufficient gas");
+        }
+        
+        return (true, "");
+    }
+    
+    /**
+     * @notice Estimate gas for compound operation
+     * @param tokenId Token ID to estimate for
+     * @return estimatedGas Estimated gas cost
+     */
+    function estimateCompoundGas(uint256 tokenId) external view returns (uint256 estimatedGas) {
+        try nonfungiblePositionManager.positions(tokenId) returns (
+            uint96, address, address, address, uint24, int24, int24, uint128 liquidity, uint256, uint256, uint128 tokensOwed0, uint128 tokensOwed1
+        ) {
+            // Base gas for compound
+            estimatedGas = 150000;
+            
+            // Additional gas for larger positions
+            if (liquidity > 1e18) {
+                estimatedGas += 50000;
+            }
+            
+            // Additional gas if both tokens have fees
+            if (tokensOwed0 > 0 && tokensOwed1 > 0) {
+                estimatedGas += 30000;
+            }
+            
+            // Add TWAP protection gas
+            if (twapProtectionEnabled) {
+                estimatedGas += 25000;
+            }
+            
+            // Add buffer
+            estimatedGas += GAS_BUFFER;
+            
+        } catch {
+            estimatedGas = MAX_GAS_PER_COMPOUND;
+        }
     }
 
     /**
@@ -194,6 +358,7 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
         
         ownerOf[tokenId] = account;
         accountTokens[account].push(tokenId);
+        accountPositionCount[account] = accountTokens[account].length;
     }
 
     /**
@@ -257,6 +422,7 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
         }
         
         delete ownerOf[tokenId];
+        accountPositionCount[account] = accountTokens[account].length;
     }
 
     /**
@@ -279,6 +445,30 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
         IERC20(token).safeTransfer(to, amount);
         
         emit BalanceWithdrawn(msg.sender, token, to, amount);
+    }
+    
+    /**
+     * @notice Get user's token balance
+     * @param account User address
+     * @param token Token address
+     * @return balance Token balance
+     */
+    function getAccountBalance(address account, address token) external view returns (uint256 balance) {
+        return accountBalances[account][token];
+    }
+    
+    /**
+     * @notice Withdraw all balances for multiple tokens
+     * @param tokens Array of token addresses
+     * @param to Recipient address
+     */
+    function withdrawAllBalances(address[] calldata tokens, address to) external nonReentrant {
+        for (uint256 i = 0; i < tokens.length; i++) {
+            uint256 balance = accountBalances[msg.sender][tokens[i]];
+            if (balance > 0) {
+                _withdrawBalance(tokens[i], to, balance);
+            }
+        }
     }
 
     /**
@@ -320,10 +510,19 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
     function autoCompound(AutoCompoundParams calldata params) 
         external 
         nonReentrant 
+        notInEmergency
         returns (uint256 reward0, uint256 reward1, uint256 compounded0, uint256 compounded1) 
     {
         uint256 tokenId = params.tokenId;
         require(ownerOf[tokenId] != address(0), "Invalid token");
+        
+        // Gas safety checks
+        if (gasLimitingEnabled && msg.sender != aiAgent) {
+            (bool allowed, string memory reason) = this.checkGasLimits(msg.sender);
+            require(allowed, reason);
+            
+            lastOperationTimestamp[msg.sender] = block.timestamp;
+        }
 
         // Check if AI optimization is requested and authorized
         bool useAI = params.useAIOptimization && 
@@ -443,25 +642,34 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
 
     /**
      * @notice Validate TWAP price to prevent MEV attacks
+     * @dev Uses enhanced TWAP library with multiple validation checks
      */
     function _validateTWAP(address token0, address token1, uint24 fee) internal view {
+        if (!twapProtectionEnabled) return;
+        
         address pool = factory.getPool(token0, token1, fee);
         require(pool != address(0), "Pool not found");
 
-        // Get current price
-        (, int24 currentTick, , , , ,) = IUniswapV3Pool(pool).slot0();
-
-        // Get TWAP price
-        uint32[] memory secondsAgos = new uint32[](2);
-        secondsAgos[0] = TWAPSeconds;
-        secondsAgos[1] = 0;
-
-        (int56[] memory tickCumulatives, ) = IUniswapV3Pool(pool).observe(secondsAgos);
-        int24 twapTick = int24((tickCumulatives[1] - tickCumulatives[0]) / int56(uint56(TWAPSeconds)));
-
-        // Check if current price is within acceptable range of TWAP
-        int24 tickDifference = currentTick > twapTick ? currentTick - twapTick : twapTick - currentTick;
-        require(uint24(tickDifference) <= maxTWAPTickDifference, "Price manipulation detected");
+        IUniswapV3Pool poolContract = IUniswapV3Pool(pool);
+        
+        // Use enhanced TWAP validation from library
+        (bool success, int24 twapTick) = poolContract.verifyTWAP(
+            TWAPSeconds,
+            int24(maxTWAPTickDifference),
+            false // Don't accept AI override in this context
+        );
+        
+        require(success, "TWAP validation failed");
+        
+        // Additional price deviation check for extra security
+        (uint256 currentPrice, uint256 twapPrice) = poolContract.getPrices(TWAPSeconds);
+        bool priceValid = TWAPOracle.validatePriceDeviation(
+            currentPrice,
+            twapPrice,
+            100 // 1% max deviation in basis points
+        );
+        
+        require(priceValid, "Price deviation too high");
     }
 
     /**
@@ -529,5 +737,15 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
     {
         require(ownerOf[params.tokenId] == msg.sender, "Not token owner");
         return nonfungiblePositionManager.collect(params);
+    }
+    
+    /// @notice Modifier to check emergency status
+    modifier notInEmergency() {
+        require(
+            !emergencyPaused && 
+            (address(emergencyAdmin) == address(0) || !emergencyAdmin.isEmergencyPaused(address(this))),
+            "Contract is in emergency mode"
+        );
+        _;
     }
 }
