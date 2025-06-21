@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
 import pg from 'pg'
+import crypto from 'crypto'
 
 const { Pool } = pg
 
@@ -188,6 +189,5 @@ export async function POST(request: NextRequest) {
 
 // Helper function to hash API key
 function hashApiKey(apiKey: string): string {
-  const crypto = require('crypto')
   return crypto.createHash('sha256').update(apiKey).digest('hex')
 }
