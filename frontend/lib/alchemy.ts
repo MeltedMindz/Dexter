@@ -22,24 +22,28 @@ const mainnetSettings: AlchemySettings = {
   url: hasValidAlchemyKey ? undefined : 'https://eth.llamarpc.com',
 }
 
-export const alchemyBase = new Alchemy(baseSettings)
-export const alchemyMainnet = new Alchemy(mainnetSettings)
+// Only initialize Alchemy on the client side
+export const alchemyBase = typeof window !== 'undefined' ? new Alchemy(baseSettings) : null
+export const alchemyMainnet = typeof window !== 'undefined' ? new Alchemy(mainnetSettings) : null
 
 // Enhanced token data fetching
 export const getTokenMetadata = async (tokenAddress: string, network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.getTokenMetadata(tokenAddress)
 }
 
 // Enhanced balance fetching
 export const getTokenBalances = async (address: string, network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.getTokenBalances(address)
 }
 
 // Get NFTs for address
 export const getNftsForOwner = async (address: string, network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.nft.getNftsForOwner(address)
 }
 
@@ -54,6 +58,7 @@ export const getAssetTransfers = async (
   }
 ) => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.getAssetTransfers({
     fromAddress: address,
     category: options?.category || [AssetTransfersCategory.EXTERNAL, AssetTransfersCategory.ERC20],
@@ -66,30 +71,35 @@ export const getAssetTransfers = async (
 // Enhanced gas estimation
 export const getGasEstimate = async (transaction: any, network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.estimateGas(transaction)
 }
 
 // Get current gas prices
 export const getGasPrice = async (network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.getGasPrice()
 }
 
 // Enhanced block data
 export const getBlockWithTransactions = async (blockNumber: number | string, network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.getBlockWithTransactions(blockNumber)
 }
 
 // Get logs for contract events
 export const getLogs = async (filter: any, network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return await alchemy.core.getLogs(filter)
 }
 
 // WebSocket support for real-time updates
 export const createWebSocketConnection = (network: 'base' | 'mainnet' = 'base') => {
   const alchemy = network === 'base' ? alchemyBase : alchemyMainnet
+  if (!alchemy) throw new Error('Alchemy not available on server side')
   return alchemy.ws
 }
 

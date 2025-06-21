@@ -31,7 +31,7 @@ const mainnetRpcUrl = getMainnetRpcUrl()
 
 export const config = createConfig({
   chains: [base, mainnet],
-  connectors: [
+  connectors: typeof window !== 'undefined' ? [
     injected(),
     coinbaseWallet({
       appName: 'Dexter Protocol',
@@ -45,7 +45,7 @@ export const config = createConfig({
         icons: ['https://www.dexteragent.com/favicon.ico']
       }
     }),
-  ],
+  ] : [],
   transports: {
     [base.id]: http(baseRpcUrl),
     [mainnet.id]: http(mainnetRpcUrl),
