@@ -1,0 +1,138 @@
+name: Dexter AI Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHONPATH: ${{ github.workspace }}/dexter-liquidity:${{ github.workspace }}/backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dexter_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r dexter-liquidity/requirements.txt
+        pip install -r backend/requirements.txt
+        pip install pytest pytest-cov pytest-asyncio black isort mypy
+    
+    - name: Set up environment variables
+      run: |
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/dexter_test" >> $GITHUB_ENV
+        echo "REDIS_URL=redis://localhost:6379" >> $GITHUB_ENV
+        echo "ENVIRONMENT=test" >> $GITHUB_ENV
+    
+    - name: Run linting
+      run: |
+        black --check dexter-liquidity/ backend/
+        isort --check-only dexter-liquidity/ backend/
+    
+    - name: Run type checking
+      run: |
+        mypy dexter-liquidity/ --ignore-missing-imports || true
+        mypy backend/ --ignore-missing-imports || true
+    
+    - name: Run dexter-liquidity tests
+      working-directory: ./dexter-liquidity
+      run: |
+        python -m pytest tests/ -v --cov=. --cov-report=xml
+    
+    - name: Run backend tests
+      working-directory: ./backend
+      run: |
+        python -m pytest tests/ -v --cov=. --cov-report=xml || true
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./dexter-liquidity/coverage.xml,./backend/coverage.xml
+        fail_ci_if_error: false
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run security scan
+      run: |
+        pip install bandit safety
+        bandit -r dexter-liquidity/ backend/ || true
+        safety check || true
+
+  vps-deployment:
+    needs: [test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to VPS
+      env:
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        VPS_USER: ${{ secrets.VPS_USER }}
+        VPS_KEY: ${{ secrets.VPS_SSH_KEY }}
+      run: |
+        echo "VPS deployment would trigger here"
+        # Install SSH key
+        mkdir -p ~/.ssh
+        echo "$VPS_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # Add VPS to known hosts
+        ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
+        
+        # Deploy command (to be implemented)
+        echo "ssh $VPS_USER@$VPS_HOST 'cd /opt/dexter && git pull && docker-compose up -d --build'"

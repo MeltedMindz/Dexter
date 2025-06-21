@@ -1,0 +1,55 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Dexter AI services
+  - job_name: 'dexter-services'
+    static_configs:
+      - targets: ['172.17.0.1:8000']  # Log API
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Custom Dexter metrics endpoint
+  - job_name: 'dexter-custom-metrics'
+    static_configs:
+      - targets: ['172.17.0.1:9091']  # Custom metrics
+    scrape_interval: 30s
+    metrics_path: /metrics
+    
+  # Dexter services health
+  - job_name: 'dexter-health'
+    static_configs:
+      - targets: ['172.17.0.1:9091']  # Health endpoint
+    scrape_interval: 15s
+    metrics_path: /health
+
+  # Redis metrics (if redis_exporter is added)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Optional: Add recording rules for Dexter-specific metrics
+# rule_files:
+#   - "dexter_rules.yml"

@@ -1,0 +1,128 @@
+name: Infrastructure Monitoring
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: VPS Health Check
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # System health check
+          echo "=== System Health Check ==="
+          
+          # CPU and Memory
+          echo "CPU Usage: $(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)"
+          echo "Memory Usage: $(free -m | awk 'NR==2{printf "%.1f%%", $3*100/$2}')"
+          echo "Disk Usage: $(df -h / | awk 'NR==2{print $5}')"
+          
+          # Service status
+          echo -e "\n=== Service Status ==="
+          services=("dexter-position-harvester" "dexter-enhanced-alchemy" "dexter-analysis" "dexter-metrics-exporter")
+          
+          for service in "${services[@]}"; do
+            if systemctl is-active --quiet "$service.service"; then
+              echo "✅ $service: ACTIVE"
+            else
+              echo "❌ $service: INACTIVE"
+              # Try to restart failed services
+              systemctl restart "$service.service" || echo "Failed to restart $service"
+            fi
+          done
+          
+          # Docker containers
+          echo -e "\n=== Docker Containers ==="
+          docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}" | grep dexter
+          
+          # Recent logs check
+          echo -e "\n=== Recent Activity ==="
+          tail -5 /var/log/dexter/liquidity.log | jq -r '.message' 2>/dev/null || echo "No recent activity"
+          
+          # Metrics endpoint test
+          echo -e "\n=== Metrics Test ==="
+          if curl -s http://localhost:9091/health | jq -r '.status' 2>/dev/null | grep -q "healthy"; then
+            echo "✅ Metrics endpoint: HEALTHY"
+          else
+            echo "❌ Metrics endpoint: UNHEALTHY"
+          fi
+
+  alert-on-failure:
+    needs: health-check
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+    - name: Create GitHub Issue on Failure
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const issue = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🚨 Infrastructure Health Check Failed',
+            body: `
+            ## Infrastructure Alert
+            
+            **Time**: ${new Date().toISOString()}
+            **Workflow**: ${context.workflow}
+            **Run ID**: ${context.runId}
+            
+            ### Details
+            The automated health check has detected issues with the Dexter AI infrastructure.
+            
+            ### Action Required
+            1. Check VPS status and services
+            2. Review logs at \`/var/log/dexter/liquidity.log\`
+            3. Verify all Docker containers are running
+            4. Test metrics endpoints
+            
+            ### Auto-Recovery
+            The system will attempt to auto-restart failed services.
+            
+            This issue will be automatically closed when the next health check passes.
+            `,
+            labels: ['infrastructure', 'alert', 'urgent']
+          });
+          
+          console.log(`Created issue #${issue.data.number}`);
+
+  close-resolved-alerts:
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Close resolved infrastructure alerts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'infrastructure,alert',
+            state: 'open'
+          });
+          
+          for (const issue of issues.data) {
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed'
+            });
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: '✅ Infrastructure health check passed. Auto-closing this alert.'
+            });
+          }

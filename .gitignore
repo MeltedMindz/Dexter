@@ -1,6 +1,7 @@
 # Private folders - all sensitive documents
 private/
 .private/
+pitch-deck-2025/
 
 # Legacy private documents (if any remain in root)
 DEXTER_FUNDING_PITCH.md

@@ -1,17 +1,25 @@
 import { Alchemy, Network, AlchemySettings, AssetTransfersCategory } from 'alchemy-sdk'
 
-const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || ''
+const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
+
+// Check if we have a valid Alchemy API key
+const hasValidAlchemyKey = alchemyApiKey && 
+  alchemyApiKey !== 'demo' && 
+  alchemyApiKey !== 'demo-key-needs-replacement' && 
+  alchemyApiKey.length > 10
 
 // Base Network Alchemy instance
 const baseSettings: AlchemySettings = {
-  apiKey: alchemyApiKey,
+  apiKey: alchemyApiKey || 'demo',
   network: Network.BASE_MAINNET,
+  url: hasValidAlchemyKey ? undefined : 'https://mainnet.base.org',
 }
 
-// Mainnet Alchemy instance
+// Mainnet Alchemy instance  
 const mainnetSettings: AlchemySettings = {
-  apiKey: alchemyApiKey,
+  apiKey: alchemyApiKey || 'demo',
   network: Network.ETH_MAINNET,
+  url: hasValidAlchemyKey ? undefined : 'https://eth.llamarpc.com',
 }
 
 export const alchemyBase = new Alchemy(baseSettings)

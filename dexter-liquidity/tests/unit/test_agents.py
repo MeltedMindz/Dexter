@@ -3,7 +3,7 @@ from web3 import Web3
 from unittest.mock import Mock, patch
 import asyncio
 
-from agent_framework import (
+from agents import (
     DexterAgent,
     ConservativeAgent,
     AggressiveAgent,
@@ -15,9 +15,11 @@ from agent_framework import (
 
 @pytest.fixture
 def web3_mock():
-    web3 = Mock(spec=Web3)
+    web3 = Mock()
     web3.is_connected.return_value = True
-    web3.eth.get_block.return_value = Mock(timestamp=1234567890)
+    eth_mock = Mock()
+    eth_mock.get_block.return_value = Mock(timestamp=1234567890)
+    web3.eth = eth_mock
     return web3
 
 @pytest.fixture

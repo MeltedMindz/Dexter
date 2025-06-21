@@ -1,0 +1,220 @@
+name: Dexter AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r dexter-liquidity/requirements.txt
+        pip install pytest pytest-cov pytest-asyncio black isort mypy
+    
+    - name: Format check with Black
+      run: black --check --diff .
+    
+    - name: Import sorting check with isort
+      run: isort --check-only --diff .
+    
+    - name: Type checking with mypy
+      run: mypy dexter-liquidity/ --ignore-missing-imports
+    
+    - name: Run tests
+      run: |
+        cd dexter-liquidity
+        pytest tests/ -v --cov=. --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./dexter-liquidity/coverage.xml
+        fail_ci_if_error: true
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Bandit Security Scan
+      uses: securecodewarrior/github-action-bandit@v1
+      with:
+        path: "dexter-liquidity/"
+    
+    - name: Run Safety check
+      run: |
+        pip install safety
+        safety check -r dexter-liquidity/requirements.txt
+
+  build-and-deploy:
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix=sha-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./dexter-liquidity
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # Pull latest image
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          
+          # Update services with zero-downtime deployment
+          cd /opt/dexter-ai
+          
+          # Create blue-green deployment script
+          cat > deploy.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          
+          echo "Starting blue-green deployment..."
+          
+          # Stop current services gracefully
+          systemctl stop dexter-position-harvester || true
+          systemctl stop dexter-enhanced-alchemy || true
+          
+          # Backup current deployment
+          if [ -d "/opt/dexter-ai/backup" ]; then
+            rm -rf /opt/dexter-ai/backup-old
+            mv /opt/dexter-ai/backup /opt/dexter-ai/backup-old
+          fi
+          mkdir -p /opt/dexter-ai/backup
+          cp -r position-harvester/ backup/ 2>/dev/null || true
+          
+          # Deploy new version
+          echo "Deploying new version..."
+          
+          # Restart services
+          systemctl start dexter-position-harvester
+          systemctl start dexter-enhanced-alchemy
+          
+          # Health check
+          sleep 10
+          if systemctl is-active --quiet dexter-position-harvester && systemctl is-active --quiet dexter-enhanced-alchemy; then
+            echo "✅ Deployment successful!"
+            rm -rf /opt/dexter-ai/backup-old
+          else
+            echo "❌ Deployment failed, rolling back..."
+            systemctl stop dexter-position-harvester || true
+            systemctl stop dexter-enhanced-alchemy || true
+            
+            if [ -d "/opt/dexter-ai/backup-old" ]; then
+              rm -rf position-harvester/
+              mv backup-old/position-harvester . 2>/dev/null || true
+            fi
+            
+            systemctl start dexter-position-harvester
+            systemctl start dexter-enhanced-alchemy
+            exit 1
+          fi
+          EOF
+          
+          chmod +x deploy.sh
+          ./deploy.sh
+
+  performance-test:
+    needs: [build-and-deploy]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Performance Test
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # Test metrics endpoint
+          curl -f http://localhost:9091/metrics > /dev/null || exit 1
+          
+          # Test Grafana
+          curl -f http://localhost:3000/api/health > /dev/null || exit 1
+          
+          # Test Prometheus
+          curl -f http://localhost:9090/-/healthy > /dev/null || exit 1
+          
+          # Check service status
+          systemctl is-active --quiet dexter-position-harvester || exit 1
+          systemctl is-active --quiet dexter-enhanced-alchemy || exit 1
+          systemctl is-active --quiet dexter-metrics-exporter || exit 1
+          
+          echo "✅ All performance tests passed!"
+
+  notify:
+    needs: [performance-test]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify deployment status
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          # Log deployment to Dexter logs
+          echo "{\"timestamp\": \"$(date -Iseconds)\", \"level\": \"INFO\", \"source\": \"CI_CD\", \"message\": \"Deployment completed via GitHub Actions\", \"details\": {\"commit\": \"${{ github.sha }}\", \"branch\": \"${{ github.ref_name }}\", \"status\": \"${{ job.status }}\"}}" >> /var/log/dexter/liquidity.log

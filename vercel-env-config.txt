@@ -1,0 +1,28 @@
+# Copy these environment variables to Vercel Dashboard
+# Go to: https://vercel.com/your-team/dexter/settings/environment-variables
+
+# Essential API Keys (REQUIRED)
+NEXT_PUBLIC_ALCHEMY_API_KEY=demo-key-needs-replacement
+
+# RPC Configuration
+NEXT_PUBLIC_BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/demo
+NEXT_PUBLIC_MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/demo
+
+# Public RPC Fallbacks (these work without API keys)
+NEXT_PUBLIC_BASE_RPC_FALLBACK=https://mainnet.base.org
+NEXT_PUBLIC_MAINNET_RPC_FALLBACK=https://eth.llamarpc.com
+
+# WalletConnect (optional - has working fallback)
+NEXT_PUBLIC_WC_PROJECT_ID=130fac92acf3681422903f821a58922a
+
+# Application URLs
+NEXT_PUBLIC_API_URL=https://api.dexteragent.com
+NEXT_PUBLIC_WEBSOCKET_URL=wss://api.dexteragent.com/ws
+
+# Environment
+NODE_ENV=production
+NEXT_PUBLIC_ENVIRONMENT=production
+
+# Optional Features
+NEXT_PUBLIC_ENABLE_ANALYTICS=true
+NEXT_PUBLIC_ENABLE_ERROR_REPORTING=true

@@ -8,8 +8,7 @@ load_dotenv()
 class Config:
     """Centralized configuration for DexBrain system"""
     
-    # Blockchain RPC Endpoints
-    SOLANA_RPC: str = os.getenv('SOLANA_RPC', 'https://api.mainnet-beta.solana.com')
+    # Blockchain RPC Endpoints  
     ETHEREUM_RPC: str = os.getenv('ETHEREUM_RPC', 'https://mainnet.infura.io/v3/YOUR_PROJECT_ID')
     BASE_RPC: str = os.getenv('BASE_RPC', 'https://mainnet-rpc.linkpool.io/')
     
