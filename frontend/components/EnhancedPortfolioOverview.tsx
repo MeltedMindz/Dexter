@@ -13,23 +13,23 @@ interface NetworkToggleProps {
 
 function NetworkToggle({ network, onNetworkChange }: NetworkToggleProps) {
   return (
-    <div className="flex items-center space-x-2 bg-slate-100 dark:bg-dark-600 rounded-lg p-1">
+    <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-1">
       <button
         onClick={() => onNetworkChange('base')}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
           network === 'base'
-            ? 'bg-primary text-white'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            ? 'bg-green-500 text-white shadow-sm'
+            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
         }`}
       >
         Base
       </button>
       <button
         onClick={() => onNetworkChange('mainnet')}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
           network === 'mainnet'
-            ? 'bg-primary text-white'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            ? 'bg-blue-500 text-white shadow-sm'
+            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
         }`}
       >
         Mainnet
@@ -131,11 +131,11 @@ export function EnhancedPortfolioOverview() {
           {/* Data Source Toggle */}
           <button
             onClick={() => setShowRealData(!showRealData)}
-            className="flex items-center space-x-2 px-3 py-2 bg-slate-100 dark:bg-dark-600 rounded-lg hover:bg-slate-200 dark:hover:bg-dark-500 transition-colors"
+            className="flex items-center space-x-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 text-gray-700 dark:text-gray-200"
             title={showRealData ? 'Switch to mock data' : 'Switch to real wallet data'}
           >
             {showRealData ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-            <span className="text-sm">{showRealData ? 'Real Data' : 'Mock Data'}</span>
+            <span className="text-sm font-medium">{showRealData ? 'Real Data' : 'Mock Data'}</span>
           </button>
           
           {/* Network Toggle - only show when using real data */}
