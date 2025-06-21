@@ -3,15 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { 
   Factory, 
   Zap, 
@@ -71,7 +62,7 @@ const VAULT_TEMPLATES: VaultTemplate[] = [
     performanceFee: 10,
     riskLevel: 'Low',
     aiEnabled: false,
-    icon: <Settings className=\"w-6 h-6\" />
+    icon: <Settings className="w-6 h-6" />
   },
   {
     id: 'gamma',
@@ -88,7 +79,7 @@ const VAULT_TEMPLATES: VaultTemplate[] = [
     performanceFee: 12.5,
     riskLevel: 'Medium',
     aiEnabled: false,
-    icon: <TrendingUp className=\"w-6 h-6\" />
+    icon: <TrendingUp className="w-6 h-6" />
   },
   {
     id: 'ai_optimized',
@@ -105,7 +96,7 @@ const VAULT_TEMPLATES: VaultTemplate[] = [
     performanceFee: 15,
     riskLevel: 'Medium',
     aiEnabled: true,
-    icon: <Zap className=\"w-6 h-6\" />
+    icon: <Zap className="w-6 h-6" />
   },
   {
     id: 'institutional',
@@ -122,7 +113,7 @@ const VAULT_TEMPLATES: VaultTemplate[] = [
     performanceFee: 7.5,
     riskLevel: 'Low',
     aiEnabled: true,
-    icon: <Shield className=\"w-6 h-6\" />
+    icon: <Shield className="w-6 h-6" />
   }
 ]
 
@@ -165,11 +156,6 @@ export default function VaultFactory() {
   })
   const [isDeploying, setIsDeploying] = useState(false)
   const [deploymentHash, setDeploymentHash] = useState<string>()
-
-  const { writeContract } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash: deploymentHash as `0x${string}`
-  })
 
   const selectedTemplateData = VAULT_TEMPLATES.find(t => t.id === selectedTemplate)
 
@@ -220,32 +206,19 @@ export default function VaultFactory() {
     setIsDeploying(true)
     
     try {
-      const deploymentParams = {
-        token0: formData.token0,
-        token1: formData.token1,
-        fee: formData.feeTier,
-        templateType: selectedTemplate,
-        vaultConfig: vaultConfig,
-        name: formData.name,
-        symbol: formData.symbol,
-        initialDeposit0: parseEther(formData.initialDeposit0 || '0'),
-        initialDeposit1: parseEther(formData.initialDeposit1 || '0'),
-        createPool: formData.createPool,
-        enableWhitelist: formData.enableWhitelist,
-        initialWhitelist: [],
-        customData: '0x'
-      }
-
-      await writeContract({
-        address: '0x...', // VaultFactory address
-        abi: [], // VaultFactory ABI
-        functionName: 'createVault',
-        args: [deploymentParams],
-        value: parseEther('0.01') // Deployment fee
+      // Mock deployment for demo
+      console.log('Deploying vault with config:', {
+        template: selectedTemplate,
+        formData,
+        vaultConfig
       })
+      // Simulate deployment delay
+      setTimeout(() => {
+        setIsDeploying(false)
+        alert('Vault deployed successfully! (This is a demo)')
+      }, 2000)
     } catch (error) {
       console.error('Deployment failed:', error)
-    } finally {
       setIsDeploying(false)
     }
   }
@@ -269,40 +242,38 @@ export default function VaultFactory() {
 
   if (!isConnected) {
     return (
-      <div className=\"min-h-screen bg-gray-50 p-6 flex items-center justify-center\">
-        <Card className=\"w-full max-w-md\">
-          <CardContent className=\"p-6 text-center\">
-            <Factory className=\"w-12 h-12 text-gray-400 mx-auto mb-4\" />
-            <h2 className=\"text-xl font-semibold mb-2\">Connect Wallet</h2>
-            <p className=\"text-gray-600 mb-4\">
-              Please connect your wallet to create a new vault
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 flex items-center justify-center">
+        <div className="w-full max-w-md bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6 text-center">
+          <Factory className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Connect Wallet</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Please connect your wallet to create a new vault
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className=\"min-h-screen bg-gray-50 p-6\">
-      <div className=\"max-w-4xl mx-auto space-y-6\">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className=\"text-center\">
-          <h1 className=\"text-3xl font-bold text-gray-900 mb-2\">Create New Vault</h1>
-          <p className=\"text-gray-600\">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create New Vault</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Deploy a new automated liquidity management vault with AI optimization
           </p>
         </div>
 
         {/* Progress Steps */}
-        <div className=\"flex items-center justify-center space-x-4 mb-8\">
+        <div className="flex items-center justify-center space-x-4 mb-8">
           {[
             { number: 1, title: 'Template' },
             { number: 2, title: 'Configuration' },
             { number: 3, title: 'Settings' },
             { number: 4, title: 'Deploy' }
           ].map((step, index) => (
-            <div key={step.number} className=\"flex items-center\">
+            <div key={step.number} className="flex items-center">
               <div className={`
                 flex items-center justify-center w-10 h-10 rounded-full border-2 font-medium
                 ${getStepStatus(step.number) === 'completed' ? 'bg-green-500 border-green-500 text-white' :
@@ -310,401 +281,333 @@ export default function VaultFactory() {
                   'bg-gray-200 border-gray-300 text-gray-500'}
               `}>
                 {getStepStatus(step.number) === 'completed' ? (
-                  <CheckCircle className=\"w-5 h-5\" />
+                  <CheckCircle className="w-5 h-5" />
                 ) : (
                   step.number
                 )}
               </div>
-              <span className=\"ml-2 text-sm font-medium text-gray-700\">{step.title}</span>
-              {index < 3 && <ChevronRight className=\"w-4 h-4 text-gray-400 mx-4\" />}
+              <span className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">{step.title}</span>
+              {index < 3 && <ChevronRight className="w-4 h-4 text-gray-400 mx-4" />}
             </div>
           ))}
         </div>
 
         {/* Step 1: Template Selection */}
         {currentStep === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Choose Vault Template</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className=\"grid grid-cols-1 md:grid-cols-2 gap-6\">
-                {VAULT_TEMPLATES.map((template) => (
-                  <div
-                    key={template.id}
-                    className={`
-                      border rounded-lg p-6 cursor-pointer transition-all
-                      ${selectedTemplate === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}
-                    `}
-                    onClick={() => handleTemplateSelect(template.id)}
-                  >
-                    <div className=\"flex items-center justify-between mb-4\">
-                      <div className=\"flex items-center space-x-3\">
-                        <div className={`
-                          p-2 rounded-lg
-                          ${selectedTemplate === template.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}
-                        `}>
-                          {template.icon}
-                        </div>
-                        <div>
-                          <h3 className=\"font-semibold\">{template.name}</h3>
-                          <div className=\"flex items-center space-x-2 mt-1\">
-                            <Badge variant={template.riskLevel === 'Low' ? 'default' : template.riskLevel === 'Medium' ? 'secondary' : 'destructive'}>
-                              {template.riskLevel} Risk
-                            </Badge>
-                            {template.aiEnabled && (
-                              <Badge variant=\"outline\" className=\"bg-purple-50 text-purple-700\">
-                                <Sparkles className=\"w-3 h-3 mr-1\" />
-                                AI
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <p className=\"text-sm text-gray-600 mb-4\">{template.description}</p>
-                    
-                    <div className=\"space-y-2 mb-4\">
-                      {template.features.map((feature, index) => (
-                        <div key={index} className=\"flex items-center text-sm text-gray-600\">
-                          <CheckCircle className=\"w-4 h-4 text-green-500 mr-2\" />
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className=\"grid grid-cols-3 gap-2 text-xs text-gray-500\">
-                      <div>
-                        <p className=\"font-medium\">Min Deposit</p>
-                        <p>${template.minDeposit}</p>
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Choose Vault Template</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {VAULT_TEMPLATES.map((template) => (
+                <div
+                  key={template.id}
+                  className={`
+                    border-2 rounded-lg p-6 cursor-pointer transition-all
+                    ${selectedTemplate === template.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 hover:border-gray-400'}
+                  `}
+                  onClick={() => handleTemplateSelect(template.id)}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`
+                        p-2 rounded-lg
+                        ${selectedTemplate === template.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}
+                      `}>
+                        {template.icon}
                       </div>
                       <div>
-                        <p className=\"font-medium\">Mgmt Fee</p>
-                        <p>{template.managementFee}%</p>
-                      </div>
-                      <div>
-                        <p className=\"font-medium\">Perf Fee</p>
-                        <p>{template.performanceFee}%</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">{template.name}</h3>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs ${
+                            template.riskLevel === 'Low' ? 'bg-green-100 text-green-800' : 
+                            template.riskLevel === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {template.riskLevel} Risk
+                          </span>
+                          {template.aiEnabled && (
+                            <span className="inline-flex items-center px-2 py-1 rounded border border-purple-500 text-purple-700 text-xs">
+                              <Sparkles className="w-3 h-3 mr-1" />
+                              AI
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{template.description}</p>
+                  
+                  <div className="space-y-2 mb-4">
+                    {template.features.map((feature, index) => (
+                      <div key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <div>
+                      <p className="font-medium">Min Deposit</p>
+                      <p>${template.minDeposit}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Mgmt Fee</p>
+                      <p>{template.managementFee}%</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Perf Fee</p>
+                      <p>{template.performanceFee}%</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Step 2: Configuration */}
         {currentStep === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Vault Configuration</CardTitle>
-            </CardHeader>
-            <CardContent className=\"space-y-6\">
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Vault Configuration</h2>
+            <div className="space-y-6">
               {/* Basic Info */}
-              <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor=\"name\">Vault Name</Label>
-                  <Input
-                    id=\"name\"
-                    placeholder=\"e.g., ETH/USDC Optimized\"
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vault Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., ETH/USDC Optimized"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label htmlFor=\"symbol\">Vault Symbol</Label>
-                  <Input
-                    id=\"symbol\"
-                    placeholder=\"e.g., dETH-USDC\"
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vault Symbol</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., dETH-USDC"
                     value={formData.symbol}
                     onChange={(e) => setFormData({...formData, symbol: e.target.value})}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                   />
                 </div>
               </div>
 
               {/* Token Selection */}
-              <div className=\"space-y-4\">
-                <h3 className=\"font-medium\">Token Pair</h3>
-                <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">
+              <div className="space-y-4">
+                <h3 className="font-medium text-gray-900 dark:text-white">Token Pair</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor=\"token0\">Token 0</Label>
-                    <Select value={formData.token0} onValueChange={(value) => setFormData({...formData, token0: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder=\"Select token\" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {POPULAR_TOKENS.map((token) => (
-                          <SelectItem key={token.address} value={token.address}>
-                            {token.symbol} - {token.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Token 0</label>
+                    <select 
+                      value={formData.token0} 
+                      onChange={(e) => setFormData({...formData, token0: e.target.value})}
+                      className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
+                    >
+                      <option value="">Select token</option>
+                      {POPULAR_TOKENS.map((token) => (
+                        <option key={token.address} value={token.address}>
+                          {token.symbol} - {token.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
-                    <Label htmlFor=\"token1\">Token 1</Label>
-                    <Select value={formData.token1} onValueChange={(value) => setFormData({...formData, token1: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder=\"Select token\" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {POPULAR_TOKENS.map((token) => (
-                          <SelectItem key={token.address} value={token.address}>
-                            {token.symbol} - {token.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Token 1</label>
+                    <select 
+                      value={formData.token1} 
+                      onChange={(e) => setFormData({...formData, token1: e.target.value})}
+                      className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
+                    >
+                      <option value="">Select token</option>
+                      {POPULAR_TOKENS.map((token) => (
+                        <option key={token.address} value={token.address}>
+                          {token.symbol} - {token.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
 
               {/* Fee Tier */}
               <div>
-                <Label>Fee Tier</Label>
-                <div className=\"grid grid-cols-2 md:grid-cols-4 gap-2 mt-2\">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fee Tier</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                   {FEE_TIERS.map((tier) => (
                     <div
                       key={tier.value}
                       className={`
-                        border rounded-lg p-3 cursor-pointer text-center transition-all
-                        ${formData.feeTier === tier.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}
+                        border-2 rounded-lg p-3 cursor-pointer text-center transition-all
+                        ${formData.feeTier === tier.value ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 hover:border-gray-400'}
                       `}
                       onClick={() => setFormData({...formData, feeTier: tier.value})}
                     >
-                      <p className=\"font-medium\">{tier.label}</p>
-                      <p className=\"text-xs text-gray-600\">{tier.description}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{tier.label}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{tier.description}</p>
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Initial Liquidity */}
-              <div className=\"space-y-4\">
-                <h3 className=\"font-medium\">Initial Liquidity (Optional)</h3>
-                <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">
-                  <div>
-                    <Label htmlFor=\"deposit0\">Token 0 Amount</Label>
-                    <Input
-                      id=\"deposit0\"
-                      type=\"number\"
-                      placeholder=\"0.0\"
-                      value={formData.initialDeposit0}
-                      onChange={(e) => setFormData({...formData, initialDeposit0: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor=\"deposit1\">Token 1 Amount</Label>
-                    <Input
-                      id=\"deposit1\"
-                      type=\"number\"
-                      placeholder=\"0.0\"
-                      value={formData.initialDeposit1}
-                      onChange={(e) => setFormData({...formData, initialDeposit1: e.target.value})}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Advanced Options */}
-              <div className=\"space-y-4\">
-                <h3 className=\"font-medium\">Advanced Options</h3>
-                <div className=\"space-y-3\">
-                  <div className=\"flex items-center justify-between\">
-                    <div>
-                      <Label>Create Pool if Not Exists</Label>
-                      <p className=\"text-sm text-gray-600\">Automatically create Uniswap V3 pool</p>
-                    </div>
-                    <Switch
-                      checked={formData.createPool}
-                      onCheckedChange={(checked) => setFormData({...formData, createPool: checked})}
-                    />
-                  </div>
-                  <div className=\"flex items-center justify-between\">
-                    <div>
-                      <Label>Enable Whitelist</Label>
-                      <p className=\"text-sm text-gray-600\">Restrict deposits to whitelisted addresses</p>
-                    </div>
-                    <Switch
-                      checked={formData.enableWhitelist}
-                      onCheckedChange={(checked) => setFormData({...formData, enableWhitelist: checked})}
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Step 3: Strategy Settings */}
         {currentStep === 3 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Strategy Settings</CardTitle>
-            </CardHeader>
-            <CardContent className=\"space-y-6\">
-              <div className=\"grid grid-cols-1 md:grid-cols-2 gap-6\">
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Strategy Settings</h2>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label>Strategy Mode</Label>
-                  <Select 
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Strategy Mode</label>
+                  <select 
                     value={vaultConfig.strategyMode} 
-                    onValueChange={(value: any) => setVaultConfig({...vaultConfig, strategyMode: value})}
+                    onChange={(e) => setVaultConfig({...vaultConfig, strategyMode: e.target.value as any})}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=\"MANUAL\">Manual Control</SelectItem>
-                      <SelectItem value=\"AI_ASSISTED\">AI Assisted</SelectItem>
-                      <SelectItem value=\"FULLY_AUTOMATED\">Fully Automated</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="MANUAL">Manual Control</option>
+                    <option value="AI_ASSISTED">AI Assisted</option>
+                    <option value="FULLY_AUTOMATED">Fully Automated</option>
+                  </select>
                 </div>
 
                 <div>
-                  <Label>Position Type</Label>
-                  <Select 
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Position Type</label>
+                  <select 
                     value={vaultConfig.positionType} 
-                    onValueChange={(value: any) => setVaultConfig({...vaultConfig, positionType: value})}
+                    onChange={(e) => setVaultConfig({...vaultConfig, positionType: e.target.value as any})}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=\"SINGLE_RANGE\">Single Range</SelectItem>
-                      <SelectItem value=\"DUAL_POSITION\">Dual Position</SelectItem>
-                      <SelectItem value=\"MULTI_RANGE\">Multi Range</SelectItem>
-                      <SelectItem value=\"AI_OPTIMIZED\">AI Optimized</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="SINGLE_RANGE">Single Range</option>
+                    <option value="DUAL_POSITION">Dual Position</option>
+                    <option value="MULTI_RANGE">Multi Range</option>
+                    <option value="AI_OPTIMIZED">AI Optimized</option>
+                  </select>
                 </div>
 
                 <div>
-                  <Label>Rebalance Threshold (%)</Label>
-                  <Input
-                    type=\"number\"
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rebalance Threshold (%)</label>
+                  <input
+                    type="number"
                     value={vaultConfig.rebalanceThreshold}
                     onChange={(e) => setVaultConfig({...vaultConfig, rebalanceThreshold: parseInt(e.target.value)})}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <Label>Max Slippage (%)</Label>
-                  <Input
-                    type=\"number\"
-                    step=\"0.1\"
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Slippage (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
                     value={vaultConfig.maxSlippage}
                     onChange={(e) => setVaultConfig({...vaultConfig, maxSlippage: parseFloat(e.target.value)})}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                   />
                 </div>
               </div>
 
-              <div className=\"flex items-center justify-between\">
+              <div className="flex items-center justify-between">
                 <div>
-                  <Label>Auto Compound</Label>
-                  <p className=\"text-sm text-gray-600\">Automatically compound earned fees</p>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Auto Compound</label>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Automatically compound earned fees</p>
                 </div>
-                <Switch
+                <input
+                  type="checkbox"
                   checked={vaultConfig.autoCompound}
-                  onCheckedChange={(checked) => setVaultConfig({...vaultConfig, autoCompound: checked})}
+                  onChange={(e) => setVaultConfig({...vaultConfig, autoCompound: e.target.checked})}
+                  className="w-5 h-5"
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Step 4: Deploy */}
         {currentStep === 4 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Deploy Vault</CardTitle>
-            </CardHeader>
-            <CardContent className=\"space-y-6\">
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Deploy Vault</h2>
+            <div className="space-y-6">
               {/* Summary */}
-              <div className=\"bg-gray-50 rounded-lg p-6\">
-                <h3 className=\"font-medium mb-4\">Deployment Summary</h3>
-                <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4 text-sm\">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                <h3 className="font-medium mb-4 text-gray-900 dark:text-white">Deployment Summary</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className=\"text-gray-600\">Template</p>
-                    <p className=\"font-medium\">{selectedTemplateData?.name}</p>
+                    <p className="text-gray-600 dark:text-gray-400">Template</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedTemplateData?.name}</p>
                   </div>
                   <div>
-                    <p className=\"text-gray-600\">Name</p>
-                    <p className=\"font-medium\">{formData.name}</p>
+                    <p className="text-gray-600 dark:text-gray-400">Name</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{formData.name}</p>
                   </div>
                   <div>
-                    <p className=\"text-gray-600\">Token Pair</p>
-                    <p className=\"font-medium\">
+                    <p className="text-gray-600 dark:text-gray-400">Token Pair</p>
+                    <p className="font-medium text-gray-900 dark:text-white">
                       {POPULAR_TOKENS.find(t => t.address === formData.token0)?.symbol} / 
                       {POPULAR_TOKENS.find(t => t.address === formData.token1)?.symbol}
                     </p>
                   </div>
                   <div>
-                    <p className=\"text-gray-600\">Fee Tier</p>
-                    <p className=\"font-medium\">{formData.feeTier / 10000}%</p>
+                    <p className="text-gray-600 dark:text-gray-400">Fee Tier</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{formData.feeTier / 10000}%</p>
                   </div>
                   <div>
-                    <p className=\"text-gray-600\">Strategy Mode</p>
-                    <p className=\"font-medium\">{vaultConfig.strategyMode.replace('_', ' ')}</p>
+                    <p className="text-gray-600 dark:text-gray-400">Strategy Mode</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{vaultConfig.strategyMode.replace('_', ' ')}</p>
                   </div>
                   <div>
-                    <p className=\"text-gray-600\">Deployment Fee</p>
-                    <p className=\"font-medium\">{deploymentFee} ETH</p>
+                    <p className="text-gray-600 dark:text-gray-400">Deployment Fee</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{deploymentFee} ETH</p>
                   </div>
                 </div>
               </div>
 
               {/* Warnings */}
-              <Alert>
-                <AlertTriangle className=\"h-4 w-4\" />
-                <AlertDescription>
-                  Please review all settings carefully. Some configurations cannot be changed after deployment.
-                  The deployment fee is non-refundable.
-                </AlertDescription>
-              </Alert>
+              <div className="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4">
+                <div className="flex">
+                  <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      Please review all settings carefully. Some configurations cannot be changed after deployment.
+                      The deployment fee is non-refundable.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* Deploy Button */}
-              <Button
+              <button
                 onClick={handleDeploy}
-                disabled={isDeploying || isConfirming}
-                size=\"lg\"
-                className=\"w-full\"
+                disabled={isDeploying}
+                className="w-full bg-primary text-black px-6 py-3 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150 disabled:opacity-50"
               >
-                {isDeploying ? 'Deploying...' : isConfirming ? 'Confirming...' : `Deploy Vault (${deploymentFee} ETH)`}
-              </Button>
-
-              {/* Success */}
-              {isSuccess && (
-                <Alert className=\"border-green-200 bg-green-50\">
-                  <CheckCircle className=\"h-4 w-4 text-green-600\" />
-                  <AlertDescription className=\"text-green-800\">
-                    Vault deployed successfully! You can now manage your vault from the dashboard.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
+                {isDeploying ? 'Deploying...' : `Deploy Vault (${deploymentFee} ETH)`}
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Navigation */}
-        <div className=\"flex justify-between\">
-          <Button
-            variant=\"outline\"
+        <div className="flex justify-between">
+          <button
             onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
             disabled={currentStep === 1}
+            className="bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150 disabled:opacity-50"
           >
             Previous
-          </Button>
+          </button>
           
           {currentStep < 4 ? (
-            <Button
+            <button
               onClick={() => setCurrentStep(currentStep + 1)}
               disabled={!canProceedToNext()}
+              className="bg-primary text-black px-4 py-2 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150 disabled:opacity-50"
             >
               Next
-            </Button>
+            </button>
           ) : (
             <div /> // Placeholder for alignment
           )}

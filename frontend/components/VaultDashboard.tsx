@@ -3,12 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAccount, useReadContract, useWriteContract } from 'wagmi'
 import { formatUnits, parseUnits } from 'viem'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Progress } from '@/components/ui/progress'
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -80,69 +74,6 @@ export default function VaultDashboard({ vaultAddress }: { vaultAddress: string 
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Contract read hooks
-  const { data: vaultInfo } = useReadContract({
-    address: vaultAddress as `0x${string}`,
-    abi: [
-      {
-        name: 'getVaultConfig',
-        type: 'function',
-        stateMutability: 'view',
-        inputs: [],
-        outputs: [{ type: 'tuple', components: [] }]
-      }
-    ],
-    functionName: 'getVaultConfig'
-  })
-
-  const { data: vaultMetrics } = useReadContract({
-    address: vaultAddress as `0x${string}`,
-    abi: [
-      {
-        name: 'getVaultMetrics',
-        type: 'function', 
-        stateMutability: 'view',
-        inputs: [],
-        outputs: [{ type: 'tuple', components: [] }]
-      }
-    ],
-    functionName: 'getVaultMetrics'
-  })
-
-  const { data: positionRanges } = useReadContract({
-    address: vaultAddress as `0x${string}`,
-    abi: [
-      {
-        name: 'getPositionRanges',
-        type: 'function',
-        stateMutability: 'view', 
-        inputs: [],
-        outputs: [{ type: 'array', components: [] }]
-      }
-    ],
-    functionName: 'getPositionRanges'
-  })
-
-  const { data: aiRecommendation } = useReadContract({
-    address: vaultAddress as `0x${string}`,
-    abi: [
-      {
-        name: 'getAIRecommendation',
-        type: 'function',
-        stateMutability: 'view',
-        inputs: [],
-        outputs: [{ type: 'tuple', components: [] }]
-      }
-    ],
-    functionName: 'getAIRecommendation'
-  })
-
-  // Contract write hooks
-  const { writeContract: deposit } = useWriteContract()
-  const { writeContract: withdraw } = useWriteContract()
-  const { writeContract: compound } = useWriteContract()
-  const { writeContract: rebalance } = useWriteContract()
-
   // Mock data for demonstration
   const mockVaultInfo: VaultInfo = {
     address: vaultAddress,
@@ -198,15 +129,10 @@ export default function VaultDashboard({ vaultAddress }: { vaultAddress: string 
 
   const handleDeposit = async () => {
     if (!depositAmount || !address) return
-    
     setIsLoading(true)
     try {
-      await deposit({
-        address: vaultAddress as `0x${string}`,
-        abi: [],
-        functionName: 'deposit',
-        args: [parseUnits(depositAmount, 18), address]
-      })
+      // Deposit logic would go here
+      console.log('Depositing:', depositAmount)
     } catch (error) {
       console.error('Deposit failed:', error)
     } finally {
@@ -216,15 +142,10 @@ export default function VaultDashboard({ vaultAddress }: { vaultAddress: string 
 
   const handleWithdraw = async () => {
     if (!withdrawAmount || !address) return
-    
     setIsLoading(true)
     try {
-      await withdraw({
-        address: vaultAddress as `0x${string}`,
-        abi: [],
-        functionName: 'withdraw',
-        args: [parseUnits(withdrawAmount, 18), address, address]
-      })
+      // Withdraw logic would go here
+      console.log('Withdrawing:', withdrawAmount)
     } catch (error) {
       console.error('Withdraw failed:', error)
     } finally {
@@ -235,12 +156,8 @@ export default function VaultDashboard({ vaultAddress }: { vaultAddress: string 
   const handleCompound = async () => {
     setIsLoading(true)
     try {
-      await compound({
-        address: vaultAddress as `0x${string}`,
-        abi: [],
-        functionName: 'compound',
-        args: []
-      })
+      // Compound logic would go here
+      console.log('Compounding')
     } catch (error) {
       console.error('Compound failed:', error)
     } finally {
@@ -261,430 +178,280 @@ export default function VaultDashboard({ vaultAddress }: { vaultAddress: string 
     return `${(parseFloat(value) * 100).toFixed(2)}%`
   }
 
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'positions', label: 'Positions' },
+    { id: 'strategy', label: 'Strategy' },
+    { id: 'analytics', label: 'Analytics' },
+    { id: 'manage', label: 'Manage' }
+  ]
+
   return (
-    <div className=\"min-h-screen bg-gray-50 p-6\">
-      <div className=\"max-w-7xl mx-auto space-y-6\">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className=\"flex items-center justify-between\">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className=\"text-3xl font-bold text-gray-900\">{mockVaultInfo.name}</h1>
-            <p className=\"text-gray-600\">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{mockVaultInfo.name}</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               {mockVaultInfo.token0}/{mockVaultInfo.token1} • {mockVaultInfo.fee/10000}% Fee
             </p>
           </div>
-          <div className=\"flex items-center space-x-3\">
-            <Badge variant=\"outline\" className=\"bg-green-50 text-green-700\">
-              <CheckCircle className=\"w-4 h-4 mr-1\" />
+          <div className="flex items-center space-x-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              <CheckCircle className="w-4 h-4 mr-1" />
               Active
-            </Badge>
-            <Button size=\"sm\" variant=\"outline\">
-              <Settings className=\"w-4 h-4 mr-2\" />
+            </span>
+            <button className="inline-flex items-center px-4 py-2 border-2 border-black dark:border-white bg-white dark:bg-black text-black dark:text-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150">
+              <Settings className="w-4 h-4 mr-2" />
               Configure
-            </Button>
+            </button>
           </div>
         </div>
 
         {/* Key Metrics Cards */}
-        <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6\">
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">Total Value Locked</p>
-                  <p className=\"text-2xl font-bold text-gray-900\">
-                    {formatCurrency(mockMetrics.totalValueLocked)}
-                  </p>
-                </div>
-                <DollarSign className=\"w-8 h-8 text-blue-600\" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">Current APR</p>
-                  <p className=\"text-2xl font-bold text-green-600\">
-                    {formatPercentage(mockMetrics.apr)}
-                  </p>
-                </div>
-                <TrendingUp className=\"w-8 h-8 text-green-600\" />
-              </div>
-              <div className=\"mt-2\">
-                <p className=\"text-xs text-gray-500\">
-                  24h Fees: {formatCurrency(mockMetrics.totalFees24h)}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Value Locked</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(mockMetrics.totalValueLocked)}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              <DollarSign className="w-8 h-8 text-blue-600" />
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">Sharpe Ratio</p>
-                  <p className=\"text-2xl font-bold text-purple-600\">
-                    {parseFloat(mockMetrics.sharpeRatio).toFixed(2)}
-                  </p>
-                </div>
-                <BarChart3 className=\"w-8 h-8 text-purple-600\" />
-              </div>
-              <div className=\"mt-2\">
-                <p className=\"text-xs text-gray-500\">
-                  Max Drawdown: {formatPercentage(mockMetrics.maxDrawdown)}
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Current APR</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {formatPercentage(mockMetrics.apr)}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              <TrendingUp className="w-8 h-8 text-green-600" />
+            </div>
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                24h Fees: {formatCurrency(mockMetrics.totalFees24h)}
+              </p>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">AI Optimizations</p>
-                  <p className=\"text-2xl font-bold text-orange-600\">
-                    {mockMetrics.aiOptimizationCount}
-                  </p>
-                </div>
-                <Zap className=\"w-8 h-8 text-orange-600\" />
-              </div>
-              <div className=\"mt-2\">
-                <p className=\"text-xs text-gray-500\">
-                  Compounds: {mockMetrics.successfulCompounds}
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sharpe Ratio</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {parseFloat(mockMetrics.sharpeRatio).toFixed(2)}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              <BarChart3 className="w-8 h-8 text-purple-600" />
+            </div>
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Max Drawdown: {formatPercentage(mockMetrics.maxDrawdown)}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">AI Optimizations</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {mockMetrics.aiOptimizationCount}
+                </p>
+              </div>
+              <Zap className="w-8 h-8 text-orange-600" />
+            </div>
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Compounds: {mockMetrics.successfulCompounds}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Main Content Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className=\"space-y-6\">
-          <TabsList className=\"grid w-full grid-cols-5\">
-            <TabsTrigger value=\"overview\">Overview</TabsTrigger>
-            <TabsTrigger value=\"positions\">Positions</TabsTrigger>
-            <TabsTrigger value=\"strategy\">Strategy</TabsTrigger>
-            <TabsTrigger value=\"analytics\">Analytics</TabsTrigger>
-            <TabsTrigger value=\"manage\">Manage</TabsTrigger>
-          </TabsList>
+        {/* Tabs */}
+        <div className="space-y-6">
+          <div className="border-b-2 border-black dark:border-white">
+            <nav className="-mb-px flex space-x-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedTab(tab.id)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    selectedTab === tab.id
+                      ? 'border-black dark:border-white text-black dark:text-white'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
 
-          {/* Overview Tab */}
-          <TabsContent value=\"overview\" className=\"space-y-6\">
-            <div className=\"grid grid-cols-1 lg:grid-cols-2 gap-6\">
+          {/* Tab Content */}
+          {selectedTab === 'overview' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Portfolio Composition */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className=\"flex items-center\">
-                    <PieChart className=\"w-5 h-5 mr-2\" />
-                    Portfolio Composition
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"space-y-4\">
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Your Shares</span>
-                      <span className=\"text-sm text-gray-600\">
-                        {(parseFloat(mockVaultInfo.userShares) / parseFloat(mockVaultInfo.totalShares) * 100).toFixed(2)}%
-                      </span>
+              <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <PieChart className="w-5 h-5 mr-2" />
+                  Portfolio Composition
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Your Shares</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {(parseFloat(mockVaultInfo.userShares) / parseFloat(mockVaultInfo.totalShares) * 100).toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 h-2">
+                    <div 
+                      className="bg-primary h-2" 
+                      style={{ width: `${(parseFloat(mockVaultInfo.userShares) / parseFloat(mockVaultInfo.totalShares)) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">Your Value</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {formatCurrency((parseFloat(mockMetrics.totalValueLocked) * parseFloat(mockVaultInfo.userShares) / parseFloat(mockVaultInfo.totalShares)).toString())}
+                      </p>
                     </div>
-                    <Progress 
-                      value={(parseFloat(mockVaultInfo.userShares) / parseFloat(mockVaultInfo.totalShares)) * 100} 
-                      className=\"h-2\"
-                    />
-                    <div className=\"grid grid-cols-2 gap-4 text-sm\">
-                      <div>
-                        <p className=\"text-gray-600\">Your Value</p>
-                        <p className=\"font-medium\">
-                          {formatCurrency((parseFloat(mockMetrics.totalValueLocked) * parseFloat(mockVaultInfo.userShares) / parseFloat(mockVaultInfo.totalShares)).toString())}
-                        </p>
-                      </div>
-                      <div>
-                        <p className=\"text-gray-600\">Share Count</p>
-                        <p className=\"font-medium\">{mockVaultInfo.userShares}</p>
-                      </div>
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">Share Count</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{mockVaultInfo.userShares}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* AI Recommendation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className=\"flex items-center\">
-                    <Zap className=\"w-5 h-5 mr-2\" />
-                    AI Recommendation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"space-y-4\">
-                    <div className=\"flex items-center justify-between\">
-                      <Badge variant=\"outline\" className=\"bg-blue-50 text-blue-700\">
-                        {mockRecommendation.strategyType.replace('_', ' ')}
-                      </Badge>
-                      <div className=\"text-right\">
-                        <p className=\"text-sm text-gray-600\">Confidence</p>
-                        <p className=\"font-medium text-blue-600\">
-                          {(mockRecommendation.confidenceScore * 100).toFixed(0)}%
-                        </p>
-                      </div>
+              <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <Zap className="w-5 h-5 mr-2" />
+                  AI Recommendation
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center px-2 py-1 rounded border border-blue-500 text-blue-700 text-sm">
+                      {mockRecommendation.strategyType.replace('_', ' ')}
+                    </span>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Confidence</p>
+                      <p className="font-medium text-blue-600">
+                        {(mockRecommendation.confidenceScore * 100).toFixed(0)}%
+                      </p>
                     </div>
-                    
-                    <div className=\"grid grid-cols-2 gap-4 text-sm\">
-                      <div>
-                        <p className=\"text-gray-600\">Expected APR</p>
-                        <p className=\"font-medium text-green-600\">
-                          {formatPercentage(mockRecommendation.expectedAPR.toString())}
-                        </p>
-                      </div>
-                      <div>
-                        <p className=\"text-gray-600\">Risk Level</p>
-                        <p className=\"font-medium text-orange-600\">
-                          {formatPercentage(mockRecommendation.expectedRisk.toString())}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <p className=\"text-xs text-gray-600\">
-                      {mockRecommendation.reasoning}
-                    </p>
-                    
-                    <Button size=\"sm\" className=\"w-full\">
-                      Apply Recommendation
-                    </Button>
                   </div>
-                </CardContent>
-              </Card>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">Expected APR</p>
+                      <p className="font-medium text-green-600">
+                        {formatPercentage(mockRecommendation.expectedAPR.toString())}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">Risk Level</p>
+                      <p className="font-medium text-orange-600">
+                        {formatPercentage(mockRecommendation.expectedRisk.toString())}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {mockRecommendation.reasoning}
+                  </p>
+                  
+                  <button className="w-full bg-primary text-black px-4 py-2 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150">
+                    Apply Recommendation
+                  </button>
+                </div>
+              </div>
             </div>
-          </TabsContent>
+          )}
 
-          {/* Positions Tab */}
-          <TabsContent value=\"positions\" className=\"space-y-6\">
-            <Card>
-              <CardHeader>
-                <CardTitle>Active Position Ranges</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className=\"space-y-4\">
-                  {mockRanges.map((range, index) => (
-                    <div key={range.id} className=\"border rounded-lg p-4\">
-                      <div className=\"flex items-center justify-between mb-3\">
-                        <h4 className=\"font-medium\">{range.name}</h4>
-                        <Badge variant={range.isActive ? \"default\" : \"secondary\"}>
-                          {range.isActive ? \"Active\" : \"Inactive\"}
-                        </Badge>
-                      </div>
-                      
-                      <div className=\"grid grid-cols-2 md:grid-cols-4 gap-4 text-sm\">
-                        <div>
-                          <p className=\"text-gray-600\">Tick Range</p>
-                          <p className=\"font-medium\">{range.tickLower} to {range.tickUpper}</p>
-                        </div>
-                        <div>
-                          <p className=\"text-gray-600\">Allocation</p>
-                          <p className=\"font-medium\">{range.allocation / 100}%</p>
-                        </div>
-                        <div>
-                          <p className=\"text-gray-600\">Liquidity</p>
-                          <p className=\"font-medium\">{formatCurrency(range.liquidity)}</p>
-                        </div>
-                        <div>
-                          <p className=\"text-gray-600\">Status</p>
-                          <p className=\"font-medium text-green-600\">In Range</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Strategy Tab */}
-          <TabsContent value=\"strategy\" className=\"space-y-6\">
-            <div className=\"grid grid-cols-1 lg:grid-cols-2 gap-6\">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Current Strategy</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"space-y-4\">
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Strategy Mode</span>
-                      <Badge>AI Assisted</Badge>
-                    </div>
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Position Type</span>
-                      <Badge variant=\"outline\">Dual Position</Badge>
-                    </div>
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Auto Compound</span>
-                      <Badge variant=\"outline\" className=\"bg-green-50 text-green-700\">
-                        Enabled
-                      </Badge>
-                    </div>
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Rebalance Threshold</span>
-                      <span className=\"text-sm text-gray-600\">10%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Strategy Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"space-y-4\">
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Win Rate</span>
-                      <span className=\"text-sm font-medium text-green-600\">76%</span>
-                    </div>
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Avg Return per Rebalance</span>
-                      <span className=\"text-sm font-medium text-green-600\">0.8%</span>
-                    </div>
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">Capital Efficiency</span>
-                      <span className=\"text-sm font-medium text-blue-600\">85%</span>
-                    </div>
-                    <div className=\"flex items-center justify-between\">
-                      <span className=\"text-sm font-medium\">vs Benchmark</span>
-                      <span className=\"text-sm font-medium text-green-600\">+4.2%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Analytics Tab */}
-          <TabsContent value=\"analytics\" className=\"space-y-6\">
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Analytics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className=\"grid grid-cols-1 md:grid-cols-3 gap-6\">
-                  <div className=\"text-center\">
-                    <p className=\"text-2xl font-bold text-green-600\">
-                      {formatPercentage(mockMetrics.apr)}
-                    </p>
-                    <p className=\"text-sm text-gray-600\">Current APR</p>
-                  </div>
-                  <div className=\"text-center\">
-                    <p className=\"text-2xl font-bold text-purple-600\">
-                      {parseFloat(mockMetrics.sharpeRatio).toFixed(2)}
-                    </p>
-                    <p className=\"text-sm text-gray-600\">Sharpe Ratio</p>
-                  </div>
-                  <div className=\"text-center\">
-                    <p className=\"text-2xl font-bold text-red-600\">
-                      {formatPercentage(mockMetrics.impermanentLoss)}
-                    </p>
-                    <p className=\"text-sm text-gray-600\">Impermanent Loss</p>
-                  </div>
-                </div>
-                
-                <div className=\"mt-6 text-center\">
-                  <p className=\"text-gray-600 mb-4\">Detailed analytics charts would be displayed here</p>
-                  <div className=\"h-64 bg-gray-100 rounded-lg flex items-center justify-center\">
-                    <p className=\"text-gray-500\">Performance Chart Placeholder</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Manage Tab */}
-          <TabsContent value=\"manage\" className=\"space-y-6\">
-            <div className=\"grid grid-cols-1 lg:grid-cols-2 gap-6\">
+          {selectedTab === 'manage' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Deposit */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Deposit</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"space-y-4\">
-                    <Input
-                      type=\"number\"
-                      placeholder=\"Amount to deposit\"
-                      value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
-                    />
-                    <Button 
-                      onClick={handleDeposit} 
-                      disabled={isLoading || !depositAmount}
-                      className=\"w-full\"
-                    >
-                      {isLoading ? 'Depositing...' : 'Deposit'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Deposit</h3>
+                <div className="space-y-4">
+                  <input
+                    type="number"
+                    placeholder="Amount to deposit"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
+                  />
+                  <button 
+                    onClick={handleDeposit} 
+                    disabled={isLoading || !depositAmount}
+                    className="w-full bg-primary text-black px-4 py-2 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150 disabled:opacity-50"
+                  >
+                    {isLoading ? 'Depositing...' : 'Deposit'}
+                  </button>
+                </div>
+              </div>
 
               {/* Withdraw */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Withdraw</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"space-y-4\">
-                    <Input
-                      type=\"number\"
-                      placeholder=\"Amount to withdraw\"
-                      value={withdrawAmount}
-                      onChange={(e) => setWithdrawAmount(e.target.value)}
-                    />
-                    <Button 
-                      onClick={handleWithdraw} 
-                      disabled={isLoading || !withdrawAmount}
-                      variant=\"outline\"
-                      className=\"w-full\"
-                    >
-                      {isLoading ? 'Withdrawing...' : 'Withdraw'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Withdraw</h3>
+                <div className="space-y-4">
+                  <input
+                    type="number"
+                    placeholder="Amount to withdraw"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
+                  />
+                  <button 
+                    onClick={handleWithdraw} 
+                    disabled={isLoading || !withdrawAmount}
+                    className="w-full bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150 disabled:opacity-50"
+                  >
+                    {isLoading ? 'Withdrawing...' : 'Withdraw'}
+                  </button>
+                </div>
+              </div>
 
               {/* Actions */}
-              <Card className=\"lg:col-span-2\">
-                <CardHeader>
-                  <CardTitle>Vault Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className=\"grid grid-cols-1 md:grid-cols-3 gap-4\">
-                    <Button 
-                      onClick={handleCompound}
-                      disabled={isLoading}
-                      className=\"flex items-center justify-center\"
-                    >
-                      <Zap className=\"w-4 h-4 mr-2\" />
-                      Compound
-                    </Button>
-                    <Button 
-                      onClick={() => rebalance({})}
-                      disabled={isLoading}
-                      variant=\"outline\"
-                      className=\"flex items-center justify-center\"
-                    >
-                      <BarChart3 className=\"w-4 h-4 mr-2\" />
-                      Rebalance
-                    </Button>
-                    <Button 
-                      variant=\"outline\"
-                      className=\"flex items-center justify-center\"
-                    >
-                      <Eye className=\"w-4 h-4 mr-2\" />
-                      View Details
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="lg:col-span-2 bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Vault Actions</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button 
+                    onClick={handleCompound}
+                    disabled={isLoading}
+                    className="flex items-center justify-center bg-primary text-black px-4 py-2 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150 disabled:opacity-50"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Compound
+                  </button>
+                  <button 
+                    disabled={isLoading}
+                    className="flex items-center justify-center bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150 disabled:opacity-50"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Rebalance
+                  </button>
+                  <button 
+                    className="flex items-center justify-center bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </button>
+                </div>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -3,11 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAccount, useReadContract } from 'wagmi'
 import { formatUnits } from 'viem'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Search, 
   Filter, 
@@ -236,313 +231,298 @@ export default function VaultList() {
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'Low': return 'bg-green-100 text-green-800'
-      case 'Medium': return 'bg-yellow-100 text-yellow-800'
-      case 'High': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'Low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      case 'Medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+      case 'High': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
     }
   }
 
   return (
-    <div className=\"min-h-screen bg-gray-50 p-6\">
-      <div className=\"max-w-7xl mx-auto space-y-6\">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className=\"flex items-center justify-between\">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className=\"text-3xl font-bold text-gray-900\">Vault Explorer</h1>
-            <p className=\"text-gray-600\">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Vault Explorer</h1>
+            <p className="text-gray-600 dark:text-gray-400">
               Discover and invest in automated liquidity management vaults
             </p>
           </div>
-          <Link href=\"/vaults/create\">
-            <Button>
-              <DollarSign className=\"w-4 h-4 mr-2\" />
+          <Link href="/vaults/create">
+            <button className="inline-flex items-center bg-primary text-black px-4 py-2 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150">
+              <DollarSign className="w-4 h-4 mr-2" />
               Create Vault
-            </Button>
+            </button>
           </Link>
         </div>
 
         {/* Filters and Search */}
-        <Card>
-          <CardContent className=\"p-6\">
-            <div className=\"grid grid-cols-1 md:grid-cols-4 gap-4 items-end\">
-              <div>
-                <label className=\"text-sm font-medium text-gray-700 mb-2 block\">
-                  Search Vaults
-                </label>
-                <div className=\"relative\">
-                  <Search className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4\" />
-                  <Input
-                    placeholder=\"Search by name or tokens...\"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className=\"pl-10\"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className=\"text-sm font-medium text-gray-700 mb-2 block\">
-                  Filter by Template
-                </label>
-                <Select value={filterBy} onValueChange={setFilterBy}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value=\"all\">All Templates</SelectItem>
-                    <SelectItem value=\"basic\">Basic</SelectItem>
-                    <SelectItem value=\"gamma_style\">Gamma Style</SelectItem>
-                    <SelectItem value=\"ai_optimized\">AI Optimized</SelectItem>
-                    <SelectItem value=\"institutional\">Institutional</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className=\"text-sm font-medium text-gray-700 mb-2 block\">
-                  Sort by
-                </label>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value=\"tvl\">Total Value Locked</SelectItem>
-                    <SelectItem value=\"apr\">APR</SelectItem>
-                    <SelectItem value=\"volume\">24h Volume</SelectItem>
-                    <SelectItem value=\"age\">Recently Created</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className=\"flex items-center space-x-2\">
+        <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                Search Vaults
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
-                  type=\"checkbox\"
-                  id=\"myVaults\"
-                  checked={showOnlyMyVaults}
-                  onChange={(e) => setShowOnlyMyVaults(e.target.checked)}
-                  className=\"rounded border-gray-300\"
+                  placeholder="Search by name or tokens..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
                 />
-                <label htmlFor=\"myVaults\" className=\"text-sm font-medium text-gray-700\">
-                  My Vaults Only
-                </label>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                Filter by Template
+              </label>
+              <select 
+                value={filterBy} 
+                onChange={(e) => setFilterBy(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
+              >
+                <option value="all">All Templates</option>
+                <option value="basic">Basic</option>
+                <option value="gamma_style">Gamma Style</option>
+                <option value="ai_optimized">AI Optimized</option>
+                <option value="institutional">Institutional</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                Sort by
+              </label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-black dark:border-white bg-white dark:bg-gray-900 text-black dark:text-white"
+              >
+                <option value="tvl">Total Value Locked</option>
+                <option value="apr">APR</option>
+                <option value="volume">24h Volume</option>
+                <option value="age">Recently Created</option>
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="myVaults"
+                checked={showOnlyMyVaults}
+                onChange={(e) => setShowOnlyMyVaults(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="myVaults" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                My Vaults Only
+              </label>
+            </div>
+          </div>
+        </div>
 
         {/* Vault Stats */}
-        <div className=\"grid grid-cols-1 md:grid-cols-4 gap-6\">
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">Total Vaults</p>
-                  <p className=\"text-2xl font-bold text-gray-900\">{MOCK_VAULTS.length}</p>
-                </div>
-                <BarChart3 className=\"w-8 h-8 text-blue-600\" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Vaults</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{MOCK_VAULTS.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <BarChart3 className="w-8 h-8 text-blue-600" />
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">Total TVL</p>
-                  <p className=\"text-2xl font-bold text-gray-900\">
-                    {formatCurrency(MOCK_VAULTS.reduce((sum, v) => sum + parseFloat(v.totalValueLocked), 0).toString())}
-                  </p>
-                </div>
-                <DollarSign className=\"w-8 h-8 text-green-600\" />
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total TVL</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(MOCK_VAULTS.reduce((sum, v) => sum + parseFloat(v.totalValueLocked), 0).toString())}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <DollarSign className="w-8 h-8 text-green-600" />
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">Avg APR</p>
-                  <p className=\"text-2xl font-bold text-gray-900\">
-                    {formatPercentage((MOCK_VAULTS.reduce((sum, v) => sum + parseFloat(v.metrics.apr), 0) / MOCK_VAULTS.length).toString())}
-                  </p>
-                </div>
-                <TrendingUp className=\"w-8 h-8 text-purple-600\" />
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg APR</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatPercentage((MOCK_VAULTS.reduce((sum, v) => sum + parseFloat(v.metrics.apr), 0) / MOCK_VAULTS.length).toString())}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <TrendingUp className="w-8 h-8 text-purple-600" />
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className=\"p-6\">
-              <div className=\"flex items-center justify-between\">
-                <div>
-                  <p className=\"text-sm font-medium text-gray-600\">AI Vaults</p>
-                  <p className=\"text-2xl font-bold text-gray-900\">
-                    {MOCK_VAULTS.filter(v => v.isAIEnabled).length}
-                  </p>
-                </div>
-                <Zap className=\"w-8 h-8 text-orange-600\" />
+          <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">AI Vaults</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {MOCK_VAULTS.filter(v => v.isAIEnabled).length}
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <Zap className="w-8 h-8 text-orange-600" />
+            </div>
+          </div>
         </div>
 
         {/* Vault List */}
-        <div className=\"space-y-4\">
+        <div className="space-y-4">
           {filteredVaults.length === 0 ? (
-            <Card>
-              <CardContent className=\"p-12 text-center\">
-                <Search className=\"w-12 h-12 text-gray-300 mx-auto mb-4\" />
-                <h3 className=\"text-lg font-medium text-gray-900 mb-2\">No vaults found</h3>
-                <p className=\"text-gray-600\">
-                  Try adjusting your search criteria or create a new vault.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal p-12 text-center">
+              <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No vaults found</h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Try adjusting your search criteria or create a new vault.
+              </p>
+            </div>
           ) : (
             filteredVaults.map((vault) => (
-              <Card key={vault.address} className=\"hover:shadow-lg transition-shadow\">
-                <CardContent className=\"p-6\">
-                  <div className=\"flex items-center justify-between\">
-                    <div className=\"flex items-center space-x-4\">
-                      {/* Vault Info */}
-                      <div className=\"flex-1\">
-                        <div className=\"flex items-center space-x-3 mb-2\">
-                          <h3 className=\"text-lg font-semibold text-gray-900\">{vault.name}</h3>
-                          <Badge variant=\"outline\">{vault.symbol}</Badge>
-                          <Badge className={getRiskColor(vault.riskLevel)}>
-                            {vault.riskLevel} Risk
-                          </Badge>
-                          {vault.isAIEnabled && (
-                            <Badge variant=\"outline\" className=\"bg-purple-50 text-purple-700\">
-                              <Zap className=\"w-3 h-3 mr-1\" />
-                              AI
-                            </Badge>
-                          )}
-                          {vault.userShares && (
-                            <Badge variant=\"outline\" className=\"bg-blue-50 text-blue-700\">
-                              <Users className=\"w-3 h-3 mr-1\" />
-                              My Vault
-                            </Badge>
-                          )}
+              <div key={vault.address} className="bg-white dark:bg-black border-2 border-black dark:border-white shadow-brutal dark:shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150 p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    {/* Vault Info */}
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{vault.name}</h3>
+                        <span className="inline-flex items-center px-2 py-1 rounded border border-gray-500 text-gray-700 dark:text-gray-300 text-sm">
+                          {vault.symbol}
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-1 rounded text-sm ${getRiskColor(vault.riskLevel)}`}>
+                          {vault.riskLevel} Risk
+                        </span>
+                        {vault.isAIEnabled && (
+                          <span className="inline-flex items-center px-2 py-1 rounded border border-purple-500 text-purple-700 dark:text-purple-300 text-sm">
+                            <Zap className="w-3 h-3 mr-1" />
+                            AI
+                          </span>
+                        )}
+                        {vault.userShares && (
+                          <span className="inline-flex items-center px-2 py-1 rounded border border-blue-500 text-blue-700 dark:text-blue-300 text-sm">
+                            <Users className="w-3 h-3 mr-1" />
+                            My Vault
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center space-x-1">
+                          <span className="font-medium">{vault.token0Symbol}/{vault.token1Symbol}</span>
+                          <span>•</span>
+                          <span>{vault.feeTier / 10000}% Fee</span>
                         </div>
-                        
-                        <div className=\"flex items-center space-x-6 text-sm text-gray-600\">
-                          <div className=\"flex items-center space-x-1\">
-                            <span className=\"font-medium\">{vault.token0Symbol}/{vault.token1Symbol}</span>
-                            <span>•</span>
-                            <span>{vault.feeTier / 10000}% Fee</span>
-                          </div>
-                          <div className=\"flex items-center space-x-1\">
-                            <span>{getTemplateDisplayName(vault.templateType)}</span>
-                          </div>
-                          <div className=\"flex items-center space-x-1\">
-                            <Clock className=\"w-3 h-3\" />
-                            <span>{formatTimeAgo(vault.createdAt)}</span>
-                          </div>
+                        <div className="flex items-center space-x-1">
+                          <span>{getTemplateDisplayName(vault.templateType)}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-3 h-3" />
+                          <span>{formatTimeAgo(vault.createdAt)}</span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Metrics */}
-                      <div className=\"grid grid-cols-2 md:grid-cols-4 gap-6 text-center\">
-                        <div>
-                          <p className=\"text-sm text-gray-600\">TVL</p>
-                          <p className=\"text-lg font-semibold text-gray-900\">
-                            {formatCurrency(vault.totalValueLocked)}
-                          </p>
-                        </div>
-                        
-                        <div>
-                          <p className=\"text-sm text-gray-600\">APR</p>
-                          <p className=\"text-lg font-semibold text-green-600\">
-                            {formatPercentage(vault.metrics.apr)}
-                          </p>
-                        </div>
-                        
-                        <div>
-                          <p className=\"text-sm text-gray-600\">24h Fees</p>
-                          <p className=\"text-lg font-semibold text-blue-600\">
-                            {formatCurrency(vault.metrics.totalFees24h)}
-                          </p>
-                        </div>
-                        
-                        <div>
-                          <p className=\"text-sm text-gray-600\">Sharpe Ratio</p>
-                          <p className=\"text-lg font-semibold text-purple-600\">
-                            {parseFloat(vault.metrics.sharpeRatio).toFixed(2)}
-                          </p>
-                        </div>
+                    {/* Metrics */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">TVL</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {formatCurrency(vault.totalValueLocked)}
+                        </p>
                       </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">APR</p>
+                        <p className="text-lg font-semibold text-green-600">
+                          {formatPercentage(vault.metrics.apr)}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">24h Fees</p>
+                        <p className="text-lg font-semibold text-blue-600">
+                          {formatCurrency(vault.metrics.totalFees24h)}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Sharpe Ratio</p>
+                        <p className="text-lg font-semibold text-purple-600">
+                          {parseFloat(vault.metrics.sharpeRatio).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
 
-                      {/* Actions */}
-                      <div className=\"flex items-center space-x-2\">
-                        <Button
-                          variant=\"ghost\"
-                          size=\"sm\"
-                          onClick={() => toggleFavorite(vault.address)}
-                        >
-                          {favoriteVaults.has(vault.address) ? (
-                            <Star className=\"w-4 h-4 text-yellow-500 fill-current\" />
-                          ) : (
-                            <StarOff className=\"w-4 h-4 text-gray-400\" />
-                          )}
-                        </Button>
-                        
-                        <Link href={`/vaults/${vault.address}`}>
-                          <Button size=\"sm\">
-                            <Eye className=\"w-4 h-4 mr-2\" />
-                            View
-                          </Button>
-                        </Link>
-                      </div>
+                    {/* Actions */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => toggleFavorite(vault.address)}
+                        className="p-2 border-2 border-black dark:border-white bg-white dark:bg-black hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
+                      >
+                        {favoriteVaults.has(vault.address) ? (
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                        ) : (
+                          <StarOff className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
+                      
+                      <Link href={`/vaults/${vault.address}`}>
+                        <button className="inline-flex items-center bg-primary text-black px-4 py-2 border-2 border-black font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] transition-all duration-150">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View
+                        </button>
+                      </Link>
                     </div>
                   </div>
+                </div>
 
-                  {/* User Position (if applicable) */}
-                  {vault.userShares && (
-                    <div className=\"mt-4 pt-4 border-t border-gray-200\">
-                      <div className=\"flex items-center justify-between text-sm\">
-                        <div className=\"flex items-center space-x-4\">
-                          <div>
-                            <span className=\"text-gray-600\">Your Shares: </span>
-                            <span className=\"font-medium\">{vault.userShares}</span>
-                          </div>
-                          <div>
-                            <span className=\"text-gray-600\">Your Value: </span>
-                            <span className=\"font-medium text-green-600\">
-                              {formatCurrency((parseFloat(vault.totalValueLocked) * parseFloat(vault.userShares) / parseFloat(vault.totalShares)).toString())}
-                            </span>
-                          </div>
-                          <div>
-                            <span className=\"text-gray-600\">Share: </span>
-                            <span className=\"font-medium\">
-                              {(parseFloat(vault.userShares) / parseFloat(vault.totalShares) * 100).toFixed(2)}%
-                            </span>
-                          </div>
+                {/* User Position (if applicable) */}
+                {vault.userShares && (
+                  <div className="mt-4 pt-4 border-t-2 border-black dark:border-white">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center space-x-4">
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Your Shares: </span>
+                          <span className="font-medium text-gray-900 dark:text-white">{vault.userShares}</span>
                         </div>
-                        <Link href={`/vaults/${vault.address}`}>
-                          <Button variant=\"outline\" size=\"sm\">
-                            <ArrowUpRight className=\"w-4 h-4 mr-1\" />
-                            Manage
-                          </Button>
-                        </Link>
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Your Value: </span>
+                          <span className="font-medium text-green-600">
+                            {formatCurrency((parseFloat(vault.totalValueLocked) * parseFloat(vault.userShares) / parseFloat(vault.totalShares)).toString())}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">Share: </span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {(parseFloat(vault.userShares) / parseFloat(vault.totalShares) * 100).toFixed(2)}%
+                          </span>
+                        </div>
                       </div>
+                      <Link href={`/vaults/${vault.address}`}>
+                        <button className="inline-flex items-center bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          Manage
+                        </button>
+                      </Link>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </div>
+                )}
+              </div>
             ))
           )}
         </div>
 
         {/* Load More */}
         {filteredVaults.length >= 10 && (
-          <div className=\"text-center\">
-            <Button variant=\"outline\">
+          <div className="text-center">
+            <button className="bg-white dark:bg-black text-black dark:text-white px-4 py-2 border-2 border-black dark:border-white font-bold hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_#000000] dark:hover:shadow-[6px_6px_0px_0px_#FFFFFF] transition-all duration-150">
               Load More Vaults
-            </Button>
+            </button>
           </div>
         )}
       </div>
