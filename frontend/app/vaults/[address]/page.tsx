@@ -8,13 +8,11 @@ export const metadata: Metadata = generateSEOMetadata({
   keywords: ['vault dashboard', 'vault management', 'liquidity analytics', 'DeFi performance tracking', 'AI optimization']
 })
 
-interface VaultPageProps {
-  params: Promise<{
-    address: string
-  }>
+type VaultPageProps = {
+  params: Promise<{ address: string }>
 }
 
-export default async function VaultPage({ params }: VaultPageProps) {
-  const { address } = await params
-  return <VaultDashboard vaultAddress={address} />
+export default async function VaultPage(props: VaultPageProps) {
+  const params = await props.params
+  return <VaultDashboard vaultAddress={params.address} />
 }
