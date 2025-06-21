@@ -3,9 +3,9 @@ import { generateSEOMetadata } from '@/lib/seo'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Create Vault | Dexter Protocol",
+  title: "Create Vault",
   description: "Deploy your own automated liquidity management vault with AI optimization",
-  path: "/vaults/create"
+  keywords: ['create vault', 'deploy vault', 'liquidity management', 'DeFi vault creation', 'AI optimization']
 })
 
 export default function CreateVaultPage() {

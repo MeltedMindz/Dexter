@@ -3,17 +3,18 @@ import { generateSEOMetadata } from '@/lib/seo'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Vault Dashboard | Dexter Protocol",
+  title: "Vault Dashboard",
   description: "Manage your automated liquidity vault with real-time analytics and AI optimization",
-  path: "/vaults/[address]"
+  keywords: ['vault dashboard', 'vault management', 'liquidity analytics', 'DeFi performance tracking', 'AI optimization']
 })
 
 interface VaultPageProps {
-  params: {
+  params: Promise<{
     address: string
-  }
+  }>
 }
 
-export default function VaultPage({ params }: VaultPageProps) {
-  return <VaultDashboard vaultAddress={params.address} />
+export default async function VaultPage({ params }: VaultPageProps) {
+  const { address } = await params
+  return <VaultDashboard vaultAddress={address} />
 }
