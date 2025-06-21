@@ -125,5 +125,20 @@ test-*.md
 temp-*
 .temp/
 
+# Root level cleanup - files that should be in organized folders
+*.py
+!setup.py
+!requirements.txt
+*.sh
+!install.sh
+*.json
+!package*.json
+!tsconfig*.json
+*_exporter.py
+*_system.py
+*_demo.py
+*_harvester.py
+*_service.py
+
 # Git housekeeping
 .git/gc.log
