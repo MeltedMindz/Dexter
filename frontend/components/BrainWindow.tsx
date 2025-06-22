@@ -33,7 +33,7 @@ export function BrainWindow() {
     const fetchLogs = async () => {
       try {
         // Try DexBrain structured logs API first
-        const dexbrainResponse = await fetch('https://api.dexteragent.com/api/logs/recent?limit=50&type=all', {
+        const dexbrainResponse = await fetch('http://5.78.71.231:8080/api/logs/recent?limit=50&type=all', {
           method: 'GET',
           cache: 'no-store',
           headers: {
@@ -65,7 +65,7 @@ export function BrainWindow() {
         }
         
         // Fallback to original API
-        const response = await fetch('https://api.dexteragent.com/api/logs', {
+        const response = await fetch('/api/logs', {
           method: 'GET',
           cache: 'no-store'
         });
