@@ -245,6 +245,21 @@ def get_network_stats():
                 if datetime.now() - last_used_dt < timedelta(hours=24):
                     recent_submissions += agent.get('data_submissions', 0)
         
+        # Get vault statistics if available
+        vault_stats = {}
+        if hasattr(dex_brain, 'vault_engine') and dex_brain.vault_engine:
+            vault_stats = {
+                'vault_integration': True,
+                'ai_strategies_active': True,
+                'compound_service_active': hasattr(dex_brain, 'compound_service') and dex_brain.compound_service is not None
+            }
+        else:
+            vault_stats = {
+                'vault_integration': False,
+                'ai_strategies_active': False,
+                'compound_service_active': False
+            }
+        
         return jsonify({
             'network_stats': {
                 'total_agents': len(agents),
@@ -252,7 +267,8 @@ def get_network_stats():
                 'total_insights': total_insights,
                 'recent_submissions_24h': recent_submissions,
                 'supported_blockchains': ['base', 'solana', 'ethereum'],
-                'categories': category_counts
+                'categories': category_counts,
+                'vault_stats': vault_stats
             },
             'timestamp': datetime.now().isoformat()
         })
@@ -287,6 +303,293 @@ def retrain_models(**kwargs):
     except Exception as e:
         logger.error(f"Model retraining failed: {e}")
         return jsonify({'error': 'Failed to retrain models'}), 500
+
+
+@app.route('/api/vault/intelligence', methods=['GET'])
+@require_api_key(rate_limiter, api_key_manager)
+def get_vault_intelligence(**kwargs):
+    """Get AI-powered vault intelligence and strategy recommendations"""
+    agent_info = kwargs.get('agent_info')
+    
+    # Get query parameters
+    vault_address = request.args.get('vault_address')
+    
+    if not vault_address:
+        return jsonify({'error': 'vault_address parameter required'}), 400
+    
+    try:
+        # Mock pool and vault data for demonstration
+        # In production, this would fetch from actual sources
+        pool_data = {
+            'current_tick': 100000,
+            'current_price': 3000,
+            'liquidity': 1000000,
+            'volume_24h': 5000000,
+            'fee_tier': 3000,
+            'tick_spacing': 60,
+            'prices': list(range(2900, 3100, 10))
+        }
+        
+        vault_metrics = {
+            'total_value_locked': 2000000,
+            'total_fees_24h': 5000,
+            'impermanent_loss': 0.02,
+            'apr': 0.15,
+            'sharpe_ratio': 1.2,
+            'max_drawdown': 0.05,
+            'successful_compounds': 45,
+            'ai_optimization_count': 12,
+            'capital_efficiency': 0.85,
+            'risk_score': 0.3
+        }
+        
+        # Generate vault intelligence
+        intelligence = asyncio.run(
+            dex_brain.generate_vault_intelligence(
+                vault_address, pool_data, vault_metrics
+            )
+        )
+        
+        logger.info(f"Vault intelligence served to agent {agent_info['agent_id']} for vault {vault_address}")
+        
+        return jsonify({
+            'vault_intelligence': intelligence,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Vault intelligence request failed: {e}")
+        return jsonify({'error': 'Failed to generate vault intelligence'}), 500
+
+
+@app.route('/api/vault/compound-opportunities', methods=['GET'])
+@require_api_key(rate_limiter, api_key_manager)
+def get_compound_opportunities(**kwargs):
+    """Get current compound opportunities from the compound service"""
+    agent_info = kwargs.get('agent_info')
+    
+    # Get query parameters
+    limit = min(int(request.args.get('limit', 10)), 50)
+    min_profit = float(request.args.get('min_profit', 5.0))
+    
+    try:
+        if not hasattr(dex_brain, 'compound_service') or not dex_brain.compound_service:
+            return jsonify({
+                'error': 'Compound service not available',
+                'opportunities': []
+            }), 503
+        
+        # Get compound opportunities
+        opportunities = asyncio.run(
+            dex_brain.compound_service.find_compound_opportunities(
+                max_positions=limit,
+                min_profit_usd=min_profit
+            )
+        )
+        
+        # Convert to serializable format
+        opportunities_data = []
+        for opp in opportunities:
+            opportunities_data.append({
+                'token_id': opp.token_id,
+                'owner': opp.owner,
+                'current_fees_usd': opp.current_fees_usd,
+                'estimated_gas_cost': opp.estimated_gas_cost,
+                'profit_potential': opp.profit_potential,
+                'optimal_timing_score': opp.optimal_timing_score,
+                'strategy': opp.strategy.value,
+                'urgency_score': opp.urgency_score,
+                'risk_score': opp.risk_score,
+                'ai_confidence': opp.ai_confidence,
+                'estimated_apr_improvement': opp.estimated_apr_improvement,
+                'priority_score': opp.priority_score
+            })
+        
+        logger.info(f"Compound opportunities served to agent {agent_info['agent_id']}: {len(opportunities_data)} opportunities")
+        
+        return jsonify({
+            'opportunities': opportunities_data,
+            'total_count': len(opportunities_data),
+            'filters': {
+                'limit': limit,
+                'min_profit': min_profit
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Compound opportunities request failed: {e}")
+        return jsonify({'error': 'Failed to get compound opportunities'}), 500
+
+
+@app.route('/api/vault/analytics', methods=['GET'])
+@require_api_key(rate_limiter, api_key_manager)
+def get_vault_analytics(**kwargs):
+    """Get comprehensive vault analytics and performance metrics"""
+    agent_info = kwargs.get('agent_info')
+    
+    # Get query parameters
+    days = min(int(request.args.get('days', 30)), 90)
+    
+    try:
+        if not hasattr(dex_brain, 'compound_service') or not dex_brain.compound_service:
+            return jsonify({
+                'error': 'Compound service not available',
+                'analytics': {}
+            }), 503
+        
+        # Get compound analytics
+        analytics = asyncio.run(
+            dex_brain.compound_service.get_compound_analytics(days=days)
+        )
+        
+        logger.info(f"Vault analytics served to agent {agent_info['agent_id']} for {days} days")
+        
+        return jsonify({
+            'analytics': analytics,
+            'period_days': days,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Vault analytics request failed: {e}")
+        return jsonify({'error': 'Failed to get vault analytics'}), 500
+
+
+@app.route('/api/logs/recent', methods=['GET'])
+def get_recent_logs():
+    """Get recent structured logs for the BrainWindow"""
+    try:
+        # Get query parameters
+        limit = min(int(request.args.get('limit', 100)), 500)
+        log_type = request.args.get('type', 'all')  # all, vault, compound, intelligence
+        since_timestamp = request.args.get('since')
+        
+        # Mock structured logs for demonstration
+        # In production, this would read from actual log files or database
+        current_time = datetime.now()
+        
+        logs = []
+        
+        # Generate sample logs based on type
+        if log_type in ['all', 'vault']:
+            logs.extend([
+                {
+                    'timestamp': (current_time - timedelta(minutes=5)).isoformat(),
+                    'level': 'INFO',
+                    'module': 'VaultMLEngine',
+                    'message': 'Strategy prediction complete | Recommended: gamma_balanced | Confidence: 87% | Expected APR: 18.5% | Ranges: 2',
+                    'type': 'vault_strategy',
+                    'metadata': {
+                        'strategy': 'gamma_balanced',
+                        'confidence': 0.87,
+                        'expected_apr': 0.185,
+                        'ranges_count': 2
+                    }
+                },
+                {
+                    'timestamp': (current_time - timedelta(minutes=8)).isoformat(),
+                    'level': 'INFO',
+                    'module': 'GammaStyleOptimizer',
+                    'message': 'Dual position optimization complete | Base Range: [98000, 102000] (75%) | Limit Range: [99500, 100500] (25%)',
+                    'type': 'vault_optimization',
+                    'metadata': {
+                        'base_range': [98000, 102000],
+                        'base_allocation': 0.75,
+                        'limit_range': [99500, 100500],
+                        'limit_allocation': 0.25
+                    }
+                }
+            ])
+        
+        if log_type in ['all', 'compound']:
+            logs.extend([
+                {
+                    'timestamp': (current_time - timedelta(minutes=3)).isoformat(),
+                    'level': 'INFO',
+                    'module': 'CompoundService',
+                    'message': 'COMPOUND_SUCCESS | Token ID: 12345 | TX Hash: 0xabc...def | Gas Used: 150,000 | Net Profit: $45.67',
+                    'type': 'compound_success',
+                    'metadata': {
+                        'token_id': 12345,
+                        'tx_hash': '0xabc...def',
+                        'gas_used': 150000,
+                        'net_profit': 45.67,
+                        'strategy': 'ai_optimized'
+                    }
+                },
+                {
+                    'timestamp': (current_time - timedelta(minutes=7)).isoformat(),
+                    'level': 'INFO',
+                    'module': 'CompoundService',
+                    'message': 'Found 15 compound opportunities | Total Profit Potential: $1,234.56 | Top Priority Score: 0.89',
+                    'type': 'compound_opportunities',
+                    'metadata': {
+                        'opportunities_count': 15,
+                        'total_profit_potential': 1234.56,
+                        'top_priority_score': 0.89
+                    }
+                }
+            ])
+        
+        if log_type in ['all', 'intelligence']:
+            logs.extend([
+                {
+                    'timestamp': (current_time - timedelta(minutes=2)).isoformat(),
+                    'level': 'INFO',
+                    'module': 'DexBrain',
+                    'message': 'Generated vault intelligence for 0x123...abc | Strategy: gamma_balanced | Confidence: 87% | Compound Opportunities: 5',
+                    'type': 'vault_intelligence',
+                    'metadata': {
+                        'vault_address': '0x123...abc',
+                        'strategy': 'gamma_balanced',
+                        'confidence': 0.87,
+                        'compound_opportunities': 5
+                    }
+                },
+                {
+                    'timestamp': (current_time - timedelta(minutes=6)).isoformat(),
+                    'level': 'INFO',
+                    'module': 'DexBrain',
+                    'message': 'Intelligence served to agent dexter_agent_1 | Insights: 45 | Predictions: 3 | Quality Score: 92%',
+                    'type': 'intelligence_feed',
+                    'metadata': {
+                        'agent_id': 'dexter_agent_1',
+                        'insights_count': 45,
+                        'predictions_count': 3,
+                        'quality_score': 0.92
+                    }
+                }
+            ])
+        
+        # Sort logs by timestamp (most recent first)
+        logs.sort(key=lambda x: x['timestamp'], reverse=True)
+        
+        # Apply limit
+        logs = logs[:limit]
+        
+        # Filter by timestamp if provided
+        if since_timestamp:
+            try:
+                since_dt = datetime.fromisoformat(since_timestamp.replace('Z', '+00:00'))
+                logs = [log for log in logs if datetime.fromisoformat(log['timestamp']) > since_dt]
+            except ValueError:
+                pass  # Invalid timestamp format, ignore filter
+        
+        return jsonify({
+            'logs': logs,
+            'total_count': len(logs),
+            'filters': {
+                'limit': limit,
+                'type': log_type,
+                'since': since_timestamp
+            },
+            'timestamp': current_time.isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Recent logs request failed: {e}")
+        return jsonify({'error': 'Failed to get recent logs'}), 500
 
 
 @app.errorhandler(404)

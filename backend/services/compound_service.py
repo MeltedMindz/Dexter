@@ -5,6 +5,7 @@ Integrates with DexBrain AI models for optimal compounding strategies.
 
 import asyncio
 import logging
+import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
@@ -16,8 +17,19 @@ from web3.contract import Contract
 
 from dexbrain.config import Config
 from dexbrain.enhanced_ml_models import EnhancedMLModels, LSTMModel, TickRangePredictor
+from ai.vault_strategy_models import VaultMLEngine, integrate_with_compound_service
 from data.fetchers.uniswap_v3_fetcher import UniswapV3Fetcher
 from utils.performance_tracker import PerformanceTracker, PerformanceMetrics
+
+# Configure structured logging for compound operations
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/opt/dexter-ai/compound-operations.log'),
+        logging.StreamHandler()
+    ]
+)
 
 
 class CompoundStrategy(Enum):
@@ -85,11 +97,17 @@ class CompoundService:
         self.lstm_model = LSTMModel()
         self.tick_predictor = TickRangePredictor()
         
+        # Initialize vault AI engine
+        self.vault_engine = VaultMLEngine()
+        self.vault_strategy_recommender = integrate_with_compound_service()
+        
         # Initialize data fetcher
         self.uniswap_fetcher = UniswapV3Fetcher()
         
         # Performance tracking
         self.performance_tracker = PerformanceTracker()
+        
+        self.logger.info("[CompoundService] Initialized with vault AI integration")
         
         # Contract instances (would be initialized with actual addresses)
         self.compoundor_contract: Optional[Contract] = None
@@ -204,6 +222,14 @@ class CompoundService:
     ) -> CompoundResult:
         """Execute a compound operation for a specific opportunity."""
         start_time = datetime.now()
+        operation_start = time.time()
+        
+        self.logger.info(f"[CompoundService] COMPOUND_EXECUTE | "
+                        f"Token ID: {opportunity.token_id} | "
+                        f"Strategy: {opportunity.strategy.value} | "
+                        f"Current Fees: ${opportunity.current_fees_usd:.2f} | "
+                        f"Expected Profit: ${opportunity.profit_potential:.2f} | "
+                        f"AI Confidence: {opportunity.ai_confidence:.2%}")
         
         try:
             # Pre-execution validation
@@ -241,6 +267,9 @@ class CompoundService:
             # Track performance
             await self._track_compound_performance(opportunity, tx_hash, gas_used, execution_time)
             
+            operation_time = time.time() - operation_start
+            profit_after_gas = opportunity.profit_potential - gas_cost_eth * 3000  # Assume $3000 ETH
+            
             result = CompoundResult(
                 token_id=opportunity.token_id,
                 success=True,
@@ -254,12 +283,26 @@ class CompoundService:
                 error_message=None
             )
             
-            self.logger.info(f"Successfully compounded position {opportunity.token_id}")
+            self.logger.info(f"[CompoundService] COMPOUND_SUCCESS | "
+                           f"Token ID: {opportunity.token_id} | "
+                           f"TX Hash: {tx_hash} | "
+                           f"Gas Used: {gas_used:,} | "
+                           f"Gas Cost: ${gas_cost_eth * 3000:.2f} | "
+                           f"Fees Compounded: ${opportunity.current_fees_usd:.2f} | "
+                           f"Net Profit: ${profit_after_gas:.2f} | "
+                           f"Execution Time: {operation_time:.3f}s")
+            
             return result
             
         except Exception as e:
             execution_time = (datetime.now() - start_time).total_seconds()
-            self.logger.error(f"Failed to compound position {opportunity.token_id}: {e}")
+            operation_time = time.time() - operation_start
+            
+            self.logger.error(f"[CompoundService] COMPOUND_FAILED | "
+                            f"Token ID: {opportunity.token_id} | "
+                            f"Strategy: {opportunity.strategy.value} | "
+                            f"Error: {str(e)} | "
+                            f"Execution Time: {operation_time:.3f}s")
             
             return CompoundResult(
                 token_id=opportunity.token_id,

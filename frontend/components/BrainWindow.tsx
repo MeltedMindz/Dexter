@@ -4,9 +4,13 @@ import { useState, useEffect, useRef } from 'react'
 import { Brain, Activity, Zap, Eye } from 'lucide-react'
 
 interface LogEntry {
-  type: 'log' | 'error' | 'history' | 'heartbeat';
+  type: 'log' | 'error' | 'history' | 'heartbeat' | 'vault_strategy' | 'vault_optimization' | 'compound_success' | 'compound_opportunities' | 'vault_intelligence' | 'intelligence_feed';
   data?: string;
+  message?: string;
   timestamp: Date;
+  metadata?: any;
+  level?: string;
+  module?: string;
 }
 
 export function BrainWindow() {
@@ -25,10 +29,43 @@ export function BrainWindow() {
   useEffect(() => {
     let pollInterval: NodeJS.Timeout;
     
-    // Use HTTP polling instead of SSE
+    // Fetch logs from DexBrain API
     const fetchLogs = async () => {
       try {
-        const response = await fetch('/api/logs', {
+        // Try DexBrain structured logs API first
+        const dexbrainResponse = await fetch('https://api.dexteragent.com/api/logs/recent?limit=50&type=all', {
+          method: 'GET',
+          cache: 'no-store',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (dexbrainResponse.ok) {
+          const dexbrainData = await dexbrainResponse.json();
+          
+          if (dexbrainData.logs && Array.isArray(dexbrainData.logs)) {
+            console.log('✅ Fetched DexBrain structured logs:', dexbrainData.logs.length, 'entries');
+            setIsConnected(true);
+            
+            // Transform DexBrain logs to expected format
+            const transformedLogs = dexbrainData.logs.map((log: any) => ({
+              type: log.type || 'log',
+              data: log.message || log.data || 'No data',
+              message: log.message,
+              timestamp: new Date(log.timestamp || new Date()),
+              metadata: log.metadata,
+              level: log.level,
+              module: log.module
+            }));
+            
+            setLogs(transformedLogs.slice(-50)); // Keep last 50 entries
+            return;
+          }
+        }
+        
+        // Fallback to original API
+        const response = await fetch('https://api.dexteragent.com/api/logs', {
           method: 'GET',
           cache: 'no-store'
         });
@@ -67,17 +104,47 @@ export function BrainWindow() {
             }));
             setLogs(fallbackLogs.slice(-50));
           } else {
-            // Only show connection status if no real data available
-            console.log('📝 No real data available, showing connection status');
+            // Show structured demo logs with vault intelligence
+            console.log('📝 No real data available, showing demo vault intelligence logs');
             setLogs([
               {
+                type: 'vault_strategy',
+                data: '[VaultMLEngine] Strategy prediction complete | Recommended: gamma_balanced | Confidence: 87% | Expected APR: 18.5% | Ranges: 2',
+                timestamp: new Date(Date.now() - 5 * 60 * 1000)
+              },
+              {
+                type: 'compound_success',
+                data: '[CompoundService] COMPOUND_SUCCESS | Token ID: 12345 | TX Hash: 0xabc...def | Gas Used: 150,000 | Net Profit: $45.67',
+                timestamp: new Date(Date.now() - 3 * 60 * 1000)
+              },
+              {
+                type: 'vault_intelligence',
+                data: '[DexBrain] Generated vault intelligence for 0x123...abc | Strategy: gamma_balanced | Confidence: 87% | Compound Opportunities: 5',
+                timestamp: new Date(Date.now() - 2 * 60 * 1000)
+              },
+              {
+                type: 'compound_opportunities',
+                data: '[CompoundService] Found 15 compound opportunities | Total Profit Potential: $1,234.56 | Top Priority Score: 0.89',
+                timestamp: new Date(Date.now() - 7 * 60 * 1000)
+              },
+              {
+                type: 'vault_optimization',
+                data: '[GammaStyleOptimizer] Dual position optimization complete | Base Range: [98000, 102000] (75%) | Limit Range: [99500, 100500] (25%)',
+                timestamp: new Date(Date.now() - 8 * 60 * 1000)
+              },
+              {
+                type: 'intelligence_feed',
+                data: '[DexBrain] Intelligence served to agent dexter_agent_1 | Insights: 45 | Predictions: 3 | Quality Score: 92%',
+                timestamp: new Date(Date.now() - 6 * 60 * 1000)
+              },
+              {
                 type: 'error',
-                data: '[Network] Unable to connect to Dexter AI agents on VPS',
+                data: '[Network] Unable to connect to live DexBrain API - showing demo data',
                 timestamp: new Date()
               },
               {
                 type: 'log',
-                data: '[System] Attempting to reconnect to real trading data...',
+                data: '[System] Vault infrastructure integration active • AI strategies enabled',
                 timestamp: new Date(Date.now() - 3000)
               }
             ]);
@@ -91,12 +158,12 @@ export function BrainWindow() {
         setLogs([
           {
             type: 'error',
-            data: '[Network] Connection to VPS failed - retrying...',
+            data: '[Network] Connection to DexBrain API failed - retrying...',
             timestamp: new Date()
           },
           {
             type: 'log',
-            data: '[System] Attempting to reconnect to live trading agents',
+            data: '[System] Attempting to reconnect to vault intelligence network',
             timestamp: new Date(Date.now() - 3000)
           }
         ]);
@@ -127,21 +194,47 @@ export function BrainWindow() {
     }
   }, [logs, autoScroll])
 
-  const formatLogLine = (line: string) => {
+  const formatLogLine = (log: LogEntry) => {
+    const line = log.data || log.message || 'No data'
     // Remove ANSI color codes if present
     const cleanLine = line.replace(/\x1b\[[0-9;]*m/g, '')
     
-    // Highlight different log types
-    if (cleanLine.includes('ERROR') || cleanLine.includes('error')) {
-      return <span className="text-red-400">{cleanLine}</span>
-    } else if (cleanLine.includes('WARN') || cleanLine.includes('warning')) {
-      return <span className="text-yellow-400">{cleanLine}</span>
-    } else if (cleanLine.includes('INFO') || cleanLine.includes('Starting')) {
-      return <span className="text-cyan-400">{cleanLine}</span>
-    } else if (cleanLine.includes('Success') || cleanLine.includes('✓')) {
-      return <span className="text-green-400">{cleanLine}</span>
+    // Get type-specific styling
+    const getLogStyle = (type: string, level?: string) => {
+      if (type === 'error' || level === 'ERROR') {
+        return 'text-red-400'
+      } else if (type === 'vault_strategy') {
+        return 'text-cyan-400'
+      } else if (type === 'compound_success') {
+        return 'text-green-400'
+      } else if (type === 'compound_opportunities') {
+        return 'text-yellow-400'
+      } else if (type === 'vault_intelligence') {
+        return 'text-purple-400'
+      } else if (type === 'vault_optimization') {
+        return 'text-blue-400'
+      } else if (type === 'intelligence_feed') {
+        return 'text-orange-400'
+      } else if (cleanLine.includes('WARN') || cleanLine.includes('warning')) {
+        return 'text-yellow-400'
+      } else if (cleanLine.includes('INFO') || cleanLine.includes('Starting')) {
+        return 'text-cyan-400'
+      } else if (cleanLine.includes('Success') || cleanLine.includes('✓')) {
+        return 'text-green-400'
+      }
+      return 'text-green-400'
     }
-    return <span className="text-green-400">{cleanLine}</span>
+    
+    const styleClass = getLogStyle(log.type, log.level)
+    
+    // Add module prefix if available
+    const modulePrefix = log.module ? `[${log.module}] ` : ''
+    
+    return (
+      <span className={styleClass}>
+        {modulePrefix}{cleanLine}
+      </span>
+    )
   }
 
   return (
@@ -236,11 +329,19 @@ export function BrainWindow() {
                   <>
                     {logs.map((log, index) => (
                       <div key={index} className="mb-1">
-                        {log.data?.split('\n').map((line, i) => (
-                          <div key={i} className="leading-relaxed">
-                            {formatLogLine(line)}
+                        <div className="leading-relaxed flex items-start gap-2">
+                          <span className="text-gray-500 text-xs min-w-[60px]">
+                            {log.timestamp.toLocaleTimeString('en-US', { 
+                              hour12: false, 
+                              hour: '2-digit', 
+                              minute: '2-digit', 
+                              second: '2-digit' 
+                            })}
+                          </span>
+                          <div className="flex-1">
+                            {formatLogLine(log)}
                           </div>
-                        ))}
+                        </div>
                       </div>
                     ))}
                     <div ref={logsEndRef} />
@@ -270,16 +371,16 @@ export function BrainWindow() {
             <div className="bg-gradient-to-r from-gray-900 to-black p-4 border-t border-gray-700">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
                 <div className="text-center">
-                  <div className="text-primary font-bold">GLOBAL INTELLIGENCE</div>
-                  <div className="text-gray-400">Real-time data sharing across agents</div>
+                  <div className="text-primary font-bold">VAULT INTELLIGENCE</div>
+                  <div className="text-gray-400">AI-powered strategy optimization</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-accent-cyan font-bold">PERFORMANCE TRACKING</div>
-                  <div className="text-gray-400">Live P&L and APR monitoring</div>
+                  <div className="text-accent-cyan font-bold">COMPOUND TRACKING</div>
+                  <div className="text-gray-400">Live compound opportunities & execution</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-accent-yellow font-bold">MULTI-CHAIN</div>
-                  <div className="text-gray-400">Base • Ethereum • Arbitrum • Solana</div>
+                  <div className="text-accent-yellow font-bold">MULTI-RANGE</div>
+                  <div className="text-gray-400">Gamma-style dual position management</div>
                 </div>
               </div>
             </div>

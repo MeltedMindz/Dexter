@@ -25,6 +25,16 @@ DATA_QUALITY_SCORE = Gauge('dexbrain_data_quality_score', 'Average data quality 
 NETWORK_TVL = Gauge('dexbrain_network_tvl_usd', 'Total value locked across network')
 LAST_INTELLIGENCE_UPDATE = Gauge('dexbrain_last_intelligence_update', 'Timestamp of last intelligence update')
 
+# Vault-specific metrics
+VAULT_STRATEGIES_GENERATED = Counter('dexbrain_vault_strategies_total', 'Total vault strategies generated', ['strategy_type'])
+VAULT_COMPOUNDS_SUCCESSFUL = Counter('dexbrain_vault_compounds_successful_total', 'Successful vault compounds')
+VAULT_COMPOUNDS_FAILED = Counter('dexbrain_vault_compounds_failed_total', 'Failed vault compounds')
+VAULT_TOTAL_TVL = Gauge('dexbrain_vault_total_tvl_usd', 'Total value locked in all vaults')
+VAULT_AVERAGE_APR = Gauge('dexbrain_vault_average_apr', 'Average APR across all vaults')
+VAULT_AI_CONFIDENCE = Gauge('dexbrain_vault_ai_confidence', 'Average AI confidence score for vault strategies')
+COMPOUND_OPPORTUNITIES = Gauge('dexbrain_compound_opportunities', 'Current number of compound opportunities')
+COMPOUND_PROFIT_POTENTIAL = Gauge('dexbrain_compound_profit_potential_usd', 'Total profit potential from compound opportunities')
+
 # Database connection
 DB_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost:5432/dexter_db')
 
@@ -141,6 +151,59 @@ class DexBrainMetricsExporter:
         except Exception as e:
             print(f"❌ Network metrics collection failed: {e}")
             
+    async def collect_vault_metrics(self):
+        """Collect vault-specific metrics"""
+        try:
+            # Get vault statistics from API
+            async with aiohttp.ClientSession() as session:
+                # Get vault analytics
+                try:
+                    async with session.get(f"{self.api_base_url}/api/vault/analytics?days=1") as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            analytics = data.get('analytics', {})
+                            
+                            # Update vault TVL if available
+                            if 'compound_volume' in analytics:
+                                volume_data = analytics['compound_volume']
+                                if 'total_tvl' in volume_data:
+                                    VAULT_TOTAL_TVL.set(volume_data['total_tvl'])
+                                    
+                            # Update average APR
+                            if 'overall_metrics' in analytics:
+                                metrics = analytics['overall_metrics']
+                                if 'average_apr' in metrics:
+                                    VAULT_AVERAGE_APR.set(metrics['average_apr'])
+                                    
+                            print(f"📊 Vault analytics updated")
+                except Exception as e:
+                    print(f"⚠️ Vault analytics collection failed: {e}")
+                
+                # Get compound opportunities
+                try:
+                    async with session.get(f"{self.api_base_url}/api/vault/compound-opportunities?limit=50") as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            opportunities = data.get('opportunities', [])
+                            
+                            COMPOUND_OPPORTUNITIES.set(len(opportunities))
+                            
+                            # Calculate total profit potential
+                            total_profit = sum(opp.get('profit_potential', 0) for opp in opportunities)
+                            COMPOUND_PROFIT_POTENTIAL.set(total_profit)
+                            
+                            # Calculate average AI confidence
+                            if opportunities:
+                                avg_confidence = sum(opp.get('ai_confidence', 0) for opp in opportunities) / len(opportunities)
+                                VAULT_AI_CONFIDENCE.set(avg_confidence)
+                            
+                            print(f"🔄 Compound opportunities: {len(opportunities)}, Profit potential: ${total_profit:,.2f}")
+                except Exception as e:
+                    print(f"⚠️ Compound opportunities collection failed: {e}")
+                    
+        except Exception as e:
+            print(f"❌ Vault metrics collection failed: {e}")
+            
     async def collect_all_metrics(self):
         """Collect all metrics"""
         print(f"🔄 Collecting metrics at {datetime.now()}")
@@ -150,6 +213,7 @@ class DexBrainMetricsExporter:
             self.collect_api_metrics(),
             self.collect_data_quality_metrics(),
             self.collect_network_metrics(),
+            self.collect_vault_metrics(),
             return_exceptions=True
         )
         

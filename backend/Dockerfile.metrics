@@ -1,0 +1,37 @@
+# DexBrain Metrics Exporter Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install monitoring dependencies
+RUN pip install prometheus-client psycopg2-binary aiohttp
+
+# Copy application code
+COPY . .
+
+# Create log directory
+RUN mkdir -p /opt/dexter-ai
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Expose port
+EXPOSE 8081
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8081/metrics || exit 1
+
+# Run DexBrain Metrics Exporter
+CMD ["python", "-m", "monitoring.dexbrain-metrics"]

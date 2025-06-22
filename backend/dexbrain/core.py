@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 from typing import List, Dict, Any, Optional
 import numpy as np
 from .blockchain.solana_connector import SolanaConnector
@@ -12,6 +13,14 @@ from .agent_registry import AgentRegistry
 from .performance_scoring import PerformanceScorer
 from .data_quality import DataQualityEngine
 from .schemas import AgentSubmission
+
+# Import vault AI systems
+try:
+    from ai.vault_strategy_models import VaultMLEngine, VaultMetrics, StrategyRecommendation
+    from services.compound_service import CompoundService
+    VAULT_INTEGRATION = True
+except ImportError:
+    VAULT_INTEGRATION = False
 
 
 class DexBrain:
@@ -42,6 +51,16 @@ class DexBrain:
         self.agent_registry = AgentRegistry()
         self.performance_scorer = PerformanceScorer()
         self.data_quality_engine = DataQualityEngine()
+        
+        # Vault infrastructure integration
+        if VAULT_INTEGRATION:
+            self.vault_engine = VaultMLEngine()
+            self.compound_service = CompoundService(Config)
+            self.logger.info("DexBrain initialized with vault infrastructure integration")
+        else:
+            self.vault_engine = None
+            self.compound_service = None
+            self.logger.warning("Vault infrastructure not available - running in legacy mode")
     
     async def aggregate_data(
         self, 
@@ -408,6 +427,130 @@ class DexBrain:
                 'benchmarks': {},
                 'error': str(e)
             }
+    
+    async def generate_vault_intelligence(
+        self,
+        vault_address: str,
+        pool_data: Dict[str, Any],
+        vault_metrics: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Generate AI-powered vault intelligence and strategy recommendations"""
+        
+        if not VAULT_INTEGRATION or not self.vault_engine:
+            return {
+                'error': 'Vault intelligence not available',
+                'recommendation': None
+            }
+        
+        start_time = time.time()
+        
+        try:
+            # Convert dict to VaultMetrics object
+            metrics = VaultMetrics(
+                total_value_locked=vault_metrics.get('total_value_locked', 0),
+                total_fees_24h=vault_metrics.get('total_fees_24h', 0),
+                impermanent_loss=vault_metrics.get('impermanent_loss', 0),
+                apr=vault_metrics.get('apr', 0),
+                sharpe_ratio=vault_metrics.get('sharpe_ratio', 0),
+                max_drawdown=vault_metrics.get('max_drawdown', 0),
+                successful_compounds=vault_metrics.get('successful_compounds', 0),
+                ai_optimization_count=vault_metrics.get('ai_optimization_count', 0),
+                capital_efficiency=vault_metrics.get('capital_efficiency', 0),
+                risk_score=vault_metrics.get('risk_score', 0)
+            )
+            
+            # Get market data
+            market_data = {
+                'btc_price': 50000,  # Would be fetched from actual sources
+                'eth_price': 3000,
+                'total_market_cap': 2000000000000,
+                'defi_tvl': 100000000000,
+                'volatility_index': 0.3
+            }
+            
+            # Generate strategy recommendation
+            recommendation = self.vault_engine.predict_strategy(
+                pool_data, metrics, market_data
+            )
+            
+            # Find compound opportunities if compound service is available
+            compound_opportunities = []
+            if self.compound_service:
+                try:
+                    opportunities = await self.compound_service.find_compound_opportunities()
+                    compound_opportunities = [
+                        {
+                            'token_id': opp.token_id,
+                            'current_fees_usd': opp.current_fees_usd,
+                            'profit_potential': opp.profit_potential,
+                            'strategy': opp.strategy.value,
+                            'urgency_score': opp.urgency_score,
+                            'ai_confidence': opp.ai_confidence
+                        }
+                        for opp in opportunities[:5]  # Top 5 opportunities
+                    ]
+                except Exception as e:
+                    self.logger.warning(f"Could not fetch compound opportunities: {e}")
+            
+            execution_time = time.time() - start_time
+            
+            intelligence = {
+                'vault_address': vault_address,
+                'strategy_recommendation': {
+                    'strategy_type': recommendation.strategy_type.value,
+                    'allocation_mode': recommendation.allocation_mode.value,
+                    'confidence_score': recommendation.confidence_score,
+                    'expected_apr': recommendation.expected_apr,
+                    'expected_risk': recommendation.expected_risk,
+                    'position_ranges': recommendation.position_ranges,
+                    'reasoning': recommendation.reasoning,
+                    'timestamp': recommendation.timestamp.isoformat()
+                },
+                'compound_opportunities': compound_opportunities,
+                'market_analysis': {
+                    'current_price': pool_data.get('current_price', 0),
+                    'volatility': self._calculate_volatility(pool_data),
+                    'liquidity_depth': pool_data.get('liquidity', 0),
+                    'volume_24h': pool_data.get('volume_24h', 0)
+                },
+                'performance_metrics': {
+                    'current_apr': metrics.apr,
+                    'sharpe_ratio': metrics.sharpe_ratio,
+                    'capital_efficiency': metrics.capital_efficiency,
+                    'risk_score': metrics.risk_score
+                },
+                'metadata': {
+                    'execution_time': execution_time,
+                    'timestamp': time.time(),
+                    'ai_engine_version': '2.0',
+                    'vault_integration': True
+                }
+            }
+            
+            self.logger.info(f"[DexBrain] Generated vault intelligence for {vault_address} | "
+                           f"Strategy: {recommendation.strategy_type.value} | "
+                           f"Confidence: {recommendation.confidence_score:.2%} | "
+                           f"Compound Opportunities: {len(compound_opportunities)} | "
+                           f"Execution Time: {execution_time:.3f}s")
+            
+            return intelligence
+            
+        except Exception as e:
+            self.logger.error(f"Failed to generate vault intelligence: {e}")
+            return {
+                'error': str(e),
+                'vault_address': vault_address,
+                'timestamp': time.time()
+            }
+    
+    def _calculate_volatility(self, pool_data: Dict) -> float:
+        """Calculate price volatility from pool data"""
+        prices = pool_data.get('prices', [])
+        if len(prices) < 2:
+            return 0.2  # Default volatility
+        
+        returns = np.diff(np.log(prices))
+        return float(np.std(returns) * np.sqrt(24))  # Annualized volatility
 
 
 async def main():

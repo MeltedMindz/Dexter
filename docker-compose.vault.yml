@@ -1,0 +1,234 @@
+version: '3.8'
+
+services:
+  # Main DexBrain Intelligence API
+  dexbrain-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dexbrain
+    container_name: dexbrain-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ALCHEMY_API_KEY=${ALCHEMY_API_KEY}
+      - BASE_RPC_URL=${BASE_RPC_URL}
+      - LOG_LEVEL=INFO
+      - API_PORT=8080
+      - VAULT_INTEGRATION=true
+    volumes:
+      - ./backend:/app
+      - vault-logs:/opt/dexter-ai
+    depends_on:
+      - db
+      - redis
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Vault Strategy Service
+  vault-strategy:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.vault
+    container_name: vault-strategy
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ALCHEMY_API_KEY=${ALCHEMY_API_KEY}
+      - BASE_RPC_URL=${BASE_RPC_URL}
+      - DEXBRAIN_API_URL=http://dexbrain-api:8080
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./backend:/app
+      - vault-logs:/opt/dexter-ai
+    depends_on:
+      - dexbrain-api
+      - db
+      - redis
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  # Compound Service
+  compound-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.compound
+    container_name: compound-service
+    ports:
+      - "8082:8082"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ALCHEMY_API_KEY=${ALCHEMY_API_KEY}
+      - BASE_RPC_URL=${BASE_RPC_URL}
+      - DEXBRAIN_API_URL=http://dexbrain-api:8080
+      - LOG_LEVEL=INFO
+      - COMPOUND_INTERVAL=300  # 5 minutes
+    volumes:
+      - ./backend:/app
+      - vault-logs:/opt/dexter-ai
+    depends_on:
+      - dexbrain-api
+      - vault-strategy
+      - db
+      - redis
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: dexter-postgres
+    environment:
+      POSTGRES_DB: dexter_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dexter_secure_password_2024}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: dexter-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-dexter_redis_2024}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: dexter-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  # DexBrain Metrics Exporter
+  dexbrain-metrics:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.metrics
+    container_name: dexbrain-metrics
+    ports:
+      - "8083:8081"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DEXBRAIN_API_URL=http://dexbrain-api:8080
+      - LOG_LEVEL=INFO
+    volumes:
+      - vault-logs:/opt/dexter-ai
+    depends_on:
+      - dexbrain-api
+      - db
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  # Grafana Monitoring Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: dexter-grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-dexter_admin_2024}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  # Log Aggregator for Real-time Streaming
+  log-aggregator:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.logs
+    container_name: log-aggregator
+    ports:
+      - "8084:8084"
+    environment:
+      - LOG_LEVEL=INFO
+      - STREAM_LOGS=true
+    volumes:
+      - vault-logs:/opt/dexter-ai
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  # Node Exporter for System Metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: dexter-node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  vault-logs:
+
+networks:
+  dexter-network:
+    driver: bridge

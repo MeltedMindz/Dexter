@@ -1,0 +1,25 @@
+# Sensitive fundraising materials
+*.pdf
+*.pptx
+*.docx
+*.xlsx
+
+# Personal notes and communications
+*notes*
+*call*
+*meeting*
+*private*
+
+# Investor specific materials
+investor-*/
+due-diligence/
+legal/
+
+# Financial projections (keep models, exclude sensitive data)
+financial-model-*.xlsx
+cap-table-*.xlsx
+term-sheet-*.pdf
+
+# But keep the pitch deck template
+!INVESTOR_PITCH_DECK.md
+!README.md
