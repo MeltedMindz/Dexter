@@ -44,9 +44,10 @@
         .slide.active {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             opacity: 1;
             transform: translateX(0);
+            padding-top: 80px;
         }
 
         .slide.exiting {
@@ -1180,7 +1181,7 @@
 
     <!-- Slide 8: AI Engine Architecture -->
     <div class="slide">
-        <div class="content" style="justify-content: flex-start; padding-top: 40px;">
+        <div class="content">
             <h2>AI Engine: The Brain Behind Optimization</h2>
             
             <div class="ai-pipeline">
@@ -1512,161 +1513,105 @@
         });
 
         function downloadPDF() {
-            // Show loading message
+            // Simple, reliable print-to-PDF approach
             const originalText = event.target.textContent;
-            event.target.textContent = 'Generating PDF...';
+            event.target.textContent = 'Opening Print Dialog...';
             event.target.disabled = true;
             
-            // Check if html2pdf is available
-            if (typeof html2pdf === 'undefined') {
-                // Fallback to print-to-PDF method
-                fallbackPDFGeneration();
-                return;
-            }
-            
-            // Create a container with all slides for PDF
-            const pdfContainer = document.createElement('div');
-            pdfContainer.style.cssText = `
-                position: absolute;
-                top: -10000px;
-                left: -10000px;
-                width: 1920px;
-                background: #ffffff;
-                font-family: 'Inter', sans-serif;
-            `;
-            
-            // Clone all slides
+            // Save current state
             const slides = document.querySelectorAll('.slide');
+            const navigation = document.querySelector('.navigation');
+            const counter = document.querySelector('.slide-counter');
+            const originalBody = document.body.innerHTML;
+            
+            // Hide navigation
+            navigation.style.display = 'none';
+            counter.style.display = 'none';
+            
+            // Show all slides for printing
             slides.forEach((slide, index) => {
-                const slideClone = slide.cloneNode(true);
-                slideClone.style.cssText = `
-                    display: flex !important;
-                    flex-direction: column;
-                    justify-content: flex-start;
-                    width: 1920px;
-                    height: 1080px;
-                    padding: 60px 80px;
-                    margin: 0 0 40px 0;
-                    background: #ffffff;
-                    border-radius: 16px;
-                    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
-                    page-break-after: always;
-                    opacity: 1;
-                    transform: none;
-                    transition: none;
-                `;
-                
-                // Fix content positioning
-                const content = slideClone.querySelector('.content');
-                if (content) {
-                    content.style.justifyContent = 'flex-start';
-                    content.style.paddingTop = '0';
-                }
+                slide.style.display = 'flex';
+                slide.style.pageBreakAfter = 'always';
+                slide.style.margin = '0 auto 2rem auto';
+                slide.style.opacity = '1';
+                slide.style.transform = 'none';
+                slide.style.transition = 'none';
+                slide.classList.add('active');
                 
                 if (index === slides.length - 1) {
-                    slideClone.style.pageBreakAfter = 'avoid';
+                    slide.style.pageBreakAfter = 'avoid';
                 }
-                
-                pdfContainer.appendChild(slideClone);
             });
             
-            document.body.appendChild(pdfContainer);
-            
-            const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
-                filename: 'Dexter_Protocol_Pitch_Deck.pdf',
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: { 
-                    scale: 1,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    width: 1920,
-                    height: pdfContainer.scrollHeight
-                },
-                jsPDF: { 
-                    unit: 'px', 
-                    format: [1920, 1080],
-                    orientation: 'landscape',
-                    compress: true
-                },
-                pagebreak: { mode: ['css', 'legacy'] }
-            };
-            
-            html2pdf().set(opt).from(pdfContainer).save().then(() => {
-                // Clean up
-                document.body.removeChild(pdfContainer);
-                event.target.textContent = originalText;
-                event.target.disabled = false;
-                
-                setTimeout(() => {
-                    alert('✅ PDF downloaded successfully!\n\nYour 13-slide professional pitch deck is ready to share with investors.');
-                }, 500);
-            }).catch((error) => {
-                console.error('PDF generation failed:', error);
-                document.body.removeChild(pdfContainer);
-                fallbackPDFGeneration();
-            });
-        }
-        
-        function fallbackPDFGeneration() {
-            // Fallback method using print dialog
-            const originalText = event.target.textContent;
-            event.target.textContent = 'Preparing Print...';
-            
-            // Create print-optimized HTML
-            const printWindow = window.open('', '_blank');
-            const slides = document.querySelectorAll('.slide');
-            let printHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Dexter Protocol - Investor Pitch Deck</title>
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { font-family: 'Inter', sans-serif; background: #ffffff; }
+            // Add print styles
+            const printStyles = document.createElement('style');
+            printStyles.innerHTML = `
+                @media print {
+                    body { 
+                        margin: 0; 
+                        padding: 0; 
+                        background: white !important;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
                     .slide { 
-                        width: 297mm; 
-                        height: 210mm; 
-                        padding: 20mm; 
-                        page-break-after: always; 
-                        background: #ffffff;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: flex-start;
+                        page-break-after: always !important;
+                        margin: 0 !important;
+                        padding: 60px 80px !important;
+                        background: white !important;
+                        border-radius: 0 !important;
+                        box-shadow: none !important;
+                        width: 100% !important;
+                        height: 100vh !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: flex-start !important;
                     }
-                    .slide:last-child { page-break-after: avoid; }
-                    h1 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }
-                    h2 { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; }
-                    h3 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem; }
-                    p, li { font-family: 'Inter', sans-serif; line-height: 1.4; margin-bottom: 0.5rem; }
-                    .stats-grid, .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-                    .stat-item, .feature-card { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
-                    @media print {
-                        body { margin: 0; padding: 0; }
-                        .slide { margin: 0; }
+                    .slide:last-child { 
+                        page-break-after: avoid !important; 
                     }
-                </style>
-            </head>
-            <body>`;
+                    .navigation, .slide-counter { 
+                        display: none !important; 
+                    }
+                    h1, h2, h3, p, li, div {
+                        color: black !important;
+                        background: transparent !important;
+                    }
+                }
+            `;
+            document.head.appendChild(printStyles);
             
-            slides.forEach(slide => {
-                const slideContent = slide.innerHTML;
-                printHTML += `<div class="slide">${slideContent}</div>`;
-            });
-            
-            printHTML += '</body></html>';
-            
-            printWindow.document.write(printHTML);
-            printWindow.document.close();
-            
+            // Trigger print dialog
             setTimeout(() => {
-                printWindow.print();
-                event.target.textContent = originalText;
-                event.target.disabled = false;
-                alert('📄 Print dialog opened!\n\nSelect "Save as PDF" in the print dialog to save your pitch deck.');
-            }, 1000);
+                window.print();
+                
+                // Restore original state after print dialog
+                setTimeout(() => {
+                    slides.forEach((slide, index) => {
+                        if (index === currentSlide) {
+                            slide.style.display = 'flex';
+                            slide.classList.add('active');
+                        } else {
+                            slide.style.display = 'none';
+                            slide.classList.remove('active');
+                        }
+                        slide.style.pageBreakAfter = '';
+                        slide.style.margin = '';
+                        slide.style.opacity = '';
+                        slide.style.transform = '';
+                        slide.style.transition = '';
+                    });
+                    
+                    navigation.style.display = 'flex';
+                    counter.style.display = 'block';
+                    document.head.removeChild(printStyles);
+                    
+                    event.target.textContent = originalText;
+                    event.target.disabled = false;
+                }, 1000);
+                
+                alert('📄 Print dialog opened!\n\nTo save as PDF:\n• Select "Save as PDF" or "Microsoft Print to PDF"\n• Choose landscape orientation\n• Click Save');
+            }, 500);
         }
     </script>
 </body>
