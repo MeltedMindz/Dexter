@@ -348,24 +348,13 @@
             border: 2px solid rgba(59, 130, 246, 0.2);
         }
 
-        .download-btn {
-            background: linear-gradient(135deg, #3B82F6, #14B8A6);
-            color: white;
-            border: none;
-            padding: 18px 36px;
-            border-radius: 50px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .contact-info {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
             margin-top: 2rem;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-        }
-
-        .download-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.4);
         }
 
         .problem-points {
@@ -1470,7 +1459,10 @@
             <div class="cta-section">
                 <h3>Ready to build the future of concentrated liquidity management?</h3>
                 <p>Join us in launching the first AI-native, ERC4626-compliant vault infrastructure</p>
-                <button class="download-btn" onclick="downloadPDF()">Download Pitch Deck PDF</button>
+                <div class="contact-info">
+                    <p style="font-size: 1.2rem; color: #64748B; margin-bottom: 0.5rem;">For inquiries and discussions:</p>
+                    <p style="font-size: 1.4rem; font-weight: 600; color: #3B82F6;">meltedmindz1@gmail.com</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1515,107 +1507,6 @@
             }
         });
 
-        function downloadPDF() {
-            // Simple, reliable print-to-PDF approach
-            const originalText = event.target.textContent;
-            event.target.textContent = 'Opening Print Dialog...';
-            event.target.disabled = true;
-            
-            // Save current state
-            const slides = document.querySelectorAll('.slide');
-            const navigation = document.querySelector('.navigation');
-            const counter = document.querySelector('.slide-counter');
-            const originalBody = document.body.innerHTML;
-            
-            // Hide navigation
-            navigation.style.display = 'none';
-            counter.style.display = 'none';
-            
-            // Show all slides for printing
-            slides.forEach((slide, index) => {
-                slide.style.display = 'flex';
-                slide.style.pageBreakAfter = 'always';
-                slide.style.margin = '0 auto 2rem auto';
-                slide.style.opacity = '1';
-                slide.style.transform = 'none';
-                slide.style.transition = 'none';
-                slide.classList.add('active');
-                
-                if (index === slides.length - 1) {
-                    slide.style.pageBreakAfter = 'avoid';
-                }
-            });
-            
-            // Add print styles
-            const printStyles = document.createElement('style');
-            printStyles.innerHTML = `
-                @media print {
-                    body { 
-                        margin: 0; 
-                        padding: 0; 
-                        background: white !important;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
-                    .slide { 
-                        page-break-after: always !important;
-                        margin: 0 !important;
-                        padding: 60px 80px !important;
-                        background: white !important;
-                        border-radius: 0 !important;
-                        box-shadow: none !important;
-                        width: 100% !important;
-                        height: 100vh !important;
-                        display: flex !important;
-                        flex-direction: column !important;
-                        justify-content: flex-start !important;
-                    }
-                    .slide:last-child { 
-                        page-break-after: avoid !important; 
-                    }
-                    .navigation, .slide-counter { 
-                        display: none !important; 
-                    }
-                    h1, h2, h3, p, li, div {
-                        color: black !important;
-                        background: transparent !important;
-                    }
-                }
-            `;
-            document.head.appendChild(printStyles);
-            
-            // Trigger print dialog
-            setTimeout(() => {
-                window.print();
-                
-                // Restore original state after print dialog
-                setTimeout(() => {
-                    slides.forEach((slide, index) => {
-                        if (index === currentSlide) {
-                            slide.style.display = 'flex';
-                            slide.classList.add('active');
-                        } else {
-                            slide.style.display = 'none';
-                            slide.classList.remove('active');
-                        }
-                        slide.style.pageBreakAfter = '';
-                        slide.style.margin = '';
-                        slide.style.opacity = '';
-                        slide.style.transform = '';
-                        slide.style.transition = '';
-                    });
-                    
-                    navigation.style.display = 'flex';
-                    counter.style.display = 'block';
-                    document.head.removeChild(printStyles);
-                    
-                    event.target.textContent = originalText;
-                    event.target.disabled = false;
-                }, 1000);
-                
-                alert('📄 Print dialog opened!\n\nTo save as PDF:\n• Select "Save as PDF" or "Microsoft Print to PDF"\n• Choose landscape orientation\n• Click Save');
-            }, 500);
-        }
     </script>
 </body>
 </html>
