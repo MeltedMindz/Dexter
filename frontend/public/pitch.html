@@ -604,6 +604,96 @@
             margin-top: 0.25rem;
         }
 
+        .ai-pipeline {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .pipeline-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .pipeline-step {
+            background: #FFFFFF;
+            border: 2px solid #3B82F6;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+        }
+
+        .pipeline-arrow {
+            color: #14B8A6;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .pipeline-step h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3B82F6;
+            margin: 0;
+        }
+
+        .pipeline-step p {
+            font-size: 0.8rem;
+            color: #6B7280;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .tech-comparison {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 0;
+            margin: 2rem 0;
+            background: #FFFFFF;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #E5E7EB;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .tech-comparison-header {
+            background: linear-gradient(135deg, #3B82F6 0%, #14B8A6 100%);
+            color: #FFFFFF;
+            padding: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .tech-comparison-cell {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tech-comparison-cell:nth-child(3n+1) {
+            background: #F8FAFC;
+            font-weight: 500;
+        }
+
+        .tech-comparison-cell:nth-child(3n+3) {
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+
         .problem-stat {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(245, 101, 101, 0.05) 100%);
             border: 2px solid rgba(239, 68, 68, 0.2);
@@ -744,7 +834,7 @@
 </head>
 <body>
     <div class="slide-counter">
-        Slide <span id="current-slide">1</span> of <span id="total-slides">12</span>
+        Slide <span id="current-slide">1</span> of <span id="total-slides">13</span>
     </div>
 
     <!-- Slide 1: Title -->
@@ -956,6 +1046,32 @@
                     </ul>
                 </div>
             </div>
+            
+            <div class="tech-comparison">
+                <div class="tech-comparison-header">Technical Feature</div>
+                <div class="tech-comparison-header">Competitors</div>
+                <div class="tech-comparison-header">Dexter Protocol</div>
+                
+                <div class="tech-comparison-cell">🤖 AI Optimization</div>
+                <div class="tech-comparison-cell"><span class="x-icon">✗</span> Manual strategies only</div>
+                <div class="tech-comparison-cell"><span class="check-icon">✓</span> LSTM + Reinforcement Learning</div>
+                
+                <div class="tech-comparison-cell">🏛️ Vault Standard</div>
+                <div class="tech-comparison-cell"><span class="x-icon">✗</span> Custom interfaces</div>
+                <div class="tech-comparison-cell"><span class="check-icon">✓</span> Full ERC4626 compliance</div>
+                
+                <div class="tech-comparison-cell">🛡️ MEV Protection</div>
+                <div class="tech-comparison-cell"><span class="x-icon">~</span> Basic TWAP only</div>
+                <div class="tech-comparison-cell"><span class="check-icon">✓</span> Multi-oracle + AI consensus</div>
+                
+                <div class="tech-comparison-cell">⚡ Gas Efficiency</div>
+                <div class="tech-comparison-cell"><span class="x-icon">✗</span> Individual transactions</div>
+                <div class="tech-comparison-cell"><span class="check-icon">✓</span> Batch operations (70-90% savings)</div>
+                
+                <div class="tech-comparison-cell">🔬 Development Maturity</div>
+                <div class="tech-comparison-cell"><span class="x-icon">✗</span> 1-2 development phases</div>
+                <div class="tech-comparison-cell"><span class="check-icon">✓</span> 13 phases, audit-ready</div>
+            </div>
         </div>
     </div>
 
@@ -1062,7 +1178,74 @@
         </div>
     </div>
 
-    <!-- Slide 8: Institutional Fit -->
+    <!-- Slide 8: AI Engine Architecture -->
+    <div class="slide">
+        <div class="content">
+            <h2>AI Engine: The Brain Behind Optimization</h2>
+            
+            <div class="ai-pipeline">
+                <h3>🧠 Machine Learning Pipeline</h3>
+                <div class="pipeline-flow">
+                    <div class="pipeline-step">
+                        <h4>Data Sources</h4>
+                        <p>Price, volume, volatility, liquidity depth</p>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <h4>Feature Engineering</h4>
+                        <p>20+ engineered features</p>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <h4>LSTM Models</h4>
+                        <p>Neural networks with attention</p>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <h4>Strategy Output</h4>
+                        <p>Position recommendations</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🧮 Advanced Feature Engineering</h3>
+                    <ul class="bullet-points">
+                        <li>20+ Uniswap-specific features (volatility, momentum, depth)</li>
+                        <li>Multi-timeframe analysis (1m, 5m, 15m, 1h, 4h)</li>
+                        <li>Real-time market microstructure indicators</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>🤖 LSTM Neural Networks</h3>
+                    <ul class="bullet-points">
+                        <li>Attention mechanisms for temporal pattern recognition</li>
+                        <li>30-minute retraining cycles with performance feedback</li>
+                        <li>Multi-output prediction (price, volatility, regime)</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Market Regime Detection</h3>
+                    <ul class="bullet-points">
+                        <li>Hidden Markov Models for state identification</li>
+                        <li>Dynamic strategy selection based on market conditions</li>
+                        <li>Confidence scoring for prediction reliability</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Reinforcement Learning</h3>
+                    <ul class="bullet-points">
+                        <li>Position timing optimization through trial and error</li>
+                        <li>Reward function based on Sharpe ratio and drawdown</li>
+                        <li>Continuous learning from vault performance data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Institutional Fit -->
     <div class="slide">
         <div class="content">
             <h2>Built for Professional Capital Management</h2>
@@ -1104,7 +1287,7 @@
         </div>
     </div>
 
-    <!-- Slide 9: Roadmap -->
+    <!-- Slide 10: Roadmap -->
     <div class="slide">
         <div class="content">
             <h2>Aggressive Growth with Multi-Chain Expansion</h2>
@@ -1149,7 +1332,7 @@
         </div>
     </div>
 
-    <!-- Slide 10: Team -->
+    <!-- Slide 11: Team -->
     <div class="slide">
         <div class="content">
             <h2>Proven Technical Execution & Strategic Hiring</h2>
@@ -1210,7 +1393,7 @@
         </div>
     </div>
 
-    <!-- Slide 11: Fundraising Ask -->
+    <!-- Slide 12: Fundraising Ask -->
     <div class="slide">
         <div class="content">
             <h2>$1M SAFE @ $10M Valuation Cap</h2>
@@ -1255,7 +1438,7 @@
         </div>
     </div>
 
-    <!-- Slide 12: Thank You -->
+    <!-- Slide 13: Thank You -->
     <div class="slide">
         <div class="content" style="text-align: center;">
             <h1>Thank You</h1>
