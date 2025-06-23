@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dexter Protocol - Investor Pitch Deck</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%);
+            color: #0F172A;
+            overflow-x: auto;
+            overflow-y: auto;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        .slide {
+            width: 1920px;
+            height: 1080px;
+            display: none;
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            box-sizing: border-box;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0F172A 0%, #3B82F6 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #3B82F6;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.5rem;
+            color: #6B7280;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: #FFFFFF;
+            border-radius: 16px;
+            border: 2px solid #E5E7EB;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .stat-item:hover {
+            border-color: #3B82F6;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
+        }
+
+        .stat-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #3B82F6;
+            display: block;
+            line-height: 1.1;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .stat-number.long-text {
+            font-size: 1.8rem;
+            line-height: 1.0;
+        }
+
+        .stat-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: #FFFFFF;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: #14B8A6;
+            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.12);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: #3B82F6;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-btn:hover {
+            background: #14B8A6;
+            transform: scale(1.1);
+            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.4);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: #FFFFFF;
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: 2px solid #E5E7EB;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0F172A;
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: #FFFFFF;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            border: 2px solid #E5E7EB;
+        }
+
+        .table th,
+        .table td {
+            padding: 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #3B82F6 0%, #14B8A6 100%);
+            font-weight: 600;
+            color: #FFFFFF;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .table td {
+            color: #374151;
+        }
+
+        .table td strong {
+            color: #0F172A;
+            font-weight: 600;
+        }
+
+        .bullet-points {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .bullet-points li {
+            margin: 1rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-family: 'Inter', sans-serif;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .bullet-points li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #14B8A6;
+            font-size: 0.8rem;
+        }
+
+        .funding-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .funding-item {
+            background: #FFFFFF;
+            border-left: 4px solid #14B8A6;
+            border: 2px solid #E5E7EB;
+            border-left: 4px solid #14B8A6;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .funding-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.12);
+        }
+
+        .funding-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3B82F6;
+        }
+
+        .funding-purpose {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: #6B7280;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 3rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%);
+            border-radius: 24px;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #3B82F6, #14B8A6);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.4);
+        }
+
+        .problem-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .problem-item {
+            background: #FFFFFF;
+            border: 2px solid #FEE2E2;
+            border-left: 4px solid #EF4444;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.08);
+        }
+
+        .problem-item h3 {
+            color: #DC2626;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .problem-item p {
+            color: #374151;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .roadmap-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .roadmap-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+        }
+
+        .roadmap-date {
+            background: linear-gradient(135deg, #3B82F6, #14B8A6);
+            color: #FFFFFF;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            min-width: 140px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .roadmap-content {
+            flex: 1;
+            background: #FFFFFF;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 2px solid #E5E7EB;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .roadmap-content h3 {
+            color: #0F172A;
+            margin-bottom: 1rem;
+        }
+
+        /* Enhanced Typography */
+        p {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .highlight-box h3 {
+            color: #0F172A;
+            margin-bottom: 1rem;
+        }
+
+        .highlight-box p {
+            color: #374151;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 20px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">12</span>
+    </div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide active">
+        <div class="content">
+            <div style="text-align: center;">
+                <h1>Dexter Protocol</h1>
+                <p class="subtitle">AI-Powered Vault Infrastructure for Retail and Institutional DeFi</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number long-text">ERC4626</span>
+                    <div class="stat-label">Compliant Vaults</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$1M</span>
+                    <div class="stat-label">SAFE Round</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$10M</span>
+                    <div class="stat-label">Valuation Cap</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">Base</span>
+                    <div class="stat-label">Native Protocol</div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h3>Institutional-Grade Automated Liquidity Management</h3>
+                <p>The first AI-native, ERC4626-compliant concentrated liquidity protocol</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Problem -->
+    <div class="slide">
+        <div class="content">
+            <h2>Concentrated Liquidity Management is Complex & Inefficient</h2>
+            
+            <div class="problem-points">
+                <div class="problem-item">
+                    <h3>Capital Inefficiency</h3>
+                    <p>80%+ of Uniswap V3 LPs underperform vs. passive strategies</p>
+                </div>
+                <div class="problem-item">
+                    <h3>Active Management Burden</h3>
+                    <p>Optimal rebalancing requires 24/7 monitoring and gas-expensive transactions</p>
+                </div>
+                <div class="problem-item">
+                    <h3>Institutional Barriers</h3>
+                    <p>No standardized vault infrastructure (ERC4626) for concentrated liquidity</p>
+                </div>
+                <div class="problem-item">
+                    <h3>Fragmented Solutions</h3>
+                    <p>Existing protocols lack AI optimization and institutional-grade features</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3 style="text-align: center; color: #fbbf24;">$50B+ in DEX liquidity needs professional management</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Solution -->
+    <div class="slide">
+        <div class="content">
+            <h2>AI-Native Vault Infrastructure with Institutional Standards</h2>
+            
+            <div class="highlight-box">
+                <h3>Core Innovation</h3>
+                <p>Gamma-inspired dual-position strategies enhanced with LSTM price prediction and automated rebalancing</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>ERC4626 Compliance</h3>
+                    <p>Standardized vault infrastructure for institutional integration</p>
+                </div>
+                <div class="feature-card">
+                    <h3>AI Optimization</h3>
+                    <p>20+ engineered features and LSTM models for intelligent rebalancing</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Multi-Range Management</h3>
+                    <p>Up to 10 concurrent position ranges for complex strategies</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Hybrid Strategy Modes</h3>
+                    <p>Manual → AI-Assisted → Fully Automated progression</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Tiered Fee Structure</h3>
+                    <p>Performance-based fees with institutional discounts</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Enterprise Security</h3>
+                    <p>Multi-oracle TWAP protection and MEV resistance</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Market Opportunity -->
+    <div class="slide">
+        <div class="content">
+            <h2>$120B+ TAM in Automated Liquidity Management</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">$120B+</span>
+                    <div class="stat-label">Total DEX Liquidity (TAM)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$25B</span>
+                    <div class="stat-label">Concentrated Liquidity (SAM)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$2.5B</span>
+                    <div class="stat-label">Actively Managed (SOM)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$8B+</span>
+                    <div class="stat-label">Base Ecosystem TVL</div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>L2 Explosion</h3>
+                    <p>Base TVL grew 400% in 2024 to $8B+</p>
+                </div>
+                <div class="feature-card">
+                    <h3>CLAMM Adoption</h3>
+                    <p>70% of new DEX volume uses concentrated liquidity</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Institutional DeFi</h3>
+                    <p>$15B+ institutional capital via protocols like Aave Arc</p>
+                </div>
+                <div class="feature-card">
+                    <h3>AI Integration</h3>
+                    <p>Early-stage opportunity in DeFi automation</p>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Base Ecosystem Advantage</h3>
+                <p>$8B+ TVL, Coinbase-backed, regulatory compliance focus makes Base the ideal launch platform</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Competitive Landscape -->
+    <div class="slide">
+        <div class="content">
+            <h2>Market-Leading Protocols with Focused Niches</h2>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Protocol</th>
+                        <th>TVL</th>
+                        <th>Fee Model</th>
+                        <th>Key Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gamma Strategies</strong></td>
+                        <td>$800M+</td>
+                        <td>5% performance</td>
+                        <td>Hypervisor dual-position, battle-tested</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Revert Finance</strong></td>
+                        <td>$300M+</td>
+                        <td>Variable 0.5-2%</td>
+                        <td>MEV protection, batch operations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Arrakis (G-UNI)</strong></td>
+                        <td>$200M+</td>
+                        <td>1% management</td>
+                        <td>Multi-DEX, institutional focus</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Izumi Finance</strong></td>
+                        <td>$100M+</td>
+                        <td>Performance-based</td>
+                        <td>Liquidity mining optimization</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h3>Dexter's Competitive Advantages</h3>
+                <ul class="bullet-points">
+                    <li>Only ERC4626-compliant vault infrastructure</li>
+                    <li>AI-first architecture with LSTM optimization</li>
+                    <li>Hybrid strategy modes (manual → automated)</li>
+                    <li>Tiered fee model with institutional discounts</li>
+                    <li>Base-native with institutional compliance</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Business Model -->
+    <div class="slide">
+        <div class="content">
+            <h2>Tiered Fee Structure with Performance Alignment</h2>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Performance Fee</th>
+                        <th>Management Fee</th>
+                        <th>AI Fee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Retail</strong></td>
+                        <td>10%</td>
+                        <td>1%</td>
+                        <td>0.50%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Premium</strong></td>
+                        <td>8%</td>
+                        <td>0.5%</td>
+                        <td>0.25%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Institutional</strong></td>
+                        <td>6%</td>
+                        <td>0.25%</td>
+                        <td>0.20%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VIP</strong></td>
+                        <td>5%</td>
+                        <td>0.15%</td>
+                        <td>0.15%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Performance Thresholds</h3>
+                    <p>Higher tiers require 1-3% minimum performance before fees</p>
+                </div>
+                <div class="feature-card">
+                    <h3>High Water Mark</h3>
+                    <p>Performance fees only on new highs</p>
+                </div>
+                <div class="feature-card">
+                    <h3>AI Opt-In</h3>
+                    <p>Users choose AI optimization level</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Custom VIP Terms</h3>
+                    <p>Negotiable for $10M+ deposits</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">$75k</span>
+                    <div class="stat-label">Q3 2025 Revenue Target</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$350k</span>
+                    <div class="stat-label">Q4 2025 Revenue Target</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$1.2M+</span>
+                    <div class="stat-label">2026 Revenue Target</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Technical Differentiators -->
+    <div class="slide">
+        <div class="content">
+            <h2>Institutional-Grade Architecture with AI Optimization</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>ERC4626 Vault Standard</h3>
+                    <ul class="bullet-points">
+                        <li>Only concentrated liquidity protocol with full compliance</li>
+                        <li>Standard interfaces for institutional integration</li>
+                        <li>Template-based factory for different strategies</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>AI-Native Design</h3>
+                    <ul class="bullet-points">
+                        <li>LSTM models with 20+ engineered features</li>
+                        <li>Real-time strategy optimization</li>
+                        <li>Performance tracking with Sharpe ratio monitoring</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Multi-Range Management</h3>
+                    <ul class="bullet-points">
+                        <li>Up to 10 concurrent position ranges per vault</li>
+                        <li>Complex strategies: dual-position, multi-range, AI-optimized</li>
+                        <li>Hybrid modes: Manual → AI-assisted → Fully automated</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Enterprise Security</h3>
+                    <ul class="bullet-points">
+                        <li>Multi-oracle TWAP protection with Chainlink</li>
+                        <li>MEV resistance and emergency controls</li>
+                        <li>Modular transformer architecture</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Institutional Fit -->
+    <div class="slide">
+        <div class="content">
+            <h2>Built for Professional Capital Management</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Regulatory Alignment</h3>
+                    <ul class="bullet-points">
+                        <li>Base Network: Coinbase-operated L2</li>
+                        <li>ERC4626 Standard: Used by Yearn, Rari Capital</li>
+                        <li>Multi-Oracle Validation: Chainlink + TWAP consensus</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Enterprise Features</h3>
+                    <ul class="bullet-points">
+                        <li>Up to 50% fee reduction for institutional deposits</li>
+                        <li>Negotiable rates for $10M+ deposits</li>
+                        <li>White-glove onboarding and dedicated support</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Advanced Analytics</h3>
+                    <ul class="bullet-points">
+                        <li>Comprehensive performance reporting</li>
+                        <li>Risk metrics and portfolio analytics</li>
+                        <li>API integration for portfolio management</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Compliance Infrastructure</h3>
+                    <ul class="bullet-points">
+                        <li>Time-locked emergency controls</li>
+                        <li>Comprehensive audit trail</li>
+                        <li>KYC/AML compatible user management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Roadmap -->
+    <div class="slide">
+        <div class="content">
+            <h2>Aggressive Growth with Multi-Chain Expansion</h2>
+            
+            <div class="roadmap-timeline">
+                <div class="roadmap-item">
+                    <div class="roadmap-date">Q3 2025</div>
+                    <div class="roadmap-content">
+                        <h3>Base Network Launch</h3>
+                        <ul class="bullet-points">
+                            <li>Deploy all vault infrastructure to Base mainnet</li>
+                            <li>Target: $5M TVL with 10+ institutional vaults</li>
+                            <li>Complete security audits with Trail of Bits</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-date">Q4 2025</div>
+                    <div class="roadmap-content">
+                        <h3>Multi-Chain Expansion</h3>
+                        <ul class="bullet-points">
+                            <li>Deploy to Arbitrum and Optimism</li>
+                            <li>Cross-chain vault management interface</li>
+                            <li>Target: $25M+ TVL across chains</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-date">2026</div>
+                    <div class="roadmap-content">
+                        <h3>Platform Maturity</h3>
+                        <ul class="bullet-points">
+                            <li>Additional DEX integrations (Curve V2, Balancer V3)</li>
+                            <li>Options strategies and structured products</li>
+                            <li>Target: $100M+ TVL, profitability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Team -->
+    <div class="slide">
+        <div class="content">
+            <h2>Technical Leadership with DeFi Experience</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Melted - Founder & Technical Lead</h3>
+                    <ul class="bullet-points">
+                        <li>Builder with deep experience in DeFi infrastructure, AI/ML systems, and security-focused smart contract design</li>
+                        <li>Developed Dexter's pre-launch infrastructure, including smart contracts, AI pipelines, frontend interface, and automated strategy simulations</li>
+                        <li>Experience in blockchain security testing, system architecture, and AI-powered trading logic in research and sandbox environments</li>
+                        <li>Hands-on technical lead across AI, smart contracts, and front-end development workflows</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>Open Technical Roles</h3>
+                    <p style="margin-bottom: 1rem;"><em>(funded by raise)</em></p>
+                    <ul class="bullet-points">
+                        <li>Smart Contract Engineer: Audit prep and multi-chain deployment</li>
+                        <li>AI/ML Engineer: Enhance LSTM models and strategy optimizers</li>
+                        <li>Frontend Engineer: Institutional dashboard and mobile app</li>
+                        <li>DevOps Engineer: Production infrastructure and monitoring</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>Advisory Support</h3>
+                <ul class="bullet-points">
+                    <li><strong>Arbitrum Grant</strong>: Technical validation and ecosystem support</li>
+                    <li><strong>Base Network</strong>: Direct relationship with Coinbase team</li>
+                    <li><strong>Technical Advisory</strong>: Guidance from experienced DeFi protocol builders</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Fundraising Ask -->
+    <div class="slide">
+        <div class="content">
+            <h2>$1M SAFE @ $10M Valuation Cap</h2>
+            
+            <div class="funding-breakdown">
+                <div class="funding-item">
+                    <div class="funding-amount">$120k</div>
+                    <div class="funding-purpose">Smart Contract Audits<br>Trail of Bits security audit, formal verification</div>
+                </div>
+                <div class="funding-item">
+                    <div class="funding-amount">$300k</div>
+                    <div class="funding-purpose">Core Engineering<br>Smart contract engineer, AI/ML engineer (6 months)</div>
+                </div>
+                <div class="funding-item">
+                    <div class="funding-amount">$150k</div>
+                    <div class="funding-purpose">LP Onboarding & BD<br>Institutional partnerships, liquidity incentives</div>
+                </div>
+                <div class="funding-item">
+                    <div class="funding-amount">$100k</div>
+                    <div class="funding-purpose">AI/Infrastructure Scale<br>Enhanced ML models, production infrastructure</div>
+                </div>
+                <div class="funding-item">
+                    <div class="funding-amount">$100k</div>
+                    <div class="funding-purpose">Marketing & GTM<br>Brand development, conference presence, content</div>
+                </div>
+                <div class="funding-item">
+                    <div class="funding-amount">$230k</div>
+                    <div class="funding-purpose">Founder & Operations<br>Salary, legal, accounting, reserves (6 months)</div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3>SAFE Terms</h3>
+                <ul class="bullet-points">
+                    <li>Standard YC SAFE with $10M valuation cap</li>
+                    <li>15% early investor discount</li>
+                    <li>Optional 2% equity → token conversion warrant</li>
+                    <li>18-month runway to profitability and Series A readiness</li>
+                    <li>Prefer a single lead investor for alignment and speed, but open to a syndicate provided there is a clear lead</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Thank You -->
+    <div class="slide">
+        <div class="content" style="text-align: center;">
+            <h1>Thank You</h1>
+            <p class="subtitle">Questions & Discussion</p>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">$25M+</span>
+                    <div class="stat-label">Series A TVL Target</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$500k+</span>
+                    <div class="stat-label">Quarterly Revenue Target</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">25+</span>
+                    <div class="stat-label">Institutional Vault Deployments</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">18 Months</span>
+                    <div class="stat-label">Runway to Profitability</div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h3>Ready to revolutionize concentrated liquidity management?</h3>
+                <p>Join us in building the future of institutional DeFi infrastructure</p>
+                <button class="download-btn" onclick="downloadPDF()">Download Pitch Deck PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">‹</button>
+        <button class="nav-btn" onclick="nextSlide()">›</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        function downloadPDF() {
+            // Create a complete HTML version with all slides visible for PDF conversion
+            const styleContent = document.querySelector('style').textContent;
+            
+            const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dexter Protocol - Investor Pitch Deck</title>
+    <style>
+        ${styleContent}
+        
+        /* PDF-optimized styles */
+        .slide { 
+            display: block !important; 
+            page-break-after: always;
+            margin: 0 auto 2rem auto;
+            transform: scale(0.8);
+            transform-origin: top center;
+        }
+        .slide:last-child { 
+            page-break-after: avoid; 
+        }
+        .navigation, .slide-counter { 
+            display: none !important; 
+        }
+        body { 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        
+        @media print {
+            body { 
+                margin: 0; 
+                padding: 0; 
+                background: white;
+            }
+            .slide { 
+                page-break-after: always; 
+                transform: scale(0.7);
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    ${document.body.innerHTML.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/onclick="[^"]*"/gi, '')}
+    
+    <div style="position: fixed; top: 20px; left: 20px; background: #3B82F6; color: white; padding: 15px; border-radius: 10px; font-family: Inter; max-width: 300px; z-index: 9999;">
+        <strong>📄 Ready for PDF!</strong><br>
+        Press <strong>Ctrl+P</strong> (or Cmd+P), select "Save as PDF", then click Save.
+    </div>
+</body>
+</html>`;
+
+            // Create and download the HTML file
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Dexter_Protocol_Pitch_Deck.html';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            alert('✅ Download started!\n\nNext steps:\n1. Open the downloaded HTML file\n2. Press Ctrl+P (or Cmd+P on Mac)\n3. Select "Save as PDF"\n4. Save your professional pitch deck!\n\nThe file contains all 12 slides perfectly formatted.');
+        }
+    </script>
+</body>
+</html>
