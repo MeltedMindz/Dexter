@@ -32,39 +32,7 @@ export function BrainWindow() {
     // Fetch logs from DexBrain API
     const fetchLogs = async () => {
       try {
-        // Try DexBrain structured logs API first
-        const dexbrainResponse = await fetch('http://5.78.71.231:8080/api/logs/recent?limit=50&type=all', {
-          method: 'GET',
-          cache: 'no-store',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        
-        if (dexbrainResponse.ok) {
-          const dexbrainData = await dexbrainResponse.json();
-          
-          if (dexbrainData.logs && Array.isArray(dexbrainData.logs)) {
-            console.log('✅ Fetched DexBrain structured logs:', dexbrainData.logs.length, 'entries');
-            setIsConnected(true);
-            
-            // Transform DexBrain logs to expected format
-            const transformedLogs = dexbrainData.logs.map((log: any) => ({
-              type: log.type || 'log',
-              data: log.message || log.data || 'No data',
-              message: log.message,
-              timestamp: new Date(log.timestamp || new Date()),
-              metadata: log.metadata,
-              level: log.level,
-              module: log.module
-            }));
-            
-            setLogs(transformedLogs.slice(-50)); // Keep last 50 entries
-            return;
-          }
-        }
-        
-        // Fallback to original API
+        // Use internal API (proxied through Vercel to avoid CORS/HTTPS issues)
         const response = await fetch('/api/logs', {
           method: 'GET',
           cache: 'no-store'

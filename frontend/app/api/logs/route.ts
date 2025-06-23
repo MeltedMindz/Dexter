@@ -1,7 +1,7 @@
 export async function GET() {
   try {
     // Instead of SSE, make a simple HTTP request to get recent logs
-    const response = await fetch('http://5.78.71.231:3004/api/recent-logs', {
+    const response = await fetch('http://5.78.71.231:8080/api/logs/recent?limit=50&type=all', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
