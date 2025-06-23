@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dexter Protocol - Investor Pitch Deck</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -35,12 +36,22 @@
             background: #FFFFFF;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .slide.active {
             display: flex;
             flex-direction: column;
             justify-content: center;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.exiting {
+            opacity: 0;
+            transform: translateX(-100px);
         }
 
         .slide::before {
@@ -437,29 +448,303 @@
             line-height: 1.6;
         }
 
-        @media (max-width: 768px) {
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .competitor-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .competitor-card {
+            background: #FFFFFF;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+            position: relative;
+        }
+
+        .competitor-card.dexter {
+            border-color: #14B8A6;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+
+        .competitor-card h3 {
+            margin-bottom: 1rem;
+            color: #0F172A;
+        }
+
+        .competitor-card.dexter h3 {
+            color: #14B8A6;
+        }
+
+        .comparison-points {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .comparison-points li {
+            margin: 0.5rem 0;
+            padding: 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .check-icon {
+            color: #10B981;
+            font-weight: bold;
+        }
+
+        .x-icon {
+            color: #EF4444;
+            font-weight: bold;
+        }
+
+        .simplified-fees {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .fee-tier {
+            background: #FFFFFF;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .fee-tier:hover {
+            transform: translateY(-4px);
+            border-color: #3B82F6;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
+        }
+
+        .fee-tier.institutional {
+            border-color: #14B8A6;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+
+        .fee-percentage {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #3B82F6;
+            line-height: 1;
+        }
+
+        .fee-tier.institutional .fee-percentage {
+            color: #14B8A6;
+        }
+
+        .fee-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            color: #6B7280;
+            margin: 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .fee-description {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: #9CA3AF;
+            margin-top: 1rem;
+        }
+
+        .achievement-card {
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 2px solid rgba(20, 184, 166, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .achievement-card h3 {
+            color: #14B8A6;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .achievement-stat {
+            text-align: center;
+        }
+
+        .achievement-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3B82F6;
+        }
+
+        .achievement-label {
+            font-size: 0.8rem;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+
+        .problem-stat {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(245, 101, 101, 0.05) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .problem-stat h3 {
+            color: #DC2626;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-stat p {
+            color: #374151;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1200px) {
             .slide {
-                padding: 40px 20px;
+                width: 100vw;
+                height: 100vh;
+                padding: 40px 30px;
+                border-radius: 0;
             }
             
             h1 {
-                font-size: 2.5rem;
+                font-size: 3rem;
             }
             
             h2 {
-                font-size: 2rem;
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+                line-height: 1.2;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+                line-height: 1.3;
+            }
+            
+            h3 {
+                font-size: 1.3rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
             }
             
             .stats-grid,
-            .feature-grid {
+            .feature-grid,
+            .competitor-comparison,
+            .simplified-fees {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 1.8rem;
+            }
+            
+            .stat-number.long-text {
+                font-size: 1.4rem;
+            }
+            
+            .navigation {
+                bottom: 20px;
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .slide-counter {
+                top: 20px;
+                right: 20px;
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .table {
+                font-size: 0.8rem;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.8rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .slide {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .stat-item {
+                padding: 1.5rem 1rem;
+                min-height: 100px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="slide-counter">
-        <span id="current-slide">1</span> / <span id="total-slides">12</span>
+        Slide <span id="current-slide">1</span> of <span id="total-slides">12</span>
     </div>
 
     <!-- Slide 1: Title -->
@@ -501,21 +786,26 @@
         <div class="content">
             <h2>Concentrated Liquidity Management is Complex & Inefficient</h2>
             
+            <div class="problem-stat">
+                <h3>83%</h3>
+                <p>of Uniswap V3 LPs underperform passive holding</p>
+            </div>
+
             <div class="problem-points">
                 <div class="problem-item">
-                    <h3>Capital Inefficiency</h3>
-                    <p>80%+ of Uniswap V3 LPs underperform vs. passive strategies</p>
+                    <h3>💸 Capital Inefficiency</h3>
+                    <p>Average LP loses $2,400 per $10k position annually vs. passive strategies</p>
                 </div>
                 <div class="problem-item">
-                    <h3>Active Management Burden</h3>
+                    <h3>⏰ Active Management Burden</h3>
                     <p>Optimal rebalancing requires 24/7 monitoring and gas-expensive transactions</p>
                 </div>
                 <div class="problem-item">
-                    <h3>Institutional Barriers</h3>
+                    <h3>🏛️ Institutional Barriers</h3>
                     <p>No standardized vault infrastructure (ERC4626) for concentrated liquidity</p>
                 </div>
                 <div class="problem-item">
-                    <h3>Fragmented Solutions</h3>
+                    <h3>🔧 Fragmented Solutions</h3>
                     <p>Existing protocols lack AI optimization and institutional-grade features</p>
                 </div>
             </div>
@@ -618,54 +908,53 @@
     <!-- Slide 5: Competitive Landscape -->
     <div class="slide">
         <div class="content">
-            <h2>Market-Leading Protocols with Focused Niches</h2>
+            <h2>Why Dexter Wins Against Market Leaders</h2>
             
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Protocol</th>
-                        <th>TVL</th>
-                        <th>Fee Model</th>
-                        <th>Key Features</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Gamma Strategies</strong></td>
-                        <td>$800M+</td>
-                        <td>5% performance</td>
-                        <td>Hypervisor dual-position, battle-tested</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Revert Finance</strong></td>
-                        <td>$300M+</td>
-                        <td>Variable 0.5-2%</td>
-                        <td>MEV protection, batch operations</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Arrakis (G-UNI)</strong></td>
-                        <td>$200M+</td>
-                        <td>1% management</td>
-                        <td>Multi-DEX, institutional focus</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Izumi Finance</strong></td>
-                        <td>$100M+</td>
-                        <td>Performance-based</td>
-                        <td>Liquidity mining optimization</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="highlight-box">
-                <h3>Dexter's Competitive Advantages</h3>
-                <ul class="bullet-points">
-                    <li>Only ERC4626-compliant vault infrastructure</li>
-                    <li>AI-first architecture with LSTM optimization</li>
-                    <li>Hybrid strategy modes (manual → automated)</li>
-                    <li>Tiered fee model with institutional discounts</li>
-                    <li>Base-native with institutional compliance</li>
-                </ul>
+            <div class="competitor-comparison">
+                <div class="competitor-card">
+                    <h3>Gamma Strategies</h3>
+                    <p style="color: #6B7280; margin-bottom: 1rem;">$800M+ TVL Leader</p>
+                    <ul class="comparison-points">
+                        <li><span class="x-icon">✗</span> Manual strategies only</li>
+                        <li><span class="x-icon">✗</span> No ERC4626 compliance</li>
+                        <li><span class="check-icon">✓</span> Battle-tested dual-position</li>
+                        <li><span class="x-icon">✗</span> 5% fixed performance fee</li>
+                    </ul>
+                </div>
+                
+                <div class="competitor-card">
+                    <h3>Revert Finance</h3>
+                    <p style="color: #6B7280; margin-bottom: 1rem;">$300M+ TVL</p>
+                    <ul class="comparison-points">
+                        <li><span class="check-icon">✓</span> MEV protection</li>
+                        <li><span class="x-icon">✗</span> No AI optimization</li>
+                        <li><span class="x-icon">✗</span> No vault infrastructure</li>
+                        <li><span class="x-icon">✗</span> Limited strategy options</li>
+                    </ul>
+                </div>
+                
+                <div class="competitor-card">
+                    <h3>Arrakis Finance</h3>
+                    <p style="color: #6B7280; margin-bottom: 1rem;">$200M+ TVL</p>
+                    <ul class="comparison-points">
+                        <li><span class="check-icon">✓</span> Multi-DEX support</li>
+                        <li><span class="x-icon">✗</span> No AI optimization</li>
+                        <li><span class="x-icon">✗</span> 1% management fee</li>
+                        <li><span class="x-icon">✗</span> Limited automation</li>
+                    </ul>
+                </div>
+                
+                <div class="competitor-card dexter">
+                    <h3>🚀 Dexter Protocol</h3>
+                    <p style="color: #14B8A6; margin-bottom: 1rem; font-weight: 600;">Next-Generation</p>
+                    <ul class="comparison-points">
+                        <li><span class="check-icon">✓</span> AI-powered optimization</li>
+                        <li><span class="check-icon">✓</span> ERC4626 compliant vaults</li>
+                        <li><span class="check-icon">✓</span> Hybrid strategy modes</li>
+                        <li><span class="check-icon">✓</span> Tiered institutional fees</li>
+                        <li><span class="check-icon">✓</span> Base-native with compliance</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -673,61 +962,44 @@
     <!-- Slide 6: Business Model -->
     <div class="slide">
         <div class="content">
-            <h2>Tiered Fee Structure with Performance Alignment</h2>
+            <h2>Simple, Performance-Aligned Fee Structure</h2>
             
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Tier</th>
-                        <th>Performance Fee</th>
-                        <th>Management Fee</th>
-                        <th>AI Fee</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Retail</strong></td>
-                        <td>10%</td>
-                        <td>1%</td>
-                        <td>0.50%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Premium</strong></td>
-                        <td>8%</td>
-                        <td>0.5%</td>
-                        <td>0.25%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Institutional</strong></td>
-                        <td>6%</td>
-                        <td>0.25%</td>
-                        <td>0.20%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>VIP</strong></td>
-                        <td>5%</td>
-                        <td>0.15%</td>
-                        <td>0.15%</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="simplified-fees">
+                <div class="fee-tier">
+                    <div class="fee-percentage">10%</div>
+                    <div class="fee-label">Retail Performance Fee</div>
+                    <div class="fee-description">Individual investors<br>$100+ minimum</div>
+                </div>
+                
+                <div class="fee-tier">
+                    <div class="fee-percentage">7%</div>
+                    <div class="fee-label">Premium Performance Fee</div>
+                    <div class="fee-description">Power users<br>$10k+ minimum</div>
+                </div>
+                
+                <div class="fee-tier institutional">
+                    <div class="fee-percentage">5%</div>
+                    <div class="fee-label">Institutional Performance Fee</div>
+                    <div class="fee-description">Institutions & DAOs<br>$100k+ minimum</div>
+                </div>
+            </div>
 
             <div class="feature-grid">
                 <div class="feature-card">
-                    <h3>Performance Thresholds</h3>
-                    <p>Higher tiers require 1-3% minimum performance before fees</p>
+                    <h3>💰 High Water Mark</h3>
+                    <p>Performance fees only charged on new profit highs</p>
                 </div>
                 <div class="feature-card">
-                    <h3>High Water Mark</h3>
-                    <p>Performance fees only on new highs</p>
+                    <h3>🎯 Performance Threshold</h3>
+                    <p>2% minimum performance before any fees charged</p>
                 </div>
                 <div class="feature-card">
-                    <h3>AI Opt-In</h3>
-                    <p>Users choose AI optimization level</p>
+                    <h3>🤖 AI Optimization</h3>
+                    <p>Optional 0.25% fee for AI-powered strategies</p>
                 </div>
                 <div class="feature-card">
-                    <h3>Custom VIP Terms</h3>
-                    <p>Negotiable for $10M+ deposits</p>
+                    <h3>🏛️ Custom Terms</h3>
+                    <p>Negotiable rates for $10M+ institutional deposits</p>
                 </div>
             </div>
 
@@ -880,32 +1152,55 @@
     <!-- Slide 10: Team -->
     <div class="slide">
         <div class="content">
-            <h2>Technical Leadership with DeFi Experience</h2>
+            <h2>Proven Technical Execution & Strategic Hiring</h2>
+            
+            <div class="achievement-card">
+                <h3>🚀 Production-Ready Infrastructure Built</h3>
+                <div class="achievement-stats">
+                    <div class="achievement-stat">
+                        <div class="achievement-number">13</div>
+                        <div class="achievement-label">Development Phases</div>
+                    </div>
+                    <div class="achievement-stat">
+                        <div class="achievement-number">25+</div>
+                        <div class="achievement-label">Smart Contracts</div>
+                    </div>
+                    <div class="achievement-stat">
+                        <div class="achievement-number">50k+</div>
+                        <div class="achievement-label">Lines of Code</div>
+                    </div>
+                    <div class="achievement-stat">
+                        <div class="achievement-number">Live</div>
+                        <div class="achievement-label">dexteragent.com</div>
+                    </div>
+                </div>
+                <p>Complete ERC4626 vault infrastructure, AI pipeline, frontend interface, and automated testing deployed to production</p>
+            </div>
             
             <div class="feature-grid">
                 <div class="feature-card">
                     <h3>Melted - Founder & Technical Lead</h3>
                     <ul class="bullet-points">
-                        <li>Builder with deep experience in DeFi infrastructure, AI/ML systems, and security-focused smart contract design</li>
-                        <li>Developed Dexter's pre-launch infrastructure, including smart contracts, AI pipelines, frontend interface, and automated strategy simulations</li>
-                        <li>Experience in blockchain security testing, system architecture, and AI-powered trading logic in research and sandbox environments</li>
-                        <li>Hands-on technical lead across AI, smart contracts, and front-end development workflows</li>
+                        <li>🔧 Built entire Dexter infrastructure from smart contracts to AI models</li>
+                        <li>🛡️ Deep expertise in DeFi security, MEV protection, and institutional compliance</li>
+                        <li>🤖 Hands-on ML/AI development with production LSTM models and strategy optimization</li>
+                        <li>🏗️ Full-stack development across Solidity, Python, TypeScript, and cloud infrastructure</li>
                     </ul>
                 </div>
                 <div class="feature-card">
-                    <h3>Open Technical Roles</h3>
-                    <p style="margin-bottom: 1rem;"><em>(funded by raise)</em></p>
+                    <h3>Strategic Hiring Plan</h3>
+                    <p style="margin-bottom: 1rem; color: #14B8A6; font-weight: 600;">Funded by $1M raise</p>
                     <ul class="bullet-points">
-                        <li>Smart Contract Engineer: Audit prep and multi-chain deployment</li>
-                        <li>AI/ML Engineer: Enhance LSTM models and strategy optimizers</li>
-                        <li>Frontend Engineer: Institutional dashboard and mobile app</li>
-                        <li>DevOps Engineer: Production infrastructure and monitoring</li>
+                        <li>🔐 Smart Contract Engineer: Audit preparation and multi-chain deployment</li>
+                        <li>🧠 AI/ML Engineer: Enhanced LSTM models and strategy optimization</li>
+                        <li>💻 Frontend Engineer: Institutional dashboard and mobile interface</li>
+                        <li>⚙️ DevOps Engineer: Production scaling and monitoring infrastructure</li>
                     </ul>
                 </div>
             </div>
 
             <div class="highlight-box">
-                <h3>Advisory Support</h3>
+                <h3>🤝 Advisory & Ecosystem Support</h3>
                 <ul class="bullet-points">
                     <li><strong>Arbitrum Grant</strong>: Technical validation and ecosystem support</li>
                     <li><strong>Base Network</strong>: Direct relationship with Coinbase team</li>
@@ -1006,10 +1301,15 @@
         document.getElementById('total-slides').textContent = totalSlides;
 
         function showSlide(n) {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (n + totalSlides) % totalSlides;
-            slides[currentSlide].classList.add('active');
-            document.getElementById('current-slide').textContent = currentSlide + 1;
+            const oldSlide = slides[currentSlide];
+            oldSlide.classList.add('exiting');
+            
+            setTimeout(() => {
+                oldSlide.classList.remove('active', 'exiting');
+                currentSlide = (n + totalSlides) % totalSlides;
+                slides[currentSlide].classList.add('active');
+                document.getElementById('current-slide').textContent = currentSlide + 1;
+            }, 250);
         }
 
         function nextSlide() {
@@ -1029,75 +1329,84 @@
         });
 
         function downloadPDF() {
-            // Create a complete HTML version with all slides visible for PDF conversion
-            const styleContent = document.querySelector('style').textContent;
+            // Show loading message
+            const originalText = event.target.textContent;
+            event.target.textContent = 'Generating PDF...';
+            event.target.disabled = true;
             
-            const htmlContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dexter Protocol - Investor Pitch Deck</title>
-    <style>
-        ${styleContent}
-        
-        /* PDF-optimized styles */
-        .slide { 
-            display: block !important; 
-            page-break-after: always;
-            margin: 0 auto 2rem auto;
-            transform: scale(0.8);
-            transform-origin: top center;
-        }
-        .slide:last-child { 
-            page-break-after: avoid; 
-        }
-        .navigation, .slide-counter { 
-            display: none !important; 
-        }
-        body { 
-            padding: 20px; 
-            background: #f5f5f5;
-        }
-        
-        @media print {
-            body { 
-                margin: 0; 
-                padding: 0; 
-                background: white;
-            }
-            .slide { 
-                page-break-after: always; 
-                transform: scale(0.7);
-                margin: 0;
-            }
-        }
-    </style>
-</head>
-<body>
-    ${document.body.innerHTML.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/onclick="[^"]*"/gi, '')}
-    
-    <div style="position: fixed; top: 20px; left: 20px; background: #3B82F6; color: white; padding: 15px; border-radius: 10px; font-family: Inter; max-width: 300px; z-index: 9999;">
-        <strong>📄 Ready for PDF!</strong><br>
-        Press <strong>Ctrl+P</strong> (or Cmd+P), select "Save as PDF", then click Save.
-    </div>
-</body>
-</html>`;
-
-            // Create and download the HTML file
-            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'Dexter_Protocol_Pitch_Deck.html';
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            // Use html2pdf for proper PDF generation
+            const element = document.body;
+            const opt = {
+                margin: 0.5,
+                filename: 'Dexter_Protocol_Pitch_Deck.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'a4', 
+                    orientation: 'landscape',
+                    compress: true
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
             
-            // Show success message
-            alert('✅ Download started!\n\nNext steps:\n1. Open the downloaded HTML file\n2. Press Ctrl+P (or Cmd+P on Mac)\n3. Select "Save as PDF"\n4. Save your professional pitch deck!\n\nThe file contains all 12 slides perfectly formatted.');
+            // Temporarily show all slides for PDF
+            const slides = document.querySelectorAll('.slide');
+            const navigation = document.querySelector('.navigation');
+            const counter = document.querySelector('.slide-counter');
+            
+            // Hide navigation elements
+            navigation.style.display = 'none';
+            counter.style.display = 'none';
+            
+            // Show all slides
+            slides.forEach((slide, index) => {
+                slide.style.display = 'flex';
+                slide.style.pageBreakAfter = 'always';
+                slide.style.margin = '0 auto';
+                slide.style.transform = 'scale(0.8)';
+                slide.style.transformOrigin = 'top center';
+                if (index === slides.length - 1) {
+                    slide.style.pageBreakAfter = 'avoid';
+                }
+            });
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore original state
+                slides.forEach((slide, index) => {
+                    if (index === currentSlide) {
+                        slide.style.display = 'flex';
+                        slide.classList.add('active');
+                    } else {
+                        slide.style.display = 'none';
+                        slide.classList.remove('active');
+                    }
+                    slide.style.pageBreakAfter = '';
+                    slide.style.transform = '';
+                    slide.style.transformOrigin = '';
+                });
+                
+                navigation.style.display = 'flex';
+                counter.style.display = 'block';
+                
+                event.target.textContent = originalText;
+                event.target.disabled = false;
+                
+                // Show success message
+                setTimeout(() => {
+                    alert('✅ PDF downloaded successfully!\n\nYour professional pitch deck is ready to share with investors.');
+                }, 500);
+            }).catch((error) => {
+                console.error('PDF generation failed:', error);
+                event.target.textContent = originalText;
+                event.target.disabled = false;
+                alert('❌ PDF generation failed. Please try the print option instead.');
+            });
         }
     </script>
 </body>
