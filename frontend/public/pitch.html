@@ -1180,7 +1180,7 @@
 
     <!-- Slide 8: AI Engine Architecture -->
     <div class="slide">
-        <div class="content">
+        <div class="content" style="justify-content: flex-start; padding-top: 40px;">
             <h2>AI Engine: The Brain Behind Optimization</h2>
             
             <div class="ai-pipeline">
@@ -1517,79 +1517,156 @@
             event.target.textContent = 'Generating PDF...';
             event.target.disabled = true;
             
-            // Use html2pdf for proper PDF generation
-            const element = document.body;
+            // Check if html2pdf is available
+            if (typeof html2pdf === 'undefined') {
+                // Fallback to print-to-PDF method
+                fallbackPDFGeneration();
+                return;
+            }
+            
+            // Create a container with all slides for PDF
+            const pdfContainer = document.createElement('div');
+            pdfContainer.style.cssText = `
+                position: absolute;
+                top: -10000px;
+                left: -10000px;
+                width: 1920px;
+                background: #ffffff;
+                font-family: 'Inter', sans-serif;
+            `;
+            
+            // Clone all slides
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                const slideClone = slide.cloneNode(true);
+                slideClone.style.cssText = `
+                    display: flex !important;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    width: 1920px;
+                    height: 1080px;
+                    padding: 60px 80px;
+                    margin: 0 0 40px 0;
+                    background: #ffffff;
+                    border-radius: 16px;
+                    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+                    page-break-after: always;
+                    opacity: 1;
+                    transform: none;
+                    transition: none;
+                `;
+                
+                // Fix content positioning
+                const content = slideClone.querySelector('.content');
+                if (content) {
+                    content.style.justifyContent = 'flex-start';
+                    content.style.paddingTop = '0';
+                }
+                
+                if (index === slides.length - 1) {
+                    slideClone.style.pageBreakAfter = 'avoid';
+                }
+                
+                pdfContainer.appendChild(slideClone);
+            });
+            
+            document.body.appendChild(pdfContainer);
+            
             const opt = {
-                margin: 0.5,
+                margin: [0.5, 0.5, 0.5, 0.5],
                 filename: 'Dexter_Protocol_Pitch_Deck.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
+                image: { type: 'jpeg', quality: 0.95 },
                 html2canvas: { 
-                    scale: 2,
+                    scale: 1,
                     useCORS: true,
                     allowTaint: true,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    width: 1920,
+                    height: pdfContainer.scrollHeight
                 },
                 jsPDF: { 
-                    unit: 'in', 
-                    format: 'a4', 
+                    unit: 'px', 
+                    format: [1920, 1080],
                     orientation: 'landscape',
                     compress: true
                 },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak: { mode: ['css', 'legacy'] }
             };
             
-            // Temporarily show all slides for PDF
-            const slides = document.querySelectorAll('.slide');
-            const navigation = document.querySelector('.navigation');
-            const counter = document.querySelector('.slide-counter');
-            
-            // Hide navigation elements
-            navigation.style.display = 'none';
-            counter.style.display = 'none';
-            
-            // Show all slides
-            slides.forEach((slide, index) => {
-                slide.style.display = 'flex';
-                slide.style.pageBreakAfter = 'always';
-                slide.style.margin = '0 auto';
-                slide.style.transform = 'scale(0.8)';
-                slide.style.transformOrigin = 'top center';
-                if (index === slides.length - 1) {
-                    slide.style.pageBreakAfter = 'avoid';
-                }
-            });
-            
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore original state
-                slides.forEach((slide, index) => {
-                    if (index === currentSlide) {
-                        slide.style.display = 'flex';
-                        slide.classList.add('active');
-                    } else {
-                        slide.style.display = 'none';
-                        slide.classList.remove('active');
-                    }
-                    slide.style.pageBreakAfter = '';
-                    slide.style.transform = '';
-                    slide.style.transformOrigin = '';
-                });
-                
-                navigation.style.display = 'flex';
-                counter.style.display = 'block';
-                
+            html2pdf().set(opt).from(pdfContainer).save().then(() => {
+                // Clean up
+                document.body.removeChild(pdfContainer);
                 event.target.textContent = originalText;
                 event.target.disabled = false;
                 
-                // Show success message
                 setTimeout(() => {
                     alert('✅ PDF downloaded successfully!\n\nYour 13-slide professional pitch deck is ready to share with investors.');
                 }, 500);
             }).catch((error) => {
                 console.error('PDF generation failed:', error);
+                document.body.removeChild(pdfContainer);
+                fallbackPDFGeneration();
+            });
+        }
+        
+        function fallbackPDFGeneration() {
+            // Fallback method using print dialog
+            const originalText = event.target.textContent;
+            event.target.textContent = 'Preparing Print...';
+            
+            // Create print-optimized HTML
+            const printWindow = window.open('', '_blank');
+            const slides = document.querySelectorAll('.slide');
+            let printHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Dexter Protocol - Investor Pitch Deck</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Inter', sans-serif; background: #ffffff; }
+                    .slide { 
+                        width: 297mm; 
+                        height: 210mm; 
+                        padding: 20mm; 
+                        page-break-after: always; 
+                        background: #ffffff;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-start;
+                    }
+                    .slide:last-child { page-break-after: avoid; }
+                    h1 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }
+                    h2 { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; }
+                    h3 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem; }
+                    p, li { font-family: 'Inter', sans-serif; line-height: 1.4; margin-bottom: 0.5rem; }
+                    .stats-grid, .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+                    .stat-item, .feature-card { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
+                    @media print {
+                        body { margin: 0; padding: 0; }
+                        .slide { margin: 0; }
+                    }
+                </style>
+            </head>
+            <body>`;
+            
+            slides.forEach(slide => {
+                const slideContent = slide.innerHTML;
+                printHTML += `<div class="slide">${slideContent}</div>`;
+            });
+            
+            printHTML += '</body></html>';
+            
+            printWindow.document.write(printHTML);
+            printWindow.document.close();
+            
+            setTimeout(() => {
+                printWindow.print();
                 event.target.textContent = originalText;
                 event.target.disabled = false;
-                alert('❌ PDF generation failed. Please try the print option instead.');
-            });
+                alert('📄 Print dialog opened!\n\nSelect "Save as PDF" in the print dialog to save your pitch deck.');
+            }, 1000);
         }
     </script>
 </body>
