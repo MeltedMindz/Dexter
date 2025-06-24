@@ -1,0 +1,9 @@
+{
+  "model_name": "test_model",
+  "model_type": "sklearn",
+  "description": "Dexter AI test_model for liquidity optimization",
+  "training_date": "2025-06-23T10:57:35.329209",
+  "intended_use": "Automated liquidity management on Uniswap V3",
+  "limitations": "Trained on Base network data only",
+  "ethical_considerations": "Model decisions affect real funds"
+}

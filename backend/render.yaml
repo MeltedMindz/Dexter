@@ -2,7 +2,7 @@ services:
   - type: web
     name: dexbrain-api
     env: python
-    repo: https://github.com/MeltedMindz/Dexter.git
+    repo: https://github.com/YOUR_USERNAME/dexter-protocol.git
     buildCommand: "cd backend && pip install -r requirements.txt"
     startCommand: "cd backend && python -m dexbrain.api_server"
     healthCheckPath: /health

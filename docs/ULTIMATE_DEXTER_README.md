@@ -294,7 +294,7 @@ docker run -d --name ultimate-dexter -p 3001:3001 --env-file .env ultimate-dexte
 ```env
 OPENAI_API_KEY=sk-proj-your-key-here
 TWITTER_USERNAME=your_handle
-TWITTER_PASSWORD=your_password
+TWITTER_PASSWORD=your_secure_password_here
 SERVER_PORT=3001
 ```
 

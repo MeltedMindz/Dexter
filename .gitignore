@@ -1,24 +1,26 @@
-# Private folders - all sensitive documents
+# Private/Business-sensitive folders
 private/
 .private/
 pitch-deck-2025/
+fundraising/
+business/
+investor-materials/
 
 # Legacy private documents (if any remain in root)
-DEXTER_FUNDING_PITCH.md
-DEXTER_ONE_PAGER.md
-DEXTER_TOKEN_FLOW.md
-DEXTER_DAPP_ARCHITECTURE.md
-IMPLEMENTATION_PLAN.md
-DEXTER_PITCH_DECK.md
-PITCH_DECK_NOTES.md
-CLAUDE_VPS.md
-DEPLOYMENT_SUCCESS.md
-BRAINWINDOW_FIX_SUMMARY.md
+*_FUNDING_*.md
+*_PITCH_*.md
+*_INVESTOR_*.md
+*VPS*.md
+*DEPLOYMENT_SUCCESS*.md
+*PRODUCTION*.md
 
-# Deployment secrets (keep configs public, hide secrets)
+# Deployment secrets and production configs
 .env.production
 .env.staging
+*.env.prod*
 **/secrets.yaml
+**/production-config.*
+deployment-secrets.*
 
 # Environment files
 .env
@@ -113,35 +115,36 @@ venv.bak/
 *.tmp
 *.temp
 
-# ElizaOS Framework
+# Third-party frameworks and reference code
 eliza/
 .eliza/
+reference/
+external/
+third-party/
+
+# Production infrastructure configs
+monitoring-configs/
+production-scripts/
+deployment-configs/
+vps-configs/
 
 # Temporary and test files from development
-monitoring-configs/
 docs/temp/
 *.test.local
 test-*.md
 temp-*
 .temp/
+*-temp.*
 
-# Root level cleanup - files that should be in organized folders
-*.py
-!setup.py
-!requirements.txt
-*.sh
-!install.sh
-*.json
-!package*.json
-!tsconfig*.json
-*_exporter.py
-*_system.py
-*_demo.py
-*_harvester.py
-*_service.py
-
-# Reference repositories for study
-reference/
+# Production-specific utilities (keep examples)
+*production*.py
+*production*.sh
+*deploy*.py
+*deploy*.sh
+*vps*.py
+*vps*.sh
+backup-*.py
+monitoring-*.py
 
 # Git housekeeping
 .git/gc.log

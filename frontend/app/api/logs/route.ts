@@ -1,7 +1,10 @@
 export async function GET() {
   try {
+    // Get the DexBrain API URL from environment variables
+    const dexbrainUrl = process.env.DEXBRAIN_API_URL || process.env.NEXT_PUBLIC_DEXBRAIN_API_URL || 'http://localhost:8080';
+    
     // Instead of SSE, make a simple HTTP request to get recent logs
-    const response = await fetch('http://5.78.71.231:8080/api/logs/recent?limit=50&type=all', {
+    const response = await fetch(`${dexbrainUrl}/api/logs/recent?limit=50&type=all`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -13,13 +16,13 @@ export async function GET() {
       throw new Error(`Failed to fetch logs: ${response.status}`);
     }
 
-    const vpsData = await response.json();
+    const logsData = await response.json();
     
-    // Extract logs from VPS response and pass them through
+    // Extract logs from DexBrain API response and pass them through
     return Response.json({
       success: true,
-      logs: vpsData.logs || [],
-      count: vpsData.count || 0,
+      logs: logsData.logs || [],
+      count: logsData.count || 0,
       timestamp: new Date().toISOString()
     });
 
