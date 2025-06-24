@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { Alchemy, Network } from 'alchemy-sdk'
 import { formatUnits } from 'viem'
+import { poolAnalyzer, type TokenBalance as AnalyzerTokenBalance } from '@/lib/pool-liquidity-analyzer'
 
 interface TokenBalance {
   contractAddress: string
@@ -157,56 +158,85 @@ async function analyzePortfolio(walletAddress: string) {
       }
     }
 
-    // Process Uniswap V3 NFT positions
-    const uniV3NFTs = nfts.ownedNfts.filter(nft => 
-      nft.contract.address?.toLowerCase() === '0x03a520b32c04bf3beef7beb72e919cf822ed34f1' // Base Uniswap V3 Positions NFT
-    )
-
-    for (const nft of uniV3NFTs) {
-      lpPositions.push({
-        nftId: nft.tokenId,
-        pool: '0x0000000000000000000000000000000000000000', // Would fetch from position details
-        token0: 'ETH',
-        token1: 'USDC',
-        fee: 3000,
-        liquidity: '0',
-        tickLower: 0,
-        tickUpper: 0,
-        valueUSD: 1000, // Would calculate from position
-      })
-      totalValueUSD += 1000
+    // Analyze pool opportunities for user's tokens
+    console.log('🔍 Server: Analyzing pool opportunities for wallet tokens...')
+    
+    // Convert positions to analyzer format
+    const analyzerTokens: AnalyzerTokenBalance[] = positions.map(pos => ({
+      contractAddress: pos.contractAddress,
+      symbol: pos.symbol,
+      name: pos.name,
+      balance: pos.balance,
+      decimals: pos.decimals,
+      valueUSD: pos.valueUSD
+    }))
+    
+    let poolOpportunities: any[] = []
+    try {
+      // Find pools with >$50k liquidity for user's tokens
+      poolOpportunities = await poolAnalyzer.analyzePoolOpportunities(analyzerTokens, 50000)
+      console.log(`Server: ✅ Found ${poolOpportunities.length} high-liquidity pool opportunities`)
+      
+      // Note: LP positions remain empty as we're focusing on pool opportunities, not existing positions
+      // The analysis now shows potential pools to enter rather than positions already owned
+    } catch (error) {
+      console.error('Server: ❌ Error analyzing pool opportunities:', error)
+      // Continue without pool analysis
     }
 
-    // Generate AI-powered recommendations
+    // Generate AI-powered recommendations based on pool opportunities
     const recommendations: PoolRecommendation[] = []
     
-    const hasETH = positions.some(p => p.symbol === 'ETH' || p.symbol === 'WETH')
-    const hasStable = positions.some(p => ['USDC', 'USDT', 'DAI', 'USDbC'].includes(p.symbol))
-
-    if (hasETH && hasStable) {
+    // Convert pool opportunities to recommendations format
+    for (const opportunity of poolOpportunities.slice(0, 5)) {
+      const userTokenBalance = opportunity.userTokenBalance
+      const liquidityFormatted = (opportunity.liquidityUSD / 1000000).toFixed(1)
+      
+      let reasoning = `You hold ${parseFloat(userTokenBalance).toFixed(2)} ${opportunity.userTokenSymbol} ($${opportunity.userTokenValueUSD.toFixed(0)}). `
+      reasoning += `This ${opportunity.token0Symbol}/${opportunity.token1Symbol} pool has $${liquidityFormatted}M liquidity, `
+      reasoning += `offering ${opportunity.estimatedAPR}% APR with ${opportunity.impermanentLossRisk} IL risk. `
+      reasoning += `High liquidity ensures better capital efficiency and lower slippage.`
+      
       recommendations.push({
-        poolAddress: '0xd0b53D9277642d899DF5C87A3966A349A798F224', // Base ETH/USDC 0.05%
-        tokenPair: 'ETH/USDC',
-        fee: '0.05%',
-        expectedAPR: calculateExpectedAPR('ETH', 'USDC', 0.05),
-        impermanentLossRisk: 'medium',
-        strategy: 'tight-range',
-        reasoning: `With ${positions.find(p => p.symbol === 'ETH')?.balance} ETH and stablecoins in your wallet, the 0.05% fee tier offers optimal balance between fee capture and capital efficiency.`,
-        confidence: 87
+        poolAddress: opportunity.poolAddress,
+        tokenPair: `${opportunity.token0Symbol}/${opportunity.token1Symbol}`,
+        fee: opportunity.feeTier,
+        expectedAPR: opportunity.estimatedAPR,
+        impermanentLossRisk: opportunity.impermanentLossRisk,
+        strategy: opportunity.recommendedStrategy,
+        reasoning,
+        confidence: opportunity.confidence
       })
     }
+    
+    // Fallback recommendations if no high-liquidity pools found
+    if (recommendations.length === 0 && positions.length > 0) {
+      const hasETH = positions.some(p => p.symbol === 'ETH' || p.symbol === 'WETH')
+      const hasStable = positions.some(p => ['USDC', 'USDT', 'DAI', 'USDbC'].includes(p.symbol))
 
-    if (hasETH) {
-      recommendations.push({
-        poolAddress: '0x4C36388bE6F416A29C8d8Eee81C771cE6bE14B18', // Base ETH/USDbC 0.05%
-        tokenPair: 'ETH/USDbC',
-        fee: '0.05%',
-        expectedAPR: calculateExpectedAPR('ETH', 'USDbC', 0.05),
-        impermanentLossRisk: 'medium',
-        strategy: 'wide-range',
-        reasoning: 'Base-native stablecoin pairing with conservative range for lower maintenance.',
-        confidence: 72
-      })
+      if (hasETH && hasStable) {
+        recommendations.push({
+          poolAddress: '0xd0b53D9277642d899DF5C87A3966A349A798F224', // Base ETH/USDC 0.05%
+          tokenPair: 'ETH/USDC',
+          fee: '0.05%',
+          expectedAPR: calculateExpectedAPR('ETH', 'USDC', 0.05),
+          impermanentLossRisk: 'medium',
+          strategy: 'tight-range',
+          reasoning: `With ${positions.find(p => p.symbol === 'ETH')?.balance} ETH and stablecoins in your wallet, the 0.05% fee tier offers optimal balance between fee capture and capital efficiency.`,
+          confidence: 87
+        })
+      } else if (hasETH || hasStable) {
+        recommendations.push({
+          poolAddress: '0xd0b53D9277642d899DF5C87A3966A349A798F224',
+          tokenPair: 'ETH/USDC',
+          fee: '0.05%',
+          expectedAPR: 12,
+          impermanentLossRisk: 'medium',
+          strategy: 'moderate-range',
+          reasoning: 'ETH/USDC is the most liquid pool on Base Network. Consider acquiring both tokens to provide liquidity in this flagship pair.',
+          confidence: 70
+        })
+      }
     }
 
     // Determine risk profile

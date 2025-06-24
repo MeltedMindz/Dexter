@@ -7,6 +7,7 @@ import { useBalance } from 'wagmi'
 import { getTokenBalances, getNftsForOwner } from '@/lib/alchemy'
 import { formatUnits } from 'viem'
 import { getRecommendedPools, estimatePoolAPR, assessImpermanentLossRisk, getStrategyRecommendation } from '@/lib/uniswap-pools'
+import { poolAnalyzer, type TokenBalance as AnalyzerTokenBalance, type PoolOpportunity } from '@/lib/pool-liquidity-analyzer'
 
 interface TokenPosition {
   token: string
@@ -25,6 +26,9 @@ interface PoolRecommendation {
   strategy: string
   reasoning: string
   confidence: number
+  liquidityUSD?: number
+  userTokenBalance?: string
+  userTokenValueUSD?: number
 }
 
 interface WalletAnalysisProps {
@@ -51,11 +55,15 @@ export function WalletAnalysis({ address, onBack }: WalletAnalysisProps) {
       setIsAnalyzing(true)
       
       try {
+        console.log('Starting wallet analysis for:', address)
+        
         // Fetch real token balances from Alchemy
         const tokenBalanceData = await getTokenBalances(address)
+        console.log('Token balance data:', tokenBalanceData)
         
         // Fetch NFTs to detect Uniswap V3 positions
         const nftData = await getNftsForOwner(address)
+        console.log('NFT data:', nftData.totalCount, 'NFTs found')
         
         // Process token balances
         const positions: TokenPosition[] = []
@@ -108,28 +116,28 @@ export function WalletAnalysis({ address, onBack }: WalletAnalysisProps) {
           }
         }
         
-        // Detect Uniswap V3 positions from NFTs
-        const uniswapV3Positions = nftData.ownedNfts.filter(nft => 
-          nft.contract.address?.toLowerCase() === '0xc36442b4a4522e871399cd717abdd847ab11fe88' || // Mainnet
-          nft.contract.address?.toLowerCase() === '0x03a520b32c04bf3beef7beb72e919cf822ed34f1'    // Base
-        )
+        // Analyze pool opportunities for user's tokens
+        console.log('🔍 Analyzing pool opportunities for wallet tokens...')
         
-        // Add LP positions
-        for (const lpNft of uniswapV3Positions) {
-          const positionValue = 1000 // Would need to fetch real position value
-          positions.push({
-            token: lpNft.contract.address,
-            symbol: `UNI-V3-POS-${lpNft.tokenId}`,
-            balance: '1',
-            valueUSD: positionValue,
-            type: 'lp'
-          })
-          totalValue += positionValue
+        // Convert positions to analyzer format
+        const analyzerTokens: AnalyzerTokenBalance[] = positions.map(pos => ({
+          contractAddress: pos.token,
+          symbol: pos.symbol,
+          name: pos.symbol,
+          balance: pos.balance,
+          decimals: 18, // Default, would get from token contract
+          valueUSD: pos.valueUSD
+        }))
+        
+        let poolOpportunities: PoolOpportunity[] = []
+        try {
+          // Find pools with >$50k liquidity for user's tokens
+          poolOpportunities = await poolAnalyzer.analyzePoolOpportunities(analyzerTokens, 50000)
+          console.log(`✅ Found ${poolOpportunities.length} high-liquidity pool opportunities`)
+        } catch (error) {
+          console.error('❌ Error analyzing pool opportunities:', error)
+          // Continue without pool analysis
         }
-        
-        // Generate recommendations based on actual holdings
-        const tokenSymbols = positions.map(p => p.symbol)
-        const recommendedPools = getRecommendedPools(tokenSymbols)
         
         // Determine risk profile based on portfolio composition
         const stablePercentage = positions
@@ -140,51 +148,47 @@ export function WalletAnalysis({ address, onBack }: WalletAnalysisProps) {
         if (stablePercentage > 0.7) riskProfile = 'conservative'
         else if (stablePercentage < 0.3) riskProfile = 'aggressive'
         
-        // Convert pool recommendations to our format
-        const recommendations: PoolRecommendation[] = recommendedPools.slice(0, 3).map((pool, index) => {
-          const ilRisk = assessImpermanentLossRisk(pool.token0Symbol, pool.token1Symbol)
-          const strategy = getStrategyRecommendation(riskProfile, ilRisk)
-          const apr = estimatePoolAPR(pool)
+        // Convert pool opportunities to recommendations format
+        const recommendations: PoolRecommendation[] = poolOpportunities.slice(0, 5).map((opportunity) => {
+          // Generate personalized reasoning based on user's token holdings
+          const userTokenBalance = opportunity.userTokenBalance
+          const liquidityFormatted = (opportunity.liquidityUSD / 1000000).toFixed(1)
           
-          // Generate personalized reasoning
-          let reasoning = ''
-          const ethBalance = positions.find(p => p.symbol === 'ETH')?.balance
-          const usdcBalance = positions.find(p => p.symbol === 'USDC')?.balance
-          
-          if (pool.token0Symbol === 'ETH' && pool.token1Symbol === 'USDC') {
-            reasoning = `With ${ethBalance || '0'} ETH and ${usdcBalance || '0'} USDC, this ${pool.feeTier} fee pool offers optimal balance between fees and capital efficiency on Base.`
-          } else if (pool.token0Symbol === 'USDC' && pool.token1Symbol === 'USDbC') {
-            reasoning = `Stable-to-stable pool with minimal impermanent loss. Perfect for conservative yield generation with your stablecoin holdings.`
-          } else {
-            reasoning = `${pool.feeTier} fee tier provides ${ilRisk} risk exposure with potential for ${apr}% APR based on current market conditions.`
-          }
+          let reasoning = `You hold ${parseFloat(userTokenBalance).toFixed(2)} ${opportunity.userTokenSymbol} ($${opportunity.userTokenValueUSD.toFixed(0)}). `
+          reasoning += `This ${opportunity.token0Symbol}/${opportunity.token1Symbol} pool has $${liquidityFormatted}M liquidity, `
+          reasoning += `offering ${opportunity.estimatedAPR}% APR with ${opportunity.impermanentLossRisk} IL risk. `
+          reasoning += `High liquidity ensures better capital efficiency and lower slippage.`
           
           return {
-            poolAddress: pool.address,
-            tokenPair: `${pool.token0Symbol}/${pool.token1Symbol}`,
-            fee: pool.feeTier,
-            expectedAPR: apr,
-            ilRisk,
-            strategy,
+            poolAddress: opportunity.poolAddress,
+            tokenPair: opportunity.tokenPair,
+            fee: opportunity.feeTier,
+            expectedAPR: opportunity.estimatedAPR,
+            ilRisk: opportunity.impermanentLossRisk,
+            strategy: opportunity.recommendedStrategy,
             reasoning,
-            confidence: 90 - (index * 10) // Decreasing confidence for lower-ranked pools
+            confidence: opportunity.confidence,
+            liquidityUSD: opportunity.liquidityUSD,
+            userTokenBalance: opportunity.userTokenBalance,
+            userTokenValueUSD: opportunity.userTokenValueUSD
           }
         })
         
-        // If no specific pools match, provide general recommendations
+        // Fallback recommendations if no high-liquidity pools found
         if (recommendations.length === 0 && positions.length > 0) {
           const hasETH = positions.some(p => p.symbol === 'ETH' || p.symbol === 'WETH')
+          const hasUSDC = positions.some(p => p.symbol === 'USDC')
           
-          if (hasETH) {
+          if (hasETH || hasUSDC) {
             recommendations.push({
               poolAddress: '0xd0b53D9277642d899DF5C87A3966A349A798F224',
               tokenPair: 'ETH/USDC',
               fee: '0.05%',
-              expectedAPR: estimatePoolAPR({ fee: 500 } as any),
+              expectedAPR: 12,
               ilRisk: 'medium',
               strategy: getStrategyRecommendation(riskProfile, 'medium'),
-              reasoning: 'ETH/USDC is the most liquid pool on Base. Consider swapping some ETH to USDC to provide liquidity.',
-              confidence: 75
+              reasoning: 'ETH/USDC is the most liquid pool on Base Network. Consider acquiring both tokens to provide liquidity in this flagship pair.',
+              confidence: 70
             })
           }
         }
@@ -372,6 +376,16 @@ export function WalletAnalysis({ address, onBack }: WalletAnalysisProps) {
                     <div className="space-y-2 font-mono text-sm">
                       <div>Fee Tier: <span className="font-bold">{rec.fee}</span></div>
                       <div>Strategy: <span className="font-bold">{rec.strategy}</span></div>
+                      {rec.liquidityUSD && (
+                        <div>Liquidity: <span className="font-bold text-green-600">
+                          ${(rec.liquidityUSD / 1000000).toFixed(1)}M
+                        </span></div>
+                      )}
+                      {rec.userTokenBalance && rec.userTokenValueUSD && (
+                        <div>Your Holdings: <span className="font-bold text-blue-600">
+                          ${rec.userTokenValueUSD.toFixed(0)}
+                        </span></div>
+                      )}
                       <div>Pool: {rec.poolAddress.slice(0, 8)}...</div>
                     </div>
                   </div>
