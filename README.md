@@ -365,7 +365,22 @@ We welcome contributions from developers, researchers, and DeFi professionals:
 
 ## 📄 **License**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Dexter Protocol License - Source Available**
+
+Copyright (c) 2024-2028 MeltedMindz
+
+This software is available under a Source Available License that permits non-commercial use, research, auditing, and educational purposes. Commercial use requires explicit written permission.
+
+**Key Terms:**
+- ✅ **Non-commercial use** (research, education, auditing, personal)
+- ✅ **Security research** and vulnerability disclosure
+- ✅ **Attribution required** for all uses
+- ❌ **Commercial derivatives** prohibited without license
+- 🔄 **Converts to Apache 2.0** on January 1, 2029
+
+**Commercial Licensing:** For commercial use or to create competing products, contact: licensing@dexterprotocol.com
+
+See the [LICENSE](LICENSE) file for complete terms.
 
 ---
 
