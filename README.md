@@ -188,38 +188,47 @@ pytest tests/test_vault_integration.py::TestIntegrationFlow
 
 ---
 
-## 🎯 **Vault Templates**
+## 🎯 **Tiered Fee Structure**
 
-### **1. Basic Vault**
-- **Strategy**: Single-range positions with manual rebalancing
-- **Fees**: 0.5% management, 10% performance
-- **Min Deposit**: $100
-- **Best For**: Conservative users, DeFi beginners
+### **1. Retail Tier** (Default)
+- **Management Fee**: 1.0% annually
+- **Performance Fee**: 15% on gains above high water mark
+- **AI Optimization**: 0.5% for AI-managed strategies
+- **Compound Fee**: 0.25% per compound operation
+- **Min Balance**: $0 (no minimum)
+- **Best For**: DeFi beginners, retail users exploring automated strategies
 
-### **2. Gamma-Style Vault**
-- **Strategy**: Dual-position (base + limit) inspired by Gamma Strategies
-- **Fees**: 0.75% management, 12.5% performance  
-- **Min Deposit**: $500
-- **Best For**: Balanced risk/reward, proven strategies
+### **2. Premium Tier**
+- **Management Fee**: 0.75% annually
+- **Performance Fee**: 12.5% on gains (1% performance threshold)
+- **AI Optimization**: 0.4% for AI-managed strategies
+- **Compound Fee**: 0.2% per compound operation
+- **Min Balance**: $100,000 + 10k DEX token staking
+- **Best For**: Experienced users, moderate to large positions
 
-### **3. AI-Optimized Vault**
-- **Strategy**: ML-driven dynamic rebalancing and optimization
-- **Fees**: 0.75% management, 15% performance, 0.25% AI fee
-- **Min Deposit**: $1,000
-- **Best For**: Growth-focused users, AI early adopters
+### **3. Institutional Tier**
+- **Management Fee**: 0.5% annually
+- **Performance Fee**: 10% on gains (2% performance threshold)
+- **AI Optimization**: 0.25% for AI-managed strategies
+- **Compound Fee**: 0.15% per compound operation
+- **Min Balance**: $1,000,000 + 100k DEX token staking
+- **Best For**: DAOs, funds, institutional liquidity providers
 
-### **4. Institutional Vault**
-- **Strategy**: Multi-range positions with custom configurations
-- **Fees**: 0.25% management, 7.5% performance (custom available)
-- **Min Deposit**: $100,000
-- **Best For**: Institutions, DAOs, large-scale operations
+### **4. VIP Tier**
+- **Management Fee**: 0.25% annually
+- **Performance Fee**: 7.5% on gains (3% performance threshold)
+- **AI Optimization**: 0.15% for AI-managed strategies
+- **Compound Fee**: 0.1% per compound operation
+- **Min Balance**: $10,000,000 + 1M DEX token staking
+- **Features**: Custom fee structures, priority support, direct AI model access
+- **Best For**: Ultra-high-net-worth users, major institutions, strategic partners
 
 ---
 
 ## 📊 **Performance Metrics**
 
 ### **Technical Capabilities**
-- **Multiple Vault Templates**: 4 proven templates (Basic, Gamma-Style, AI-Optimized, Institutional)
+- **Tiered Fee Structure**: 4-tier system (Retail, Premium, Institutional, VIP) with performance thresholds
 - **ERC4626 Compliance**: Full standard implementation for institutional integration
 - **Multi-Range Support**: Complex strategies across up to 10 position ranges
 - **AI Integration**: LSTM models with 20+ Uniswap-specific features
@@ -228,7 +237,7 @@ pytest tests/test_vault_integration.py::TestIntegrationFlow
 - **Hybrid Strategy Management**: Manual, AI-Assisted, and Fully Automated modes
 - **Advanced Security**: TWAP protection, multi-oracle validation, emergency controls
 - **Professional Infrastructure**: Template-based deployment, comprehensive testing
-- **Institutional Features**: Tiered fee structures, custom configurations
+- **Institutional Features**: Dynamic tiered fees with performance thresholds and volume rebates
 
 ### **Development Status**
 - **Smart Contracts**: Complete vault infrastructure with security patterns
