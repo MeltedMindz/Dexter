@@ -192,33 +192,29 @@ pytest tests/test_vault_integration.py::TestIntegrationFlow
 
 ### **1. Retail Tier** (Default)
 - **Management Fee**: 1.0% annually
-- **Performance Fee**: 15% on gains above high water mark
+- **Performance Fee**: 10% on gains above high water mark
 - **AI Optimization**: 0.5% for AI-managed strategies
-- **Compound Fee**: 0.25% per compound operation
 - **Min Balance**: $0 (no minimum)
 - **Best For**: DeFi beginners, retail users exploring automated strategies
 
 ### **2. Premium Tier**
 - **Management Fee**: 0.75% annually
-- **Performance Fee**: 12.5% on gains (1% performance threshold)
+- **Performance Fee**: 7.5% on gains (1% performance threshold)
 - **AI Optimization**: 0.4% for AI-managed strategies
-- **Compound Fee**: 0.2% per compound operation
 - **Min Balance**: $100,000 + 10k DEX token staking
 - **Best For**: Experienced users, moderate to large positions
 
 ### **3. Institutional Tier**
 - **Management Fee**: 0.5% annually
-- **Performance Fee**: 10% on gains (2% performance threshold)
+- **Performance Fee**: 5% on gains (2% performance threshold)
 - **AI Optimization**: 0.25% for AI-managed strategies
-- **Compound Fee**: 0.15% per compound operation
 - **Min Balance**: $1,000,000 + 100k DEX token staking
 - **Best For**: DAOs, funds, institutional liquidity providers
 
 ### **4. VIP Tier**
 - **Management Fee**: 0.25% annually
-- **Performance Fee**: 7.5% on gains (3% performance threshold)
+- **Performance Fee**: 1-5% on gains (3% performance threshold, negotiable)
 - **AI Optimization**: 0.15% for AI-managed strategies
-- **Compound Fee**: 0.1% per compound operation
 - **Min Balance**: $10,000,000 + 1M DEX token staking
 - **Features**: Custom fee structures, priority support, direct AI model access
 - **Best For**: Ultra-high-net-worth users, major institutions, strategic partners
