@@ -296,23 +296,24 @@ First protocol to seamlessly blend manual control with AI optimization:
 
 ## 🌟 **Roadmap & Vision**
 
-### **Immediate (Q1 2025)**
-- [ ] Mainnet deployment of vault infrastructure
-- [ ] Advanced multi-range strategies
-- [ ] Mobile-optimized interface
-- [ ] Institutional onboarding program
+### **Q3 2025: Security Audit & Mainnet Launch**
+- [ ] Complete security audits with Trail of Bits
+- [ ] Deploy all vault infrastructure to Base mainnet
+- [ ] Target: $1M-5M initial TVL with proof-of-concept vaults
+- [ ] Institutional onboarding program with tiered fee structure
 
-### **Near-Term (Q2 2025)**
-- [ ] Cross-chain vault deployment (Arbitrum, Optimism)
-- [ ] Advanced AI models (Transformer architecture)
-- [ ] Governance token and DAO structure
-- [ ] Professional-grade API for institutions
+### **Q4 2025: Growth & Multi-Chain Preparation**
+- [ ] Scale Base TVL to $10M-25M through proven vault strategies
+- [ ] Prepare multi-chain deployment (Arbitrum, Optimism)
+- [ ] Enhanced AI models with reinforcement learning capabilities
+- [ ] Institutional partnerships and white-glove support services
 
-### **Long-Term Vision**
-- [ ] Multi-protocol support (GMX, Curve, Balancer)
-- [ ] AI-powered portfolio management
-- [ ] Regulatory compliance framework
-- [ ] White-label vault infrastructure
+### **2026: Platform Maturity & Profitability**
+- [ ] Multi-chain deployment and additional DEX integrations
+- [ ] Advanced strategies including cross-chain arbitrage
+- [ ] Target: $50M-100M+ TVL with clear path to profitability
+- [ ] Governance token and DAO structure implementation
+- [ ] Professional-grade API and regulatory compliance framework
 
 ---
 
