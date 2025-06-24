@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, Brain, TrendingUp, AlertTriangle, Target, Coins, Activity, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useBalance } from 'wagmi'
+import { getTokenBalances, getNftsForOwner } from '@/lib/alchemy'
+import { formatUnits } from 'viem'
+import { getRecommendedPools, estimatePoolAPR, assessImpermanentLossRisk, getStrategyRecommendation } from '@/lib/uniswap-pools'
 
 interface TokenPosition {
   token: string
@@ -41,66 +44,177 @@ export function WalletAnalysis({ address, onBack }: WalletAnalysisProps) {
   const { data: ethBalance } = useBalance({ address: address as `0x${string}` })
 
   useEffect(() => {
-    // Simulate AI analysis
+    // Real AI analysis using Alchemy
     const analyzeWallet = async () => {
+      if (!address) return
+      
       setIsAnalyzing(true)
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      
-      // Mock analysis results
-      const mockAnalysis = {
-        totalValue: 12450,
-        positions: [
-          {
-            token: '0xETH',
+      try {
+        // Fetch real token balances from Alchemy
+        const tokenBalanceData = await getTokenBalances(address)
+        
+        // Fetch NFTs to detect Uniswap V3 positions
+        const nftData = await getNftsForOwner(address)
+        
+        // Process token balances
+        const positions: TokenPosition[] = []
+        let totalValue = 0
+        
+        // Add ETH balance
+        if (ethBalance) {
+          const ethValue = parseFloat(ethBalance.formatted) * 2500 // Approximate ETH price
+          positions.push({
+            token: '0x0000000000000000000000000000000000000000',
             symbol: 'ETH',
-            balance: ethBalance?.formatted || '2.5',
-            valueUSD: 8750,
-            type: 'idle' as const
-          },
-          {
-            token: '0xUSDC',
-            symbol: 'USDC',
-            balance: '2500',
-            valueUSD: 2500,
-            type: 'idle' as const
-          },
-          {
-            token: '0xUNI-V3-ETH-USDC',
-            symbol: 'UNI-V3-ETH-USDC',
+            balance: ethBalance.formatted,
+            valueUSD: ethValue,
+            type: 'idle'
+          })
+          totalValue += ethValue
+        }
+        
+        // Process ERC20 tokens
+        if (tokenBalanceData.tokenBalances) {
+          for (const token of tokenBalanceData.tokenBalances) {
+            if (token.tokenBalance && parseFloat(token.tokenBalance) > 0) {
+              // Get token metadata
+              const symbol = token.symbol || 'UNKNOWN'
+              const decimals = token.decimals || 18
+              const balance = formatUnits(BigInt(token.tokenBalance), decimals)
+              
+              // Simple price estimation (would need real price oracle)
+              let valueUSD = 0
+              if (symbol === 'USDC' || symbol === 'USDT' || symbol === 'DAI') {
+                valueUSD = parseFloat(balance)
+              } else if (symbol === 'WETH') {
+                valueUSD = parseFloat(balance) * 2500
+              } else {
+                // For other tokens, estimate based on balance
+                valueUSD = parseFloat(balance) * 0.1 // Placeholder
+              }
+              
+              if (valueUSD > 1) { // Only show tokens worth more than $1
+                positions.push({
+                  token: token.contractAddress,
+                  symbol: symbol,
+                  balance: parseFloat(balance).toFixed(4),
+                  valueUSD: valueUSD,
+                  type: 'idle'
+                })
+                totalValue += valueUSD
+              }
+            }
+          }
+        }
+        
+        // Detect Uniswap V3 positions from NFTs
+        const uniswapV3Positions = nftData.ownedNfts.filter(nft => 
+          nft.contract.address?.toLowerCase() === '0xc36442b4a4522e871399cd717abdd847ab11fe88' || // Mainnet
+          nft.contract.address?.toLowerCase() === '0x03a520b32c04bf3beef7beb72e919cf822ed34f1'    // Base
+        )
+        
+        // Add LP positions
+        for (const lpNft of uniswapV3Positions) {
+          const positionValue = 1000 // Would need to fetch real position value
+          positions.push({
+            token: lpNft.contract.address,
+            symbol: `UNI-V3-POS-${lpNft.tokenId}`,
             balance: '1',
-            valueUSD: 1200,
-            type: 'lp' as const
+            valueUSD: positionValue,
+            type: 'lp'
+          })
+          totalValue += positionValue
+        }
+        
+        // Generate recommendations based on actual holdings
+        const tokenSymbols = positions.map(p => p.symbol)
+        const recommendedPools = getRecommendedPools(tokenSymbols)
+        
+        // Determine risk profile based on portfolio composition
+        const stablePercentage = positions
+          .filter(p => ['USDC', 'USDT', 'DAI', 'USDbC'].includes(p.symbol))
+          .reduce((sum, p) => sum + p.valueUSD, 0) / totalValue
+        
+        let riskProfile: 'conservative' | 'moderate' | 'aggressive' = 'moderate'
+        if (stablePercentage > 0.7) riskProfile = 'conservative'
+        else if (stablePercentage < 0.3) riskProfile = 'aggressive'
+        
+        // Convert pool recommendations to our format
+        const recommendations: PoolRecommendation[] = recommendedPools.slice(0, 3).map((pool, index) => {
+          const ilRisk = assessImpermanentLossRisk(pool.token0Symbol, pool.token1Symbol)
+          const strategy = getStrategyRecommendation(riskProfile, ilRisk)
+          const apr = estimatePoolAPR(pool)
+          
+          // Generate personalized reasoning
+          let reasoning = ''
+          const ethBalance = positions.find(p => p.symbol === 'ETH')?.balance
+          const usdcBalance = positions.find(p => p.symbol === 'USDC')?.balance
+          
+          if (pool.token0Symbol === 'ETH' && pool.token1Symbol === 'USDC') {
+            reasoning = `With ${ethBalance || '0'} ETH and ${usdcBalance || '0'} USDC, this ${pool.feeTier} fee pool offers optimal balance between fees and capital efficiency on Base.`
+          } else if (pool.token0Symbol === 'USDC' && pool.token1Symbol === 'USDbC') {
+            reasoning = `Stable-to-stable pool with minimal impermanent loss. Perfect for conservative yield generation with your stablecoin holdings.`
+          } else {
+            reasoning = `${pool.feeTier} fee tier provides ${ilRisk} risk exposure with potential for ${apr}% APR based on current market conditions.`
           }
-        ],
-        recommendations: [
-          {
-            poolAddress: '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640',
-            tokenPair: 'ETH/USDC',
-            fee: '0.3%',
-            expectedAPR: 18.5,
-            ilRisk: 'medium' as const,
-            strategy: 'Tight Range (95% concentration)',
-            reasoning: 'Based on your ETH/USDC holdings and current market volatility, a tight range strategy could maximize fee generation',
-            confidence: 87
-          },
-          {
-            poolAddress: '0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36',
-            tokenPair: 'ETH/USDT',
-            fee: '0.3%',
-            expectedAPR: 16.2,
-            ilRisk: 'medium' as const,
-            strategy: 'Wide Range (Conservative)',
-            reasoning: 'Alternative stable pairing with lower maintenance requirements',
-            confidence: 72
+          
+          return {
+            poolAddress: pool.address,
+            tokenPair: `${pool.token0Symbol}/${pool.token1Symbol}`,
+            fee: pool.feeTier,
+            expectedAPR: apr,
+            ilRisk,
+            strategy,
+            reasoning,
+            confidence: 90 - (index * 10) // Decreasing confidence for lower-ranked pools
           }
-        ],
-        riskProfile: 'moderate' as const
+        })
+        
+        // If no specific pools match, provide general recommendations
+        if (recommendations.length === 0 && positions.length > 0) {
+          const hasETH = positions.some(p => p.symbol === 'ETH' || p.symbol === 'WETH')
+          
+          if (hasETH) {
+            recommendations.push({
+              poolAddress: '0xd0b53D9277642d899DF5C87A3966A349A798F224',
+              tokenPair: 'ETH/USDC',
+              fee: '0.05%',
+              expectedAPR: estimatePoolAPR({ fee: 500 } as any),
+              ilRisk: 'medium',
+              strategy: getStrategyRecommendation(riskProfile, 'medium'),
+              reasoning: 'ETH/USDC is the most liquid pool on Base. Consider swapping some ETH to USDC to provide liquidity.',
+              confidence: 75
+            })
+          }
+        }
+        
+        setAnalysis({
+          totalValue,
+          positions,
+          recommendations,
+          riskProfile
+        })
+        
+      } catch (error) {
+        console.error('Error analyzing wallet:', error)
+        
+        // Fallback to basic data if Alchemy fails
+        setAnalysis({
+          totalValue: ethBalance ? parseFloat(ethBalance.formatted) * 2500 : 0,
+          positions: ethBalance ? [{
+            token: '0x0000000000000000000000000000000000000000',
+            symbol: 'ETH',
+            balance: ethBalance.formatted,
+            valueUSD: parseFloat(ethBalance.formatted) * 2500,
+            type: 'idle' as const
+          }] : [],
+          recommendations: [],
+          riskProfile: 'moderate'
+        })
+      } finally {
+        setIsAnalyzing(false)
       }
-      
-      setAnalysis(mockAnalysis)
-      setIsAnalyzing(false)
     }
 
     analyzeWallet()

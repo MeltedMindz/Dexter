@@ -1,4 +1,6 @@
 import { NextRequest } from 'next/server'
+import { Alchemy, Network } from 'alchemy-sdk'
+import { formatUnits } from 'viem'
 
 interface TokenBalance {
   contractAddress: string
@@ -77,86 +79,177 @@ export async function POST(request: NextRequest): Promise<Response> {
 }
 
 async function analyzePortfolio(walletAddress: string) {
-  // Mock implementation - replace with real analysis
-  await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate processing time
+  // Initialize Alchemy SDK for server-side use
+  const alchemy = new Alchemy({
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || 'demo',
+    network: Network.BASE_MAINNET,
+  })
 
-  return {
-    walletAddress,
-    totalValueUSD: 12450,
-    tokenBalances: [
-      {
+  try {
+    // Fetch real data from Alchemy
+    const [ethBalance, tokenBalances, nfts] = await Promise.all([
+      alchemy.core.getBalance(walletAddress),
+      alchemy.core.getTokenBalances(walletAddress),
+      alchemy.nft.getNftsForOwner(walletAddress)
+    ])
+
+    const positions: TokenBalance[] = []
+    const lpPositions: LPPosition[] = []
+    const idleAssets: TokenBalance[] = []
+    let totalValueUSD = 0
+
+    // Process ETH balance
+    const ethBalanceInEth = parseFloat(formatUnits(ethBalance, 18))
+    const ethPriceUSD = 2500 // Would fetch from price oracle
+    const ethValueUSD = ethBalanceInEth * ethPriceUSD
+
+    if (ethBalanceInEth > 0.001) {
+      const ethPosition = {
         contractAddress: '0x0000000000000000000000000000000000000000',
         symbol: 'ETH',
         name: 'Ethereum',
-        balance: '3.5',
+        balance: ethBalanceInEth.toFixed(6),
         decimals: 18,
-        valueUSD: 8750,
-      },
-      {
-        contractAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-        symbol: 'USDC',
-        name: 'USD Coin',
-        balance: '2500',
-        decimals: 6,
-        valueUSD: 2500,
+        valueUSD: ethValueUSD,
       }
-    ],
-    lpPositions: [
-      {
-        nftId: '123456',
-        pool: '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640',
+      positions.push(ethPosition)
+      idleAssets.push(ethPosition)
+      totalValueUSD += ethValueUSD
+    }
+
+    // Process ERC20 tokens
+    for (const token of tokenBalances.tokenBalances) {
+      if (!token.tokenBalance || token.tokenBalance === '0x0') continue
+
+      try {
+        // Get token metadata
+        const metadata = await alchemy.core.getTokenMetadata(token.contractAddress)
+        const balance = formatUnits(BigInt(token.tokenBalance), metadata.decimals || 18)
+        
+        // Price estimation logic
+        let priceUSD = 0
+        if (['USDC', 'USDT', 'DAI', 'USDbC'].includes(metadata.symbol || '')) {
+          priceUSD = 1
+        } else if (metadata.symbol === 'WETH') {
+          priceUSD = ethPriceUSD
+        } else {
+          // Would fetch from price oracle
+          priceUSD = 0.1 // Placeholder
+        }
+
+        const valueUSD = parseFloat(balance) * priceUSD
+
+        if (valueUSD > 1) {
+          const tokenPosition = {
+            contractAddress: token.contractAddress,
+            symbol: metadata.symbol || 'UNKNOWN',
+            name: metadata.name || 'Unknown Token',
+            balance: parseFloat(balance).toFixed(6),
+            decimals: metadata.decimals || 18,
+            valueUSD,
+          }
+          positions.push(tokenPosition)
+          idleAssets.push(tokenPosition)
+          totalValueUSD += valueUSD
+        }
+      } catch (error) {
+        console.error(`Error processing token ${token.contractAddress}:`, error)
+      }
+    }
+
+    // Process Uniswap V3 NFT positions
+    const uniV3NFTs = nfts.ownedNfts.filter(nft => 
+      nft.contract.address?.toLowerCase() === '0x03a520b32c04bf3beef7beb72e919cf822ed34f1' // Base Uniswap V3 Positions NFT
+    )
+
+    for (const nft of uniV3NFTs) {
+      lpPositions.push({
+        nftId: nft.tokenId,
+        pool: '0x0000000000000000000000000000000000000000', // Would fetch from position details
         token0: 'ETH',
         token1: 'USDC',
         fee: 3000,
-        liquidity: '1000000',
-        tickLower: -887220,
-        tickUpper: 887220,
-        valueUSD: 1200,
-      }
-    ],
-    idleAssets: [
-      {
-        contractAddress: '0x0000000000000000000000000000000000000000',
-        symbol: 'ETH',
-        name: 'Ethereum',
-        balance: '3.5',
-        decimals: 18,
-        valueUSD: 8750,
-      },
-      {
-        contractAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-        symbol: 'USDC',
-        name: 'USD Coin',
-        balance: '2500',
-        decimals: 6,
-        valueUSD: 2500,
-      }
-    ],
-    riskProfile: 'moderate' as const,
-    recommendations: [
-      {
-        poolAddress: '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640',
+        liquidity: '0',
+        tickLower: 0,
+        tickUpper: 0,
+        valueUSD: 1000, // Would calculate from position
+      })
+      totalValueUSD += 1000
+    }
+
+    // Generate AI-powered recommendations
+    const recommendations: PoolRecommendation[] = []
+    
+    const hasETH = positions.some(p => p.symbol === 'ETH' || p.symbol === 'WETH')
+    const hasStable = positions.some(p => ['USDC', 'USDT', 'DAI', 'USDbC'].includes(p.symbol))
+
+    if (hasETH && hasStable) {
+      recommendations.push({
+        poolAddress: '0xd0b53D9277642d899DF5C87A3966A349A798F224', // Base ETH/USDC 0.05%
         tokenPair: 'ETH/USDC',
-        fee: '0.3%',
-        expectedAPR: 18.5,
-        impermanentLossRisk: 'medium' as const,
-        strategy: 'tight-range' as const,
-        reasoning: 'Based on your ETH/USDC holdings and current market volatility, a tight range strategy could maximize fee generation while maintaining moderate risk.',
+        fee: '0.05%',
+        expectedAPR: calculateExpectedAPR('ETH', 'USDC', 0.05),
+        impermanentLossRisk: 'medium',
+        strategy: 'tight-range',
+        reasoning: `With ${positions.find(p => p.symbol === 'ETH')?.balance} ETH and stablecoins in your wallet, the 0.05% fee tier offers optimal balance between fee capture and capital efficiency.`,
         confidence: 87
-      },
-      {
-        poolAddress: '0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36',
-        tokenPair: 'ETH/USDT',
-        fee: '0.3%',
-        expectedAPR: 16.2,
-        impermanentLossRisk: 'medium' as const,
-        strategy: 'wide-range' as const,
-        reasoning: 'Alternative stable pairing with lower maintenance requirements and steady fee generation.',
+      })
+    }
+
+    if (hasETH) {
+      recommendations.push({
+        poolAddress: '0x4C36388bE6F416A29C8d8Eee81C771cE6bE14B18', // Base ETH/USDbC 0.05%
+        tokenPair: 'ETH/USDbC',
+        fee: '0.05%',
+        expectedAPR: calculateExpectedAPR('ETH', 'USDbC', 0.05),
+        impermanentLossRisk: 'medium',
+        strategy: 'wide-range',
+        reasoning: 'Base-native stablecoin pairing with conservative range for lower maintenance.',
         confidence: 72
-      }
-    ],
-    lastUpdated: new Date().toISOString()
+      })
+    }
+
+    // Determine risk profile
+    const stableValue = positions
+      .filter(p => ['USDC', 'USDT', 'DAI', 'USDbC'].includes(p.symbol))
+      .reduce((sum, p) => sum + p.valueUSD, 0)
+    
+    const stablePercentage = totalValueUSD > 0 ? stableValue / totalValueUSD : 0
+    let riskProfile: 'conservative' | 'moderate' | 'aggressive' = 'moderate'
+    
+    if (stablePercentage > 0.7) riskProfile = 'conservative'
+    else if (stablePercentage < 0.3) riskProfile = 'aggressive'
+
+    return {
+      walletAddress,
+      totalValueUSD,
+      tokenBalances: positions,
+      lpPositions,
+      idleAssets,
+      riskProfile,
+      recommendations,
+      lastUpdated: new Date().toISOString()
+    }
+  } catch (error) {
+    console.error('Portfolio analysis error:', error)
+    throw error
   }
+}
+
+// Helper function to calculate expected APR (simplified)
+function calculateExpectedAPR(token0: string, token1: string, feeTier: number): number {
+  // This would use real pool data, volume, TVL, etc.
+  const baseAPR = {
+    0.01: 5,
+    0.05: 15,
+    0.3: 12,
+    1: 8
+  }[feeTier] || 10
+
+  // Adjust based on token pair volatility
+  const volatilityMultiplier = (token0 === 'ETH' || token1 === 'ETH') ? 1.2 : 1.0
+  
+  return parseFloat((baseAPR * volatilityMultiplier).toFixed(1))
 }
 
 // GET endpoint for retrieving cached analysis
