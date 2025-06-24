@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
+import { PersistentAIChat } from '@/components/PersistentAIChat'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { generateSEOMetadata, generateJsonLd } from '@/lib/seo'
@@ -65,6 +66,9 @@ export default function RootLayout({
             {/* Fixed Footer */}
             <Footer />
           </div>
+          
+          {/* Persistent AI Chat */}
+          <PersistentAIChat />
           
           {/* Vercel Analytics & Speed Insights */}
           <Analytics />

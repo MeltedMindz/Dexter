@@ -55,6 +55,7 @@ export function Navbar() {
                 { id: 'create', label: 'CREATE', href: '/create' },
                 { id: 'positions', label: 'POSITIONS', href: '/positions' },
                 { id: 'dashboard', label: 'DASHBOARD', href: '/dashboard' },
+                { id: 'brain', label: 'AI BRAIN', href: '/brain' },
                 { id: 'docs', label: 'API DOCS', href: '/docs' },
               ].map((tab) => (
                 <Link
