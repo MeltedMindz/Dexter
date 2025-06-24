@@ -1,0 +1,4 @@
+# This file records environment variable names that are used during model inference.
+# They might need to be set when creating a serving endpoint from this model.
+# Note: it is not guaranteed that all environment variables listed here are required
+OPENAI_API_KEY

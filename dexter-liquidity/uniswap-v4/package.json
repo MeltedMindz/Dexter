@@ -1,0 +1,41 @@
+{
+  "name": "@dexter/uniswap-v4-hooks",
+  "version": "1.0.0",
+  "description": "Dexter Protocol Uniswap V4 Hooks for AI-powered liquidity management",
+  "main": "index.js",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:coverage": "forge coverage",
+    "test:gas": "forge test --gas-report",
+    "deploy:local": "forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast --verify",
+    "format": "forge fmt",
+    "lint": "solhint 'src/**/*.sol'",
+    "clean": "forge clean"
+  },
+  "dependencies": {
+    "@uniswap/v4-core": "^0.0.1",
+    "@uniswap/v4-periphery": "^0.0.1",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@chainlink/contracts": "^0.8.0"
+  },
+  "devDependencies": {
+    "forge-std": "^1.7.0",
+    "solhint": "^4.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "^1.1.0"
+  },
+  "keywords": [
+    "uniswap",
+    "v4",
+    "hooks",
+    "defi",
+    "liquidity",
+    "ai",
+    "ml",
+    "concentrated-liquidity"
+  ],
+  "author": "Dexter Protocol",
+  "license": "MIT"
+}

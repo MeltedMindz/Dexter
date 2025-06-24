@@ -823,11 +823,395 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* User Flow Styles */
+        .user-flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #E5E7EB;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            min-height: 220px;
+            flex: 1;
+            min-width: 200px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+        }
+
+        .flow-step:hover {
+            transform: translateY(-8px);
+            border-color: #3B82F6;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3B82F6, #14B8A6);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .step-content h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .step-content p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: #3B82F6;
+            font-weight: bold;
+            margin: 0 1rem;
+        }
+
+        /* Journey Grid Styles */
+        .journey-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .journey-phase {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .journey-phase:hover {
+            border-color: #14B8A6;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.12);
+        }
+
+        .journey-phase h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 0.5rem;
+        }
+
+        .journey-phase ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .journey-phase li {
+            padding: 0.5rem 0;
+            border-left: 3px solid #14B8A6;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: #374151;
+            font-size: 0.95rem;
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        .comparison-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(20, 184, 166, 0.05));
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .before, .after {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .before {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .after {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .before h4, .after h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Control Modes Styles */
+        .control-modes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .control-mode {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-mode:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+        }
+
+        .control-mode:nth-child(1) {
+            border-color: #10B981;
+        }
+
+        .control-mode:nth-child(2) {
+            border-color: #3B82F6;
+        }
+
+        .control-mode:nth-child(3) {
+            border-color: #8B5CF6;
+        }
+
+        .mode-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 1rem;
+        }
+
+        .mode-header h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0F172A;
+            margin: 0;
+        }
+
+        .mode-tag {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-tag.beginner {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+            border: 1px solid #10B981;
+        }
+
+        .mode-tag.intermediate {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+            border: 1px solid #3B82F6;
+        }
+
+        .mode-tag.advanced {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8B5CF6;
+            border: 1px solid #8B5CF6;
+        }
+
+        .control-mode ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .control-mode li {
+            padding: 0.8rem 0;
+            border-left: 3px solid #3B82F6;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: #374151;
+            font-size: 0.95rem;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .control-mode:nth-child(1) li {
+            border-left-color: #10B981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .control-mode:nth-child(3) li {
+            border-left-color: #8B5CF6;
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .progression-diagram {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .progression-diagram h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            color: #0F172A;
+            margin-bottom: 1.5rem;
+        }
+
+        .progression-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .prog-step {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+            white-space: nowrap;
+        }
+
+        .prog-arrow {
+            font-size: 1.5rem;
+            color: #3B82F6;
+            font-weight: bold;
+        }
+
+        .progression-diagram p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Responsive adjustments for user flow slides */
+        @media (max-width: 1200px) {
+            .user-flow-diagram {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 1rem 0;
+            }
+            
+            .control-modes {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .journey-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .before-after {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .progression-flow {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .prog-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .flow-step {
+                min-height: 180px;
+                padding: 1.5rem 1rem;
+            }
+            
+            .step-number {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .step-content h3 {
+                font-size: 1rem;
+            }
+            
+            .step-content p {
+                font-size: 0.85rem;
+            }
+            
+            .journey-phase {
+                padding: 1.5rem;
+            }
+            
+            .control-mode {
+                padding: 1.5rem;
+            }
+            
+            .progression-diagram {
+                padding: 1.5rem;
+            }
+            
+            .prog-step {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="slide-counter">
-        Slide <span id="current-slide">1</span> of <span id="total-slides">13</span>
+        Slide <span id="current-slide">1</span> of <span id="total-slides">16</span>
     </div>
 
     <!-- Slide 1: Title -->
@@ -877,7 +1261,8 @@
             <div class="problem-points">
                 <div class="problem-item">
                     <h3>💸 Capital Inefficiency</h3>
-                    <p>Average LP loses $2,400 per $10k position annually vs. passive strategies</p>
+                    <p>50% of Uniswap V3 liquidity providers suffer net losses after fees and impermanent loss.<br>
+                    Across ~43% of V3 liquidity, LPs experienced over $260M in cumulative IL versus $199M in fees</p>
                 </div>
                 <div class="problem-item">
                     <h3>⏰ Active Management Burden</h3>
@@ -899,7 +1284,186 @@
         </div>
     </div>
 
-    <!-- Slide 3: Solution -->
+    <!-- Slide 3: User Flow Overview -->
+    <div class="slide">
+        <div class="content">
+            <h2>Dexter User Flow: AI-Integrated (Optional Control)</h2>
+            
+            <div class="user-flow-diagram">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>🔗 Web3 Wallet Connection</h3>
+                        <p>Connect wallet (MetaMask, WalletConnect) to access personalized dashboard</p>
+                    </div>
+                </div>
+                
+                <div class="flow-arrow">→</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>📊 AI Dashboard</h3>
+                        <p>Real-time portfolio analytics with AI-powered position recommendations</p>
+                    </div>
+                </div>
+                
+                <div class="flow-arrow">→</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>💬 Natural Language Interface</h3>
+                        <p>"Optimize my ETH/USDC position for maximum yield" - AI understands and executes</p>
+                    </div>
+                </div>
+                
+                <div class="flow-arrow">→</div>
+                
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>⚙️ Optional Manual Control</h3>
+                        <p>Users can override AI decisions, set custom parameters, or go fully automated</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <h3 style="color: #10b981;">User Experience: From Complex DeFi to Simple Conversations</h3>
+                <p>Transform institutional-grade position management into intuitive chat interactions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Detailed User Journey -->
+    <div class="slide">
+        <div class="content">
+            <h2>Step-by-Step User Journey</h2>
+            
+            <div class="journey-grid">
+                <div class="journey-phase">
+                    <h3>🚀 Onboarding (30 seconds)</h3>
+                    <ul>
+                        <li>Connect Web3 wallet</li>
+                        <li>AI scans existing positions</li>
+                        <li>Generates personalized insights</li>
+                        <li>Suggests optimization opportunities</li>
+                    </ul>
+                </div>
+                
+                <div class="journey-phase">
+                    <h3>💡 AI Interaction (Natural Language)</h3>
+                    <ul>
+                        <li>"Show me my underperforming positions"</li>
+                        <li>"Create a conservative ETH vault"</li>
+                        <li>"Maximize yield on my USDC"</li>
+                        <li>"Set up auto-compounding"</li>
+                    </ul>
+                </div>
+                
+                <div class="journey-phase">
+                    <h3>⚡ Execution (One-Click)</h3>
+                    <ul>
+                        <li>AI presents strategy recommendations</li>
+                        <li>User approves or customizes</li>
+                        <li>Smart contracts execute atomically</li>
+                        <li>Real-time performance tracking</li>
+                    </ul>
+                </div>
+                
+                <div class="journey-phase">
+                    <h3>🔄 Ongoing Management</h3>
+                    <ul>
+                        <li>24/7 AI monitoring and rebalancing</li>
+                        <li>Proactive notifications and alerts</li>
+                        <li>Performance summaries and insights</li>
+                        <li>Optional manual override controls</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="comparison-box">
+                <div class="before-after">
+                    <div class="before">
+                        <h4>❌ Before Dexter</h4>
+                        <p>Manual calculations, gas optimization, 24/7 monitoring, complex interfaces</p>
+                    </div>
+                    <div class="after">
+                        <h4>✅ After Dexter</h4>
+                        <p>"Optimize my portfolio" → AI handles everything → Track performance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: AI Control Features -->
+    <div class="slide">
+        <div class="content">
+            <h2>Optional Control: AI-Assisted → Fully Automated</h2>
+            
+            <div class="control-modes">
+                <div class="control-mode">
+                    <div class="mode-header">
+                        <h3>🎯 Manual Mode</h3>
+                        <span class="mode-tag beginner">Beginner Friendly</span>
+                    </div>
+                    <ul>
+                        <li>AI provides recommendations</li>
+                        <li>User approves each action</li>
+                        <li>Learn DeFi strategies safely</li>
+                        <li>Build confidence over time</li>
+                    </ul>
+                </div>
+                
+                <div class="control-mode">
+                    <div class="mode-header">
+                        <h3>🤝 AI-Assisted Mode</h3>
+                        <span class="mode-tag intermediate">Intermediate</span>
+                    </div>
+                    <ul>
+                        <li>AI handles routine rebalancing</li>
+                        <li>User sets risk parameters</li>
+                        <li>Notifications for major decisions</li>
+                        <li>Perfect balance of control and automation</li>
+                    </ul>
+                </div>
+                
+                <div class="control-mode">
+                    <div class="mode-header">
+                        <h3>🚀 Fully Automated</h3>
+                        <span class="mode-tag advanced">Advanced</span>
+                    </div>
+                    <ul>
+                        <li>Complete AI management</li>
+                        <li>Institutional-grade optimization</li>
+                        <li>Maximum capital efficiency</li>
+                        <li>Hands-off wealth building</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="progression-diagram">
+                <h3>User Progression Path</h3>
+                <div class="progression-flow">
+                    <div class="prog-step">Manual Control</div>
+                    <div class="prog-arrow">→</div>
+                    <div class="prog-step">AI-Assisted</div>
+                    <div class="prog-arrow">→</div>
+                    <div class="prog-step">Fully Automated</div>
+                </div>
+                <p>Users naturally progress from manual control to full automation as they build trust and expertise</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3 style="color: #8b5cf6;">Key Innovation: Trust Through Transparency</h3>
+                <p>AI explains every decision, shows expected outcomes, and provides granular control options</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Solution -->
     <div class="slide">
         <div class="content">
             <h2>AI-Native Vault Infrastructure with Institutional Standards</h2>
