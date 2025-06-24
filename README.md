@@ -378,7 +378,7 @@ This software is available under a Source Available License that permits non-com
 - ❌ **Commercial derivatives** prohibited without license
 - 🔄 **Converts to Apache 2.0** on January 1, 2029
 
-**Commercial Licensing:** For commercial use or to create competing products, contact: licensing@dexterprotocol.com
+**Commercial Licensing:** For commercial use or to create competing products, contact: meltedmindz1@gmail.com
 
 See the [LICENSE](LICENSE) file for complete terms.
 
