@@ -287,7 +287,7 @@ async function analyzePortfolio(walletAddress: string) {
       }
     }
     
-    console.log(`✅ Processed tokens. Total positions: ${positions.length}, Total value: $${totalValueUSD.toFixed(2)}`)}
+    console.log(`✅ Processed tokens. Total positions: ${positions.length}, Total value: $${totalValueUSD.toFixed(2)}`)
 
     // Analyze pool opportunities for user's tokens
     console.log('🔍 Server: Analyzing pool opportunities for wallet tokens...')
