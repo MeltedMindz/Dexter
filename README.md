@@ -5,9 +5,9 @@
 Dexter Protocol is an advanced DeFi infrastructure platform that leverages artificial intelligence to optimize liquidity provision, automate position management, and maximize yields across decentralized exchanges.
 
 [![License: Source Available](https://img.shields.io/badge/License-Source%20Available-blue.svg)](LICENSE)
-[![Frontend: Next.js](https://img.shields.io/badge/Frontend-Next.js-black)](frontend/)
 [![Contracts: Solidity](https://img.shields.io/badge/Contracts-Solidity-gray)](contracts/)
 [![AI: Python](https://img.shields.io/badge/AI-Python-green)](backend/)
+[![Website: Next.js](https://img.shields.io/badge/Website-dexter--website-blue)](https://github.com/MeltedMindz/dexter-website)
 
 ## 🚀 **Core Features**
 
@@ -29,30 +29,31 @@ Dexter Protocol is an advanced DeFi infrastructure platform that leverages artif
 - **Emergency Controls**: Volatility-based safety mechanisms and emergency mode
 - **Gas Optimization**: Sophisticated batching and execution efficiency
 
-### **🔧 Professional Web Interface**
-- **Vault Management**: Complete vault creation, monitoring, and analytics dashboard
-- **Real-Time Analytics**: Live position tracking, APR calculation, IL monitoring
-- **AI Chat Assistant**: Professional DeFi guidance with Dexter AI character
-- **Multi-Chain Support**: Base Network optimization with cross-chain expansion
+### **🌐 Website Integration**
+- **Separate Repository**: [dexter-website](https://github.com/MeltedMindz/dexter-website) for user interface
+- **API Integration**: RESTful APIs for frontend communication
+- **Real-Time Data**: WebSocket connections for live updates
+- **Independent Deployment**: Frontend and backend deploy separately for optimal performance
 
-## 🏗️ **Architecture Overview**
+## 🏗️ **Protocol Architecture**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                      │
+│              Website (dexter-website repo)                 │
+│        https://github.com/MeltedMindz/dexter-website        │
 │  ┌─────────────────┐ ┌─────────────────┐ ┌──────────────┐   │
 │  │  Vault Factory  │ │ Position Manager│ │   AI Chat    │   │
 │  └─────────────────┘ └─────────────────┘ └──────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-                                │
-┌─────────────────────────────────────────────────────────────┐
+└─────────────────────────────┬───────────────────────────────┘
+                              │ API Integration
+┌─────────────────────────────┴───────────────────────────────┐
 │                 Smart Contracts (Solidity)                 │
 │  ┌─────────────────┐ ┌─────────────────┐ ┌──────────────┐   │
 │  │  ERC4626 Vaults │ │  V4 Hooks       │ │ AI Strategies│   │
 │  └─────────────────┘ └─────────────────┘ └──────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-                                │
-┌─────────────────────────────────────────────────────────────┐
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+┌─────────────────────────────┴───────────────────────────────┐
 │                   AI Engine (Python)                       │
 │  ┌─────────────────┐ ┌─────────────────┐ ┌──────────────┐   │
 │  │ DexBrain Hub    │ │ ML Pipeline     │ │  Data Sources │  │
@@ -62,11 +63,11 @@ Dexter Protocol is an advanced DeFi infrastructure platform that leverages artif
 
 ## 🛠️ **Technology Stack**
 
-### **Frontend**
-- **Framework**: Next.js 14 with TypeScript
+### **Website** ([dexter-website](https://github.com/MeltedMindz/dexter-website))
+- **Framework**: Next.js 15 with TypeScript
 - **Web3 Integration**: Wagmi + Viem for blockchain connectivity
-- **UI/UX**: Tailwind CSS with responsive design
-- **Real-Time Data**: Alchemy SDK for blockchain data
+- **UI/UX**: Tailwind CSS with Neo-brutalism design
+- **Deployment**: Vercel with automatic deployments
 
 ### **Smart Contracts**
 - **Language**: Solidity ^0.8.19
@@ -99,16 +100,7 @@ git clone https://github.com/your-org/dexter-protocol.git
 cd dexter-protocol
 ```
 
-### **2. Frontend Setup**
-```bash
-cd frontend
-npm install
-cp .env.example .env.local
-# Edit .env.local with your API keys
-npm run dev
-```
-
-### **3. AI Backend Setup**
+### **2. AI Backend Setup**
 ```bash
 cd backend
 python -m venv venv
@@ -116,6 +108,19 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 python -m dexbrain.core
 ```
+
+### **3. Website Setup**
+The user interface is maintained in a separate repository for independent deployment:
+
+```bash
+# Clone the website repository
+git clone https://github.com/MeltedMindz/dexter-website.git
+cd dexter-website
+npm install
+npm run dev
+```
+
+See the [dexter-website repository](https://github.com/MeltedMindz/dexter-website) for complete setup instructions.
 
 ### **4. Smart Contract Development**
 ```bash

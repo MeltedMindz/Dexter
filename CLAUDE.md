@@ -10,7 +10,7 @@ Dexter Protocol is an advanced AI-powered liquidity management platform for dece
 1. **Position Management System**: Advanced Uniswap V3 position management with auto-compounding
 2. **AI Optimization Engine**: ML-driven strategies for yield optimization and risk management  
 3. **Backend/DexBrain**: Centralized intelligence system processing data across all agents
-4. **Frontend Dashboard**: Professional web interface for position tracking and management
+4. **Website Integration**: Separate repository for user interface (https://github.com/MeltedMindz/dexter-website)
 5. **Smart Contracts**: On-chain infrastructure for position management and fee distribution
 6. **Uniswap V4 Hook System**: Next-generation concentrated liquidity optimization with AI-powered hooks
 
@@ -53,7 +53,7 @@ Dexter Protocol is an advanced AI-powered liquidity management platform for dece
 - **Data Quality System**: 4-dimensional monitoring with auto-healing workflows
 - **Position Management**: Complete auto-compounding system with AI integration
 - **Smart Contracts**: DexterCompoundor.sol with advanced features
-- **Professional Frontend**: Production-ready React interface
+- **Website Separation**: Independent frontend repository for rapid deployment and iteration
 
 ### Phase 5: Revert Finance Integration (Q2 2025)
 - **Enhanced TWAP Protection**: TWAPOracle.sol library with MEV resistance and AI override capability
@@ -83,7 +83,7 @@ Dexter Protocol is an advanced AI-powered liquidity management platform for dece
 - **Hybrid Strategy Modes**: Manual control, AI-assisted, and fully automated vault management
 - **Multi-Range Support**: Complex position strategies across up to 10 concurrent ranges
 - **Template-Based Factory**: Minimal proxy deployment for Basic, Gamma-Style, AI-Optimized, and Institutional vaults
-- **Professional Frontend**: VaultDashboard, VaultFactory, and VaultList components with real-time analytics
+- **Website Separation**: Complete frontend moved to independent repository (https://github.com/MeltedMindz/dexter-website)
 - **Comprehensive Testing**: End-to-end integration tests covering all vault workflows and AI optimization
 
 ### Phase 9: Platform Generalization & Production Deployment (Q2 2025)

@@ -147,4 +147,4 @@ backup-*.py
 monitoring-*.py
 
 # Git housekeeping
-.git/gc.log
+.git/gc.logdexter-website/
