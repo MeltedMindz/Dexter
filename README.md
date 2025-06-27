@@ -21,7 +21,8 @@ Dexter Protocol is an advanced DeFi infrastructure platform that leverages artif
 - **Standard Compliance**: Full ERC4626 vault implementation for institutional integration
 - **Multi-Strategy Support**: Manual, AI-assisted, and fully automated vault modes
 - **Gamma-Style Positioning**: Dual-position strategies with base + limit ranges
-- **Advanced Fee Management**: Tiered structure (Retail/Premium/Institutional/VIP)
+- **Performance-Based Fees**: Tiered structure (10% Retail, 7% Premium, 5% Institutional)
+- **High Water Mark Protection**: Fees only charged on new profit highs
 
 ### **⚡ Uniswap V4 Integration**
 - **Dynamic Hook System**: AI-powered fee optimization (0.01%-100% range)
@@ -29,11 +30,12 @@ Dexter Protocol is an advanced DeFi infrastructure platform that leverages artif
 - **Emergency Controls**: Volatility-based safety mechanisms and emergency mode
 - **Gas Optimization**: Sophisticated batching and execution efficiency
 
-### **🌐 Website Integration**
-- **Separate Repository**: [dexter-website](https://github.com/MeltedMindz/dexter-website) for user interface
-- **API Integration**: RESTful APIs for frontend communication
-- **Real-Time Data**: WebSocket connections for live updates
-- **Independent Deployment**: Frontend and backend deploy separately for optimal performance
+### **🌐 Professional Web Interface**
+- **Separate Repository**: [dexter-website](https://github.com/MeltedMindz/dexter-website) for rapid iteration
+- **AI-Powered Analysis**: Real-time portfolio analysis with personalized recommendations
+- **Multi-Chain Support**: Base Network and Ethereum mainnet integration
+- **Professional UI/UX**: Neo-brutalism design optimized for DeFi users
+- **Independent Deployment**: Frontend scales separately from protocol infrastructure
 
 ## 🏗️ **Protocol Architecture**
 
@@ -87,56 +89,55 @@ Dexter Protocol is an advanced DeFi infrastructure platform that leverages artif
 - **Deployment**: Docker containerization
 - **Monitoring**: Prometheus + Grafana dashboards
 
-## 🚀 **Quick Start**
+## 🎯 **User Experience Flow**
 
-### **Prerequisites**
-- Node.js 18+ and npm
-- Python 3.9+
-- Git
+### **1. Connect & Analyze**
+- **Wallet Connection**: Connect MetaMask, WalletConnect, or Coinbase Wallet
+- **AI Portfolio Analysis**: Instant analysis of your Base Network and Ethereum holdings
+- **Personalized Recommendations**: AI suggests optimal pools based on your tokens
+- **Risk Assessment**: Conservative, moderate, or aggressive strategy recommendations
 
-### **1. Clone Repository**
-```bash
-git clone https://github.com/your-org/dexter-protocol.git
-cd dexter-protocol
-```
+### **2. Choose Your Strategy**
+- **Manual Vaults**: Use AI insights to build vaults with full control
+- **AI-Assisted**: Let AI recommend parameters while you maintain oversight
+- **Fully Automated**: Deploy AI-managed vaults with optional strategy adjustments
+- **Hybrid Progression**: Start manual and gradually increase AI automation
 
-### **2. AI Backend Setup**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-pip install -r requirements.txt
-python -m dexbrain.core
-```
+### **3. Deploy & Optimize**
+- **ERC4626 Vault Creation**: Institutional-standard vault deployment
+- **Multi-Range Positions**: Up to 10 concurrent position ranges for complex strategies
+- **Real-Time Monitoring**: AI continuously optimizes based on market conditions
+- **Performance Tracking**: Comprehensive analytics and yield optimization metrics
 
-### **3. Website Setup**
-The user interface is maintained in a separate repository for independent deployment:
+## 🌐 **Multi-Chain Expansion Roadmap**
 
-```bash
-# Clone the website repository
-git clone https://github.com/MeltedMindz/dexter-website.git
-cd dexter-website
-npm install
-npm run dev
-```
+### **Current: Base Network Focus**
+- **Strategic Advantage**: Base Network's Coinbase backing provides regulatory clarity
+- **Native Integration**: Purpose-built for Base ecosystem with $8B+ TVL
+- **Optimal Performance**: Single-chain focus ensures maximum efficiency and user experience
 
-See the [dexter-website repository](https://github.com/MeltedMindz/dexter-website) for complete setup instructions.
+### **2025-2026: Strategic Multi-Chain Deployment**
+- **Arbitrum**: High-volume DEX ecosystem with established DeFi infrastructure
+- **Optimism**: Superchain compatibility and growing institutional adoption
+- **Polygon**: Enterprise partnerships and traditional finance integration
+- **Ethereum Mainnet**: Blue-chip DeFi protocols and maximum liquidity depth
 
-### **4. Smart Contract Development**
-```bash
-cd contracts
-# Install Foundry if not already installed
-forge install
-forge test
-```
+### **Cross-Chain Features**
+- **Unified Portfolio View**: Aggregate positions across all supported networks
+- **Cross-Chain Yield Optimization**: AI identifies best opportunities regardless of chain
+- **Bridge Integration**: Seamless asset movement between networks
+- **Risk Management**: Multi-chain exposure monitoring and correlation analysis
 
 ## 📖 **Documentation**
 
 - **[Architecture Guide](docs/architecture/)** - Technical system design
 - **[API Documentation](docs/api/)** - Backend service APIs  
 - **[Smart Contract Docs](contracts/README.md)** - Contract specifications
+- **[AI Model Documentation](backend/README.md)** - ML pipeline and model specifications
 - **[Deployment Guide](docs/deployment/)** - Production setup instructions
 - **[Contributing Guide](CONTRIBUTING.md)** - Development workflow
+
+*For developer setup and installation instructions, see individual component README files.*
 
 ## 🔐 **Security**
 
@@ -179,12 +180,12 @@ This project is released under the **Source Available License** - see the [LICEN
 
 For commercial licensing inquiries, contact: license@dexteragent.com
 
-## 🌟 **Community**
+## 🌟 **Community & Links**
 
 - **Website**: [dexteragent.com](https://dexteragent.com)
-- **Twitter**: [@DexterProtocol](https://twitter.com/DexterProtocol)
-- **Discord**: [Community Server](https://discord.gg/dexter-protocol)
-- **Documentation**: [docs.dexteragent.com](https://docs.dexteragent.com)
+- **Twitter**: [@Dexter_AI_](https://x.com/Dexter_AI_)
+- **GitHub**: [MeltedMindz/Dexter](https://github.com/MeltedMindz/Dexter)
+- **Contact**: meltedmindz1@gmail.com
 
 ---
 
