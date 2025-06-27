@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ["3.9", "3.10", "3.11"]
 
     services:
       postgres:
@@ -134,5 +134,12 @@ jobs:
         # Add VPS to known hosts
         ssh-keyscan -H $VPS_HOST >> ~/.ssh/known_hosts
         
-        # Deploy command (to be implemented)
-        echo "ssh $VPS_USER@$VPS_HOST 'cd /opt/dexter && git pull && docker-compose up -d --build'"
+        # Deploy command - sync with production deployment
+        ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST '
+          cd /opt/dexter-ai
+          git pull
+          systemctl restart dexter-position-harvester
+          systemctl restart dexter-enhanced-alchemy
+          systemctl restart dexter-ml-pipeline
+          echo "✅ VPS deployment completed"
+        '
