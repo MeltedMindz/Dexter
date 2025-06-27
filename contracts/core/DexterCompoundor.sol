@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -14,14 +12,16 @@ import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.s
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "../libraries/TWAPOracle.sol";
 import "../governance/EmergencyAdmin.sol";
+import "../security/AdvancedSecurityGuard.sol";
 
 /**
  * @title DexterCompoundor
  * @notice AI-powered auto-compounding system for Uniswap V3 positions
  * @dev Based on Revert Finance's compounding architecture with AI enhancements
  *      Includes advanced TWAP protection against MEV attacks
+ *      NOW WITH COMPREHENSIVE SECURITY PROTECTION
  */
-contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multicall {
+contract DexterCompoundor is IERC721Receiver, AdvancedSecurityGuard, Multicall {
     using SafeERC20 for IERC20;
 
     // Constants
@@ -96,6 +96,38 @@ contract DexterCompoundor is IERC721Receiver, ReentrancyGuard, Ownable, Multical
     event EmergencyUnpaused(address indexed by);
     event TokenRecovered(address indexed token, uint256 amount, address indexed to);
     event GasLimitingUpdated(bool enabled, uint256 minInterval);
+    
+    // ============ NEW CRITICAL EVENTS ============
+    
+    // Position Management Events
+    event PositionCountUpdated(address indexed account, uint256 newCount, uint256 maxAllowed, uint256 timestamp);
+    event AIManagementToggled(uint256 indexed tokenId, address indexed owner, bool aiEnabled, address toggledBy);
+    event PositionLimitsUpdated(uint256 oldMaxPositions, uint256 newMaxPositions, address indexed updatedBy);
+    
+    // Gas Safety Events
+    event GasLimitExceeded(address indexed account, uint256 gasUsed, uint256 limit, uint256 operationType);
+    event GasUsageTracked(address indexed account, uint256 gasUsed, uint256 dailyTotal, uint256 remainingAllowance);
+    event DailyGasLimitReset(address indexed account, uint256 newDailyLimit, uint256 timestamp);
+    
+    // Operation Safety Events
+    event OperationFrequencyLimited(address indexed account, uint256 timeSinceLastOp, uint256 minInterval);
+    event CompoundOperationValidated(uint256 indexed tokenId, uint256 gasEstimate, bool twapValid, bool aiOverride);
+    event TWAPValidationOverridden(address indexed aiAgent, uint256 indexed tokenId, string reason);
+    
+    // Configuration Security Events
+    event SecurityParameterUpdated(string parameter, uint256 oldValue, uint256 newValue, address indexed updatedBy);
+    event MaxGasPerCompoundUpdated(uint256 oldMax, uint256 newMax, address indexed updatedBy);
+    event MinOperationIntervalUpdated(uint256 oldInterval, uint256 newInterval, address indexed updatedBy);
+    
+    // Fee and Reward Events
+    event RewardCalculationMethodUpdated(string method, uint256 parameter, address indexed updatedBy);
+    event AIOptimizerRewardEarned(uint256 indexed tokenId, address indexed aiAgent, uint256 reward0, uint256 reward1);
+    event CompounderRewardEarned(address indexed compounder, uint256 indexed tokenId, uint256 reward0, uint256 reward1);
+    
+    // Emergency and Risk Events
+    event EmergencyModeActivated(string reason, address indexed activatedBy, uint256 affectedPositions);
+    event RiskThresholdExceeded(uint256 indexed tokenId, string riskType, uint256 currentValue, uint256 threshold);
+    event CompoundOperationFailed(uint256 indexed tokenId, string reason, uint256 gasUsed);
 
     /// @notice Reward conversion options
     enum RewardConversion { NONE, TOKEN_0, TOKEN_1, AI_OPTIMIZED }

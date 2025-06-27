@@ -146,7 +146,6 @@ contract MultiRangeManager is Ownable, ReentrancyGuard {
 
     // ============ EVENTS ============
     
-    event RangeCreated(address indexed vault, uint256 indexed rangeId, RangeType rangeType, int24 tickLower, int24 tickUpper);
     event RangeUpdated(address indexed vault, uint256 indexed rangeId, int24 newTickLower, int24 newTickUpper);
     event RangeStatusChanged(address indexed vault, uint256 indexed rangeId, RangeStatus oldStatus, RangeStatus newStatus);
     event AllocationRebalanced(address indexed vault, uint256[] rangeIds, uint256[] oldAllocations, uint256[] newAllocations);
@@ -156,6 +155,39 @@ contract MultiRangeManager is Ownable, ReentrancyGuard {
     event PerformanceUpdated(address indexed vault, uint256 indexed rangeId, uint256 roi, uint256 apr);
     event AIRecommendationReceived(address indexed vault, bytes32 recommendationHash, uint256 confidence);
     event EmergencyRebalanceTriggered(address indexed vault, uint256 deviation);
+    
+    // ============ NEW CRITICAL EVENTS ============
+    
+    // Configuration Management Events
+    event AllocationStrategyUpdated(address indexed vault, uint256 indexed rangeId, AllocationMode oldMode, AllocationMode newMode, address updatedBy);
+    event RebalanceIntervalUpdated(uint256 oldInterval, uint256 newInterval, address indexed updatedBy);
+    event EmergencyThresholdUpdated(uint256 oldThreshold, uint256 newThreshold, address indexed updatedBy);
+    event FeeConfigurationUpdated(uint256 managementFee, uint256 performanceFee, address feeRecipient, address indexed updatedBy);
+    
+    // AI Integration Events
+    event AIRecommendationApplied(address indexed vault, bytes32 recommendationHash, uint256[] affectedRanges, uint256 totalGasUsed);
+    event AIRecommendationRejected(address indexed vault, bytes32 recommendationHash, string reason, address rejectedBy);
+    event AIConfidenceThresholdUpdated(uint256 oldThreshold, uint256 newThreshold, address indexed updatedBy);
+    
+    // Authorization and Security Events
+    event VaultAuthorizationChanged(address indexed vault, bool authorized, address indexed updatedBy, string reason);
+    event ManagerAuthorizationChanged(address indexed manager, bool authorized, address indexed updatedBy);
+    event GlobalPauseToggled(bool paused, address indexed updatedBy, string reason);
+    
+    // Range Lifecycle Events
+    event RangeCreated(address indexed vault, uint256 indexed rangeId, RangeType rangeType, int24 tickLower, int24 tickUpper, uint256 targetAllocation);
+    event RangeDeprecated(address indexed vault, uint256 indexed rangeId, string reason, uint256 finalLiquidity, address deprecatedBy);
+    event RangeParametersUpdated(address indexed vault, uint256 indexed rangeId, string parameter, uint256 oldValue, uint256 newValue);
+    
+    // Performance and Analytics Events
+    event CapitalEfficiencyUpdated(address indexed vault, uint256 indexed rangeId, uint256 oldEfficiency, uint256 newEfficiency);
+    event RangeMetricsCalculated(address indexed vault, uint256 indexed rangeId, uint256 utilizationRate, uint256 sharpeRatio, uint256 profitFactor);
+    event TotalAllocationUpdated(address indexed vault, uint256 totalAllocation, uint256 activeRanges, uint256 timestamp);
+    
+    // Emergency and Risk Management Events
+    event RiskThresholdExceeded(address indexed vault, uint256 indexed rangeId, string riskType, uint256 currentValue, uint256 threshold);
+    event SlippageProtectionTriggered(address indexed vault, uint256 expectedSlippage, uint256 actualSlippage);
+    event LiquidityConcentrationAlert(address indexed vault, uint256 concentrationRatio, uint256 warningThreshold);
 
     // ============ MODIFIERS ============
     
@@ -218,13 +250,17 @@ contract MultiRangeManager is Ownable, ReentrancyGuard {
     {
         require(authorizedVaults[vault], "Vault not authorized");
         require(vaultRanges[vault].length < MAX_RANGES, "Too many ranges");
-        require(tickLower < tickUpper, "Invalid tick range");
-        require(tickUpper - tickLower >= MIN_RANGE_WIDTH, "Range too narrow");
-        require(tickUpper - tickLower <= MAX_RANGE_WIDTH, "Range too wide");
+        require(bytes(name).length > 0 && bytes(name).length <= 64, "Invalid name length");
+        
+        // Enhanced tick validation
+        _validateTickRange(tickLower, tickUpper);
+        _validateTickSpacing(vault, tickLower, tickUpper);
+        _validateEconomicViability(vault, tickLower, tickUpper, targetAllocation);
+        
         require(targetAllocation >= MIN_ALLOCATION && targetAllocation <= MAX_BPS, "Invalid allocation");
         
-        // Validate tick spacing
-        // This would need to check against the pool's tick spacing
+        // Check total allocation won't exceed 100%
+        _validateTotalAllocation(vault, targetAllocation);
         
         rangeId = vaultRanges[vault].length;
         
@@ -273,9 +309,8 @@ contract MultiRangeManager is Ownable, ReentrancyGuard {
         onlyManager 
         validRange(vault, rangeId) 
     {
-        require(newTickLower < newTickUpper, "Invalid tick range");
-        require(newTickUpper - newTickLower >= MIN_RANGE_WIDTH, "Range too narrow");
-        require(newTargetAllocation >= MIN_ALLOCATION && newTargetAllocation <= MAX_BPS, "Invalid allocation");
+        // Use enhanced validation
+        _validateRangeUpdate(vault, rangeId, newTickLower, newTickUpper, newTargetAllocation);
         
         Range storage range = vaultRanges[vault][rangeId];
         
@@ -833,5 +868,162 @@ contract MultiRangeManager is Ownable, ReentrancyGuard {
     function _applyAIRecommendation(address vault, bytes32 recommendationHash) internal {
         // Implementation would decode AI recommendation and apply changes
         // This could include rebalancing allocations, updating ranges, etc.
+    }
+
+    // ============ ENHANCED VALIDATION FUNCTIONS ============
+    
+    /**
+     * @notice Validates tick range parameters
+     * @param tickLower Lower tick boundary
+     * @param tickUpper Upper tick boundary
+     */
+    function _validateTickRange(int24 tickLower, int24 tickUpper) internal pure {
+        require(tickLower < tickUpper, "Invalid tick order");
+        require(tickLower >= TickMath.MIN_TICK, "Tick lower too small");
+        require(tickUpper <= TickMath.MAX_TICK, "Tick upper too large");
+        require(tickUpper - tickLower >= int24(MIN_RANGE_WIDTH), "Range too narrow");
+        require(tickUpper - tickLower <= int24(MAX_RANGE_WIDTH), "Range too wide");
+    }
+    
+    /**
+     * @notice Validates tick spacing against pool requirements
+     * @param vault Vault address to get pool information
+     * @param tickLower Lower tick boundary
+     * @param tickUpper Upper tick boundary
+     */
+    function _validateTickSpacing(address vault, int24 tickLower, int24 tickUpper) internal view {
+        // In a real implementation, we would get the tick spacing from the pool
+        // For now, we'll use common Uniswap V3 tick spacings
+        int24 tickSpacing = _getPoolTickSpacing(vault);
+        
+        require(tickLower % tickSpacing == 0, "Invalid tick lower spacing");
+        require(tickUpper % tickSpacing == 0, "Invalid tick upper spacing");
+    }
+    
+    /**
+     * @notice Validates economic viability of the range
+     * @param vault Vault address
+     * @param tickLower Lower tick boundary
+     * @param tickUpper Upper tick boundary
+     * @param allocation Proposed allocation percentage
+     */
+    function _validateEconomicViability(
+        address vault,
+        int24 tickLower,
+        int24 tickUpper,
+        uint256 allocation
+    ) internal view {
+        // Ensure range isn't too wide for the allocation (capital inefficiency)
+        uint256 rangeWidth = uint256(uint24(tickUpper - tickLower));
+        uint256 maxWidthForAllocation = allocation * MAX_RANGE_WIDTH / MAX_BPS;
+        require(rangeWidth <= maxWidthForAllocation, "Range too wide for allocation");
+        
+        // Ensure range isn't too narrow for practical use (high gas costs)
+        require(rangeWidth >= MIN_RANGE_WIDTH, "Range not economically viable");
+        
+        // Check if range overlaps significantly with existing ranges (inefficient)
+        _checkRangeOverlap(vault, tickLower, tickUpper);
+    }
+    
+    /**
+     * @notice Validates that total allocation won't exceed 100%
+     * @param vault Vault address
+     * @param newAllocation New allocation to add
+     */
+    function _validateTotalAllocation(address vault, uint256 newAllocation) internal view {
+        uint256 totalExistingAllocation = 0;
+        Range[] storage ranges = vaultRanges[vault];
+        
+        for (uint256 i = 0; i < ranges.length; i++) {
+            if (ranges[i].status == RangeStatus.ACTIVE) {
+                totalExistingAllocation += ranges[i].targetAllocation;
+            }
+        }
+        
+        require(totalExistingAllocation + newAllocation <= MAX_BPS, "Total allocation exceeds 100%");
+    }
+    
+    /**
+     * @notice Checks for significant overlap with existing ranges
+     * @param vault Vault address
+     * @param tickLower Lower tick boundary
+     * @param tickUpper Upper tick boundary
+     */
+    function _checkRangeOverlap(address vault, int24 tickLower, int24 tickUpper) internal view {
+        Range[] storage ranges = vaultRanges[vault];
+        uint256 maxOverlapPercentage = 5000; // 50% max overlap allowed
+        
+        for (uint256 i = 0; i < ranges.length; i++) {
+            if (ranges[i].status != RangeStatus.ACTIVE) continue;
+            
+            // Calculate overlap
+            int24 overlapLower = tickLower > ranges[i].tickLower ? tickLower : ranges[i].tickLower;
+            int24 overlapUpper = tickUpper < ranges[i].tickUpper ? tickUpper : ranges[i].tickUpper;
+            
+            if (overlapLower < overlapUpper) {
+                uint256 overlapWidth = uint256(uint24(overlapUpper - overlapLower));
+                uint256 newRangeWidth = uint256(uint24(tickUpper - tickLower));
+                uint256 overlapPercentage = overlapWidth * MAX_BPS / newRangeWidth;
+                
+                require(overlapPercentage <= maxOverlapPercentage, "Excessive range overlap");
+            }
+        }
+    }
+    
+    /**
+     * @notice Gets the tick spacing for a pool (simplified implementation)
+     * @param vault Vault address
+     * @return tickSpacing The tick spacing for the pool
+     */
+    function _getPoolTickSpacing(address vault) internal view returns (int24 tickSpacing) {
+        // In a real implementation, this would query the actual pool
+        // Common Uniswap V3 tick spacings: 1, 10, 60, 200
+        // For now, return 60 as default (0.3% fee tier)
+        return 60;
+    }
+    
+    /**
+     * @notice Enhanced validation for range updates
+     * @param vault Vault address
+     * @param rangeId Range identifier
+     * @param newTickLower New lower tick
+     * @param newTickUpper New upper tick
+     * @param newTargetAllocation New target allocation
+     */
+    function _validateRangeUpdate(
+        address vault,
+        uint256 rangeId,
+        int24 newTickLower,
+        int24 newTickUpper,
+        uint256 newTargetAllocation
+    ) internal view {
+        _validateTickRange(newTickLower, newTickUpper);
+        _validateTickSpacing(vault, newTickLower, newTickUpper);
+        
+        // Check allocation accounting for this range's current allocation
+        Range storage range = vaultRanges[vault][rangeId];
+        uint256 totalOtherAllocations = 0;
+        Range[] storage ranges = vaultRanges[vault];
+        
+        for (uint256 i = 0; i < ranges.length; i++) {
+            if (i != rangeId && ranges[i].status == RangeStatus.ACTIVE) {
+                totalOtherAllocations += ranges[i].targetAllocation;
+            }
+        }
+        
+        require(totalOtherAllocations + newTargetAllocation <= MAX_BPS, "Updated allocation exceeds 100%");
+        
+        // Check if range change is economically justified
+        uint256 currentWidth = uint256(uint24(range.tickUpper - range.tickLower));
+        uint256 newWidth = uint256(uint24(newTickUpper - newTickLower));
+        
+        // Prevent frequent small adjustments that waste gas
+        if (currentWidth > 0) {
+            uint256 widthChangePercentage = currentWidth > newWidth ? 
+                (currentWidth - newWidth) * MAX_BPS / currentWidth :
+                (newWidth - currentWidth) * MAX_BPS / currentWidth;
+            
+            require(widthChangePercentage >= 1000, "Range change too small"); // Minimum 10% change
+        }
     }
 }

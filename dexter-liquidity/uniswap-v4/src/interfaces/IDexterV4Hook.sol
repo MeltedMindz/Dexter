@@ -20,6 +20,38 @@ interface IDexterV4Hook is IHooks {
     event PositionRebalanceTriggered(bytes32 indexed poolId, address indexed owner, int24 oldLower, int24 oldUpper, int24 newLower, int24 newUpper);
     event EmergencyModeActivated(bytes32 indexed poolId, string reason);
     
+    // ============ NEW CRITICAL EVENTS ============
+    
+    // ML Service Authorization Events
+    event MLServiceAuthorizationUpdated(address indexed service, bool authorized, address indexed updatedBy, string reason);
+    event MLServicePredictionQualityUpdated(address indexed service, uint256 oldScore, uint256 newScore);
+    event MLServiceFailureDetected(address indexed service, string errorType, uint256 failureCount);
+    
+    // Emergency Management Events
+    event EmergencyModeDeactivated(bytes32 indexed poolId, address indexed deactivatedBy, uint256 duration);
+    event EmergencyThresholdUpdated(string parameter, uint256 oldValue, uint256 newValue, address indexed updatedBy);
+    event EmergencyOverrideActivated(bytes32 indexed poolId, address indexed operator, string reason);
+    
+    // Hook Ownership and Control Events
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event HookConfigurationUpdated(string parameter, bytes32 oldValue, bytes32 newValue, address indexed updatedBy);
+    event HookPausedStateChanged(bool paused, address indexed changedBy, string reason);
+    
+    // Pool State Management Events
+    event PoolStateUpdated(bytes32 indexed poolId, uint8 oldRegime, uint8 newRegime, uint256 confidence);
+    event VolatilityThresholdExceeded(bytes32 indexed poolId, uint256 currentVolatility, uint256 threshold);
+    event MarketRegimeTransition(bytes32 indexed poolId, uint8 fromRegime, uint8 toRegime, uint256 confidence, address trigger);
+    
+    // Capital Efficiency Events
+    event CapitalEfficiencyAlert(bytes32 indexed poolId, uint256 efficiency, uint256 threshold, string recommendation);
+    event OptimalRangeRecommendation(bytes32 indexed poolId, int24 recommendedLower, int24 recommendedUpper, uint256 confidence);
+    event PositionConcentrationWarning(bytes32 indexed poolId, uint256 concentrationRatio, uint256 warningLevel);
+    
+    // Fee Optimization Events
+    event DynamicFeeCalculated(bytes32 indexed poolId, uint24 baseFee, uint24 adjustedFee, uint256 volatilityFactor);
+    event FeeOptimizationTriggered(bytes32 indexed poolId, uint24 oldFee, uint24 newFee, string optimizationReason);
+    event RevenueSharingUpdated(address indexed beneficiary, uint256 sharePercentage, address indexed updatedBy);
+    
     // Errors
     error InvalidVolatility();
     error FeeTooHigh();
