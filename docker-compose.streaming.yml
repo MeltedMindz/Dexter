@@ -1,0 +1,474 @@
+# Docker Compose for Dexter AI Streaming Infrastructure
+# MLOps Level 2 Continuous Learning Pipeline with Kafka/Flink
+
+version: '3.8'
+
+services:
+  # ============ MESSAGE STREAMING ============
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    hostname: zookeeper
+    container_name: dexter-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    networks:
+      - dexter-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    hostname: kafka
+    container_name: dexter-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_NUM_PARTITIONS: 6
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - dexter-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============ STREAM PROCESSING ============
+  
+  kafka-producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: producer
+    container_name: dexter-kafka-producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_BATCH_SIZE=1000
+      - KAFKA_LINGER_MS=100
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dexter:${DB_PASSWORD}@postgres:5432/dexter_production
+    volumes:
+      - ./backend:/app/backend
+      - producer-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8003/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  kafka-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: consumer
+    container_name: dexter-kafka-consumer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - KAFKA_CONSUMER_GROUP=dexter_ml_pipeline
+      - KAFKA_AUTO_OFFSET_RESET=latest
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dexter:${DB_PASSWORD}@postgres:5432/dexter_production
+    volumes:
+      - ./backend:/app/backend
+      - consumer-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+    healthcheck:
+      test: ["CMD", "python", "-c", "import psutil; exit(0 if any('kafka_consumer' in p.name() for p in psutil.process_iter()) else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  flink-processor:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: flink-processor
+    container_name: dexter-flink-processor
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dexter:${DB_PASSWORD}@postgres:5432/dexter_production
+      - ML_MODEL_PATH=/app/models
+    volumes:
+      - ./backend:/app/backend
+      - ml-models:/app/models
+      - flink-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8004/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============ ONLINE LEARNING ============
+  
+  online-learning:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: online-learning
+    container_name: dexter-online-learning
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dexter:${DB_PASSWORD}@postgres:5432/dexter_production
+      - MODEL_STORAGE_PATH=/app/models
+      - ML_UPDATE_INTERVAL=60
+    volumes:
+      - ./backend:/app/backend
+      - ml-models:/app/models
+      - online-learning-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8005/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============ MLOPS ORCHESTRATION ============
+  
+  mlflow:
+    image: python:3.11-slim
+    container_name: dexter-mlflow
+    command: >
+      bash -c "
+        pip install mlflow[extras] psycopg2-binary &&
+        mlflow server 
+          --backend-store-uri postgresql://dexter:${DB_PASSWORD}@postgres:5432/mlflow_db
+          --default-artifact-root /mlflow/artifacts
+          --host 0.0.0.0
+          --port 5000
+      "
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=postgresql://dexter:${DB_PASSWORD}@postgres:5432/mlflow_db
+    volumes:
+      - mlflow-artifacts:/mlflow/artifacts
+    networks:
+      - dexter-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  continuous-training:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: mlops
+    container_name: dexter-continuous-training
+    depends_on:
+      mlflow:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dexter:${DB_PASSWORD}@postgres:5432/dexter_production
+      - TRAINING_DATA_PATH=/app/data
+      - MODEL_ARTIFACTS_PATH=/app/artifacts
+    volumes:
+      - ./backend:/app/backend
+      - ml-models:/app/models
+      - training-data:/app/data
+      - model-artifacts:/app/artifacts
+      - mlops-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8006/health')"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+
+  ab-testing:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: ab-testing
+    container_name: dexter-ab-testing
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://dexter:${DB_PASSWORD}@postgres:5432/dexter_production
+      - AB_TEST_SALT=dexter_ab_testing_v1
+    volumes:
+      - ./backend:/app/backend
+      - ab-testing-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    ports:
+      - "8007:8007"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8007/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============ MONITORING & OBSERVABILITY ============
+  
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: dexter-kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: dexter-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - dexter-network
+    restart: unless-stopped
+
+  stream-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile.streaming
+      target: monitor
+    container_name: dexter-stream-monitor
+    depends_on:
+      kafka:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      - PROMETHEUS_URL=http://prometheus:9090
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./backend:/app/backend
+      - monitor-logs:/var/log/dexter
+    networks:
+      - dexter-network
+    ports:
+      - "8008:8008"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8008/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============ EXISTING SERVICES ============
+  
+  postgres:
+    image: postgres:15-alpine
+    container_name: dexter-postgres
+    environment:
+      POSTGRES_DB: dexter_production
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/02-schema.sql
+    networks:
+      - dexter-network
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dexter -d dexter_production"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: dexter-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    networks:
+      - dexter-network
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: dexter-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - dexter-network
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: dexter-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - dexter-network
+    ports:
+      - "3001:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ============ NETWORKS ============
+
+networks:
+  dexter-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============ VOLUMES ============
+
+volumes:
+  # Kafka & Zookeeper
+  zookeeper-data:
+    driver: local
+  zookeeper-logs:
+    driver: local
+  kafka-data:
+    driver: local
+  
+  # Database & Cache
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  
+  # ML & MLOps
+  ml-models:
+    driver: local
+  training-data:
+    driver: local
+  model-artifacts:
+    driver: local
+  mlflow-artifacts:
+    driver: local
+  
+  # Monitoring
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  
+  # Logs
+  producer-logs:
+    driver: local
+  consumer-logs:
+    driver: local
+  flink-logs:
+    driver: local
+  online-learning-logs:
+    driver: local
+  mlops-logs:
+    driver: local
+  ab-testing-logs:
+    driver: local
+  monitor-logs:
+    driver: local

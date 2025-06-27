@@ -1,0 +1,151 @@
+# Dexter AI Streaming Infrastructure Requirements
+# MLOps Level 2 Continuous Learning Pipeline
+
+# ============ CORE DEPENDENCIES ============
+asyncio-mqtt==0.13.0
+aiofiles==23.1.0
+aiohttp==3.8.5
+asyncpg==0.28.0
+redis[hiredis]==4.6.0
+psycopg2-binary==2.9.7
+
+# ============ KAFKA & STREAMING ============
+aiokafka==0.8.10
+kafka-python==2.0.2
+confluent-kafka==2.2.0
+
+# ============ MACHINE LEARNING ============
+# Core ML libraries
+numpy==1.24.3
+pandas==2.0.3
+scikit-learn==1.3.0
+joblib==1.3.1
+
+# Online learning with River
+river==0.18.0
+
+# Deep learning (optional, for LSTM models)
+torch==2.0.1
+torchvision==0.15.2
+
+# Feature engineering
+category-encoders==2.6.1
+feature-engine==1.6.1
+
+# ============ STATISTICAL ANALYSIS ============
+scipy==1.11.1
+statsmodels==0.14.0
+pingouin==0.5.3  # Additional statistical tests
+
+# ============ MLOPS & EXPERIMENT TRACKING ============
+mlflow==2.5.0
+optuna==3.2.0  # Hyperparameter optimization
+wandb==0.15.8  # Alternative experiment tracking
+
+# Model versioning and registry
+dvc==3.12.0
+bentoml==1.0.25
+
+# ============ DATA PROCESSING ============
+pyarrow==12.0.1  # For Parquet files
+fastparquet==2023.7.0
+polars==0.18.15  # High-performance DataFrame library
+
+# ============ MONITORING & OBSERVABILITY ============
+prometheus-client==0.17.1
+psutil==5.9.5
+py-cpuinfo==9.0.0
+
+# APM and distributed tracing
+opentelemetry-api==1.18.0
+opentelemetry-sdk==1.18.0
+opentelemetry-instrumentation==0.39b0
+
+# ============ WEB3 & BLOCKCHAIN ============
+web3==6.8.0
+eth-account==0.9.0
+eth-utils==2.2.0
+
+# ============ API & WEB FRAMEWORK ============
+fastapi==0.101.1
+uvicorn[standard]==0.23.2
+starlette==0.27.0
+pydantic==2.1.1
+
+# ============ UTILITIES ============
+python-dotenv==1.0.0
+click==8.1.6
+rich==13.4.2  # Beautiful terminal output
+typer==0.9.0  # CLI framework
+schedule==1.2.0  # Job scheduling
+
+# ============ SECURITY ============
+cryptography==41.0.3
+pycryptodome==3.18.0
+hashlib-compat==1.0.1
+
+# ============ CLOUD & STORAGE ============
+boto3==1.28.17  # AWS SDK
+google-cloud-storage==2.10.0  # GCS
+azure-storage-blob==12.17.0  # Azure
+
+# ============ TESTING ============
+pytest==7.4.0
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+factory-boy==3.3.0  # Test data generation
+
+# ============ CODE QUALITY ============
+black==23.7.0
+isort==5.12.0
+mypy==1.5.1
+pylint==2.17.4
+bandit==1.7.5  # Security linting
+
+# ============ DEVELOPMENT ============
+ipython==8.14.0
+jupyter==1.0.0
+notebook==7.0.0
+
+# ============ PERFORMANCE ============
+cython==0.29.36
+numba==0.57.1  # JIT compilation
+line-profiler==4.0.3
+
+# ============ TIME SERIES ============
+prophet==1.1.4  # Facebook Prophet for forecasting
+tslearn==0.6.2  # Time series ML
+tsfresh==0.20.1  # Feature extraction for time series
+
+# ============ ADDITIONAL ML LIBRARIES ============
+# Ensemble methods
+xgboost==1.7.6
+lightgbm==4.0.0
+catboost==1.2
+
+# Reinforcement learning
+stable-baselines3==2.1.0
+gymnasium==0.29.0
+
+# Natural language processing (for documentation)
+spacy==3.6.1
+transformers==4.32.1
+
+# ============ GRAPH & NETWORK ANALYSIS ============
+networkx==3.1
+igraph==0.10.6  # Fast graph analysis
+
+# ============ FINANCIAL CALCULATIONS ============
+quantlib==1.31
+yfinance==0.2.18  # For market data (if needed)
+
+# ============ ENVIRONMENT SPECIFIC ============
+# Production WSGI server
+gunicorn==21.0.1
+
+# Memory profiling
+memory-profiler==0.60.0
+
+# Lock file for exact versions
+pip-tools==7.1.0

@@ -1,0 +1,417 @@
+# Multi-stage Dockerfile for Dexter AI Streaming Infrastructure
+# Supports Kafka, Flink, Online Learning, MLOps, and A/B Testing
+
+# ============ BASE IMAGE ============
+FROM python:3.11-slim as base
+
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    gcc \
+    g++ \
+    libpq-dev \
+    libffi-dev \
+    libssl-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Create app user
+RUN useradd --create-home --shell /bin/bash dexter
+USER dexter
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.streaming.txt .
+
+# Install Python dependencies
+RUN pip install --user -r requirements.streaming.txt
+
+# ============ KAFKA PRODUCER ============
+FROM base as producer
+
+USER root
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_producer.py
+#!/usr/bin/env python3
+import sys
+import asyncio
+from backend.streaming.kafka_producer import DexterKafkaProducer
+
+async def health_check():
+    try:
+        producer = DexterKafkaProducer()
+        await producer.start()
+        stats = producer.get_producer_stats()
+        await producer.stop()
+        
+        if stats['is_connected']:
+            print("Producer healthy")
+            sys.exit(0)
+        else:
+            print("Producer not connected")
+            sys.exit(1)
+    except Exception as e:
+        print(f"Producer health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    asyncio.run(health_check())
+EOF
+
+RUN chmod +x /app/healthcheck_producer.py
+
+# Expose metrics port
+EXPOSE 8003
+
+# Start producer service
+CMD ["python", "-m", "backend.streaming.kafka_producer"]
+
+# ============ KAFKA CONSUMER ============
+FROM base as consumer
+
+USER root
+RUN apt-get update && apt-get install -y procps && rm -rf /var/lib/apt/lists/*
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_consumer.py
+#!/usr/bin/env python3
+import sys
+import psutil
+
+def health_check():
+    try:
+        # Check if consumer process is running
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            if 'kafka_consumer' in str(proc.info['cmdline']):
+                print("Consumer healthy")
+                sys.exit(0)
+        
+        print("Consumer process not found")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Consumer health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    health_check()
+EOF
+
+RUN chmod +x /app/healthcheck_consumer.py
+
+# Start consumer service
+CMD ["python", "-m", "backend.streaming.kafka_consumer"]
+
+# ============ FLINK PROCESSOR ============
+FROM base as flink-processor
+
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Additional ML dependencies for Flink
+RUN pip install --user \
+    scikit-learn==1.3.0 \
+    numpy==1.24.3 \
+    pandas==2.0.3
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_flink.py
+#!/usr/bin/env python3
+import sys
+import asyncio
+from backend.streaming.flink_processor import FlinkStreamProcessor
+
+async def health_check():
+    try:
+        processor = FlinkStreamProcessor()
+        await processor.start()
+        metrics = processor.get_processor_metrics()
+        await processor.stop()
+        
+        if metrics['is_running']:
+            print("Flink processor healthy")
+            sys.exit(0)
+        else:
+            print("Flink processor not running")
+            sys.exit(1)
+    except Exception as e:
+        print(f"Flink processor health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    asyncio.run(health_check())
+EOF
+
+RUN chmod +x /app/healthcheck_flink.py
+
+# Expose metrics port
+EXPOSE 8004
+
+# Start Flink processor
+CMD ["python", "-m", "backend.streaming.flink_processor"]
+
+# ============ ONLINE LEARNING ============
+FROM base as online-learning
+
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Install River ML and additional dependencies
+RUN pip install --user \
+    river==0.18.0 \
+    scikit-learn==1.3.0 \
+    numpy==1.24.3 \
+    pandas==2.0.3
+
+# Create model storage directory
+RUN mkdir -p /app/models
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_online_learning.py
+#!/usr/bin/env python3
+import sys
+import asyncio
+from backend.streaming.online_learning_engine import OnlineDeFiOptimizer
+
+async def health_check():
+    try:
+        optimizer = OnlineDeFiOptimizer()
+        metrics = optimizer.get_learning_metrics()
+        
+        print(f"Online learning healthy - {metrics.samples_processed} samples processed")
+        sys.exit(0)
+    except Exception as e:
+        print(f"Online learning health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    asyncio.run(health_check())
+EOF
+
+RUN chmod +x /app/healthcheck_online_learning.py
+
+# Expose metrics port
+EXPOSE 8005
+
+# Start online learning service
+CMD ["python", "-m", "backend.streaming.online_learning_engine"]
+
+# ============ MLOPS ORCHESTRATION ============
+FROM base as mlops
+
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Install MLOps dependencies
+RUN pip install --user \
+    mlflow==2.5.0 \
+    scikit-learn==1.3.0 \
+    numpy==1.24.3 \
+    pandas==2.0.3 \
+    joblib==1.3.1 \
+    boto3==1.28.17
+
+# Create directories
+RUN mkdir -p /app/data /app/artifacts /app/models
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_mlops.py
+#!/usr/bin/env python3
+import sys
+import asyncio
+from backend.mlops.continuous_training_orchestrator import ContinuousTrainingOrchestrator
+
+async def health_check():
+    try:
+        orchestrator = ContinuousTrainingOrchestrator()
+        await orchestrator.start()
+        status = orchestrator.get_orchestrator_status()
+        
+        print(f"MLOps orchestrator healthy - {status['active_jobs']} active jobs")
+        sys.exit(0)
+    except Exception as e:
+        print(f"MLOps orchestrator health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    asyncio.run(health_check())
+EOF
+
+RUN chmod +x /app/healthcheck_mlops.py
+
+# Expose metrics port
+EXPOSE 8006
+
+# Start MLOps orchestrator
+CMD ["python", "-m", "backend.mlops.continuous_training_orchestrator"]
+
+# ============ A/B TESTING ============
+FROM base as ab-testing
+
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Install statistical dependencies
+RUN pip install --user \
+    scipy==1.11.1 \
+    statsmodels==0.14.0 \
+    numpy==1.24.3 \
+    pandas==2.0.3
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_ab_testing.py
+#!/usr/bin/env python3
+import sys
+from backend.mlops.ab_testing_framework import ABTestingFramework
+
+def health_check():
+    try:
+        framework = ABTestingFramework()
+        experiments = framework.list_experiments()
+        
+        print(f"A/B testing framework healthy - {len(experiments)} experiments")
+        sys.exit(0)
+    except Exception as e:
+        print(f"A/B testing health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    health_check()
+EOF
+
+RUN chmod +x /app/healthcheck_ab_testing.py
+
+# Expose API port
+EXPOSE 8007
+
+# Start A/B testing service
+CMD ["python", "-m", "backend.mlops.ab_testing_framework"]
+
+# ============ MONITORING ============
+FROM base as monitor
+
+USER dexter
+
+# Copy application code
+COPY --chown=dexter:dexter backend/ ./backend/
+
+# Install monitoring dependencies
+RUN pip install --user \
+    prometheus-client==0.17.1 \
+    psutil==5.9.5
+
+# Health check script
+COPY --chown=dexter:dexter <<EOF /app/healthcheck_monitor.py
+#!/usr/bin/env python3
+import sys
+import time
+import psutil
+
+def health_check():
+    try:
+        # Check system resources
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory_percent = psutil.virtual_memory().percent
+        
+        if cpu_percent < 95 and memory_percent < 95:
+            print(f"Monitor healthy - CPU: {cpu_percent}%, Memory: {memory_percent}%")
+            sys.exit(0)
+        else:
+            print(f"Monitor under stress - CPU: {cpu_percent}%, Memory: {memory_percent}%")
+            sys.exit(1)
+    except Exception as e:
+        print(f"Monitor health check failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    health_check()
+EOF
+
+RUN chmod +x /app/healthcheck_monitor.py
+
+# Create monitoring script
+COPY --chown=dexter:dexter <<EOF /app/stream_monitor.py
+#!/usr/bin/env python3
+"""
+Stream monitoring service for Dexter AI infrastructure
+"""
+import asyncio
+import logging
+import time
+from prometheus_client import start_http_server, Gauge, Counter
+import psutil
+import os
+
+# Prometheus metrics
+cpu_usage = Gauge('dexter_cpu_usage_percent', 'CPU usage percentage')
+memory_usage = Gauge('dexter_memory_usage_percent', 'Memory usage percentage')
+kafka_messages = Counter('dexter_kafka_messages_total', 'Total Kafka messages processed')
+ml_predictions = Counter('dexter_ml_predictions_total', 'Total ML predictions generated')
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+async def collect_metrics():
+    """Collect system and application metrics"""
+    while True:
+        try:
+            # System metrics
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory_percent = psutil.virtual_memory().percent
+            
+            cpu_usage.set(cpu_percent)
+            memory_usage.set(memory_percent)
+            
+            logger.info(f"Metrics collected - CPU: {cpu_percent}%, Memory: {memory_percent}%")
+            
+            await asyncio.sleep(30)  # Collect every 30 seconds
+            
+        except Exception as e:
+            logger.error(f"Metrics collection error: {e}")
+            await asyncio.sleep(30)
+
+async def main():
+    """Main monitoring service"""
+    # Start Prometheus metrics server
+    start_http_server(8008)
+    logger.info("Prometheus metrics server started on port 8008")
+    
+    # Start metrics collection
+    await collect_metrics()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+EOF
+
+RUN chmod +x /app/stream_monitor.py
+
+# Expose metrics port
+EXPOSE 8008
+
+# Start monitoring service
+CMD ["python", "/app/stream_monitor.py"]
