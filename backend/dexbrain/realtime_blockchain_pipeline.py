@@ -6,6 +6,7 @@ Multi-source data aggregation with WebSocket streams, REST APIs, and on-chain mo
 import asyncio
 import logging
 import json
+import os
 import websockets
 import aiohttp
 from datetime import datetime, timedelta
@@ -765,7 +766,10 @@ class ProfessionalBlockchainPipeline:
 
 async def main():
     """Main function to run the professional blockchain pipeline"""
-    API_KEY = "c6f241c1dd5aea81977a63b2614af70d"
+    API_KEY = os.getenv('GRAPH_API_KEY')
+    if not API_KEY:
+        logger.error("GRAPH_API_KEY environment variable not set")
+        raise ValueError("Missing required GRAPH_API_KEY environment variable")
     
     pipeline = ProfessionalBlockchainPipeline(API_KEY)
     await pipeline.start_realtime_pipeline()

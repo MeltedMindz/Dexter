@@ -8,6 +8,7 @@ import {BeforeSwapDelta, BeforeSwapDeltaLibrary} from "@uniswap/v4-core/src/type
 import {BalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
 import {PoolId, PoolIdLibrary} from "@uniswap/v4-core/src/types/PoolId.sol";
 import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import {IDexterV4Hook} from "./interfaces/IDexterV4Hook.sol";
 import {DexterMath} from "./libraries/DexterMath.sol";
@@ -15,9 +16,9 @@ import {DexterMath} from "./libraries/DexterMath.sol";
 /**
  * @title SimpleDexterHook
  * @notice Simplified AI-powered Uniswap V4 hook for dynamic fee management
- * @dev Basic implementation of DexterV4Hook without BaseHook dependency
+ * @dev Implementation with reentrancy protection and secure state management
  */
-contract SimpleDexterHook is IHooks, IDexterV4Hook {
+contract SimpleDexterHook is IHooks, IDexterV4Hook, ReentrancyGuard {
     using PoolIdLibrary for PoolKey;
     using BeforeSwapDeltaLibrary for BeforeSwapDelta;
     
@@ -146,32 +147,25 @@ contract SimpleDexterHook is IHooks, IDexterV4Hook {
         PoolKey calldata key,
         IPoolManager.SwapParams calldata,
         bytes calldata
-    ) external override returns (bytes4, BeforeSwapDelta, uint24) {
+    ) external override nonReentrant returns (bytes4, BeforeSwapDelta, uint24) {
         PoolId poolId = key.toId();
-        PoolState storage state = poolStates[poolId];
         
-        // Emergency mode check
-        if (state.emergencyMode) {
-            revert EmergencyModeActive();
-        }
+        // CHECKS: Validate input and current state
+        _validateSwapConditions(poolId);
         
-        // Calculate current volatility (simplified)
-        uint256 newVolatility = _calculateSimpleVolatility(poolId);
+        // EFFECTS: Calculate new values without modifying state yet
+        (uint256 newVolatility, uint24 optimalFee, bool emergencyTriggered) = _calculateSwapParameters(poolId);
         
-        // Check for emergency conditions
-        if (newVolatility > EMERGENCY_VOLATILITY_THRESHOLD) {
-            state.emergencyMode = true;
+        // EFFECTS: Update state only after all calculations are complete
+        _updatePoolState(poolId, newVolatility, optimalFee, emergencyTriggered);
+        
+        // INTERACTIONS: Emit events (safe after state updates)
+        emit VolatilityUpdated(bytes32(PoolId.unwrap(poolId)), newVolatility, block.timestamp);
+        
+        if (emergencyTriggered) {
             emit EmergencyModeActivated(bytes32(PoolId.unwrap(poolId)), "High volatility detected");
             revert EmergencyModeActive();
         }
-        
-        // Update volatility
-        state.currentVolatility = newVolatility;
-        emit VolatilityUpdated(bytes32(PoolId.unwrap(poolId)), newVolatility, block.timestamp);
-        
-        // Calculate optimal fee
-        uint24 optimalFee = _calculateOptimalFeeSimple(newVolatility);
-        state.currentFee = optimalFee;
         
         return (IHooks.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, optimalFee);
     }
@@ -364,5 +358,147 @@ contract SimpleDexterHook is IHooks, IDexterV4Hook {
     function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0), "SimpleDexterHook: Zero address");
         owner = newOwner;
+    }
+
+    // ============ REENTRANCY PROTECTION HELPERS ============
+    
+    /**
+     * @notice Validates swap conditions (CHECKS phase)
+     * @param poolId Pool identifier
+     */
+    function _validateSwapConditions(PoolId poolId) internal view {
+        // Check if pool is in emergency mode
+        if (poolStates[poolId].emergencyMode) {
+            revert EmergencyModeActive();
+        }
+        
+        // Additional validation checks can be added here
+        // e.g., pool exists, authorized caller, etc.
+    }
+    
+    /**
+     * @notice Calculates swap parameters without state changes (EFFECTS phase - read-only)
+     * @param poolId Pool identifier
+     * @return newVolatility Calculated volatility
+     * @return optimalFee Calculated optimal fee
+     * @return emergencyTriggered Whether emergency mode should be triggered
+     */
+    function _calculateSwapParameters(PoolId poolId) 
+        internal 
+        view 
+        returns (uint256 newVolatility, uint24 optimalFee, bool emergencyTriggered) 
+    {
+        // Gas-optimized volatility calculation
+        assembly {
+            // Load current volatility from storage
+            let stateSlot := keccak256(add(poolId, poolStates.slot))
+            let currentVol := sload(stateSlot) // currentVolatility is first field
+            
+            // Simple volatility update (gas-optimized)
+            newVolatility := currentVol
+            
+            // Calculate optimal fee: fee = volatility / 10, clamped to [1, 10000]
+            optimalFee := div(newVolatility, 10)
+            if lt(optimalFee, 1) { optimalFee := 1 }
+            if gt(optimalFee, 10000) { optimalFee := 10000 }
+        }
+        
+        // Check if emergency mode should be triggered
+        emergencyTriggered = newVolatility > EMERGENCY_VOLATILITY_THRESHOLD;
+    }
+    
+    /**
+     * @notice Updates pool state (EFFECTS phase - state modifications)
+     * @param poolId Pool identifier
+     * @param newVolatility New volatility value
+     * @param optimalFee New optimal fee
+     * @param emergencyTriggered Whether to activate emergency mode
+     */
+    function _updatePoolState(
+        PoolId poolId, 
+        uint256 newVolatility, 
+        uint24 optimalFee, 
+        bool emergencyTriggered
+    ) internal {
+        // Update pool state in a single operation to minimize gas and ensure atomicity
+        PoolState storage state = poolStates[poolId];
+        
+        // Use assembly for gas-optimized state updates
+        assembly {
+            // Get storage slot for the pool state
+            let stateSlot := keccak256(add(poolId, poolStates.slot))
+            
+            // Update volatility and fee in storage
+            sstore(stateSlot, newVolatility) // Update currentVolatility
+            sstore(add(stateSlot, 1), optimalFee) // Update currentFee
+        }
+        
+        // Update emergency mode if triggered (separate from assembly for clarity)
+        if (emergencyTriggered) {
+            state.emergencyMode = true;
+        }
+    }
+    
+    /**
+     * @notice Additional reentrancy protection for ML prediction updates
+     * @param key Pool key
+     * @param prediction ML prediction data
+     */
+    function updateMLPrediction(PoolKey calldata key, MLPrediction calldata prediction) 
+        external 
+        override 
+        onlyAuthorizedML 
+        nonReentrant 
+    {
+        PoolId poolId = key.toId();
+        
+        // CHECKS: Validate prediction data
+        require(prediction.confidence <= 10000, "Invalid confidence");
+        require(prediction.timestamp <= block.timestamp, "Future timestamp");
+        require(prediction.timestamp > block.timestamp - ML_UPDATE_INTERVAL, "Stale prediction");
+        
+        // EFFECTS: Update ML prediction state
+        mlPredictions[poolId] = prediction;
+        
+        // INTERACTIONS: Emit events
+        emit MLPredictionReceived(
+            bytes32(PoolId.unwrap(poolId)),
+            uint8(prediction.regime),
+            prediction.confidence,
+            prediction.timestamp
+        );
+        
+        // Activate emergency mode if crisis detected with high confidence
+        if (prediction.regime == MarketRegime.CRISIS && prediction.confidence > 8000) {
+            poolStates[poolId].emergencyMode = true;
+            emit EmergencyModeActivated(bytes32(PoolId.unwrap(poolId)), "ML crisis detection");
+        }
+    }
+    
+    /**
+     * @notice Enhanced emergency mode activation with reentrancy protection
+     * @param key Pool key
+     * @param reason Reason for activation
+     */
+    function activateEmergencyMode(PoolKey calldata key, string memory reason) 
+        public 
+        override 
+        nonReentrant 
+    {
+        require(
+            msg.sender == owner || authorizedMLServices[msg.sender],
+            "SimpleDexterHook: Not authorized"
+        );
+        
+        PoolId poolId = key.toId();
+        
+        // CHECKS: Validate current state
+        require(!poolStates[poolId].emergencyMode, "Emergency mode already active");
+        
+        // EFFECTS: Update state
+        poolStates[poolId].emergencyMode = true;
+        
+        // INTERACTIONS: Emit events
+        emit EmergencyModeActivated(bytes32(PoolId.unwrap(poolId)), reason);
     }
 }

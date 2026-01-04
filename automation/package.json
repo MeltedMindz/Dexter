@@ -1,0 +1,30 @@
+{
+  "name": "dexter-mvp-automation",
+  "version": "1.0.0",
+  "description": "Ultra-frequent automation service for Dexter MVP on Base chain",
+  "main": "ultra-frequent-keeper.js",
+  "scripts": {
+    "start": "node ultra-frequent-keeper.js",
+    "dev": "nodemon ultra-frequent-keeper.js",
+    "test": "jest",
+    "health": "node -e \"const UFK = require('./ultra-frequent-keeper.js'); const keeper = new UFK(require('./config.js')); keeper.healthCheck();\""
+  },
+  "dependencies": {
+    "ethers": "^5.7.2",
+    "node-cron": "^3.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0"
+  },
+  "keywords": [
+    "defi",
+    "uniswap",
+    "automation",
+    "base-chain",
+    "liquidity-management"
+  ],
+  "author": "Dexter Protocol",
+  "license": "MIT"
+}

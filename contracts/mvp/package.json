@@ -1,0 +1,41 @@
+{
+  "name": "dexter-mvp-contracts",
+  "version": "1.0.0",
+  "description": "Ultra-frequent automation contracts for Dexter MVP on Base chain",
+  "main": "deploy.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "deploy:testnet": "node deploy.js testnet",
+    "deploy:mainnet": "node deploy.js mainnet",
+    "verify": "hardhat verify",
+    "coverage": "hardhat coverage",
+    "clean": "hardhat clean"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@uniswap/v3-core": "^1.0.1",
+    "@uniswap/v3-periphery": "^1.4.3",
+    "ethers": "^5.7.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.2",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.9",
+    "hardhat": "^2.17.1",
+    "chai": "^4.3.8",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.4"
+  },
+  "keywords": [
+    "defi",
+    "uniswap",
+    "automation",
+    "base-chain",
+    "liquidity-management",
+    "mvp"
+  ],
+  "author": "Dexter Protocol",
+  "license": "MIT"
+}
