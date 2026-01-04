@@ -127,6 +127,7 @@ eliza/
 reference/
 external/
 third-party/
+uniswap-analysis/
 
 # Production infrastructure configs
 monitoring-configs/
