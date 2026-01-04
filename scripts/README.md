@@ -36,3 +36,23 @@ bash scripts/monitoring/grafana_quick_fix.sh
 ## Security Note
 
 These scripts may reference environment variables for API keys and credentials. Ensure proper environment configuration before running.
+
+## How It Fits Into the System
+- **Interacts with**: Backend services (`../backend/`), monitoring infrastructure (`../monitoring/`), databases, external APIs
+- **Depends on**: Python, Docker, system utilities, API credentials
+- **Provides**: Operational utilities, monitoring setup, data collection, backup systems
+- **Part of**: The operational infrastructure, supporting development and production operations
+
+## Current Status
+✅ **Active / In use** - Utility scripts operational for various operational tasks
+
+## What This Is NOT
+- This is not the core backend services (those are in `../backend/`)
+- This is not the monitoring infrastructure itself (that's in `../monitoring/`)
+- This is not the deployment automation (those may be in CI/CD workflows)
+
+## Relevant Docs / Entry Points
+- **Utilities**: See `utilities/README.md`
+- **Monitoring scripts**: See `monitoring/README.md`
+- **Demos**: See `demos/README.md`
+- **Root documentation**: See `../README.md`

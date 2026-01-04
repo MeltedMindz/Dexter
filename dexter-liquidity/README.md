@@ -259,3 +259,24 @@ Base Network Team
 
 
 Note: Always test thoroughly in development environment before deploying to production. Regular monitoring and maintenance are essential for optimal performance.
+
+## How It Fits Into the System
+- **Interacts with**: Backend services (`../backend/`), smart contracts, Uniswap V4 and Meteora DEXs
+- **Depends on**: Python, Web3.py, PostgreSQL, Redis, Docker
+- **Provides**: Advanced liquidity management with multiple risk strategies, automated position management
+- **Part of**: The Dexter Protocol ecosystem, providing sophisticated liquidity management capabilities
+
+## Current Status
+✅ **Active / In use** - Production system with comprehensive test coverage and monitoring
+
+## What This Is NOT
+- This is not the MVP contracts (those are in `../contracts/mvp/`)
+- This is not the backend AI services (those are in `../backend/`)
+- This is not the frontend interface (that's in `../frontend/`)
+
+## Relevant Docs / Entry Points
+- **Agents**: See `agents/README.md`
+- **Data processing**: See `data/README.md`
+- **Execution**: See `execution/README.md`
+- **Utilities**: See `utils/README.md`
+- **Root documentation**: See `../README.md`

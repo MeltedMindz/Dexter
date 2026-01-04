@@ -188,4 +188,24 @@ node -e "const keeper = require('./ultra-frequent-keeper.js'); keeper.reportMetr
 - Keeper wallet balance
 - Failed transaction rate
 
+## How It Fits Into the System
+- **Interacts with**: Automation keeper service (`../../automation/`), Uniswap V3 contracts, Base chain
+- **Depends on**: Hardhat, OpenZeppelin v4, vendored Uniswap interfaces
+- **Provides**: Ultra-frequent compound and rebalance automation for Uniswap V3 positions
+- **Part of**: The MVP implementation, designed for seamless upgrade to full AI automation
+
+## Current Status
+✅ **Active / In use** - Production-ready contracts with comprehensive test coverage
+
+## What This Is NOT
+- This is not the full Dexter Protocol contracts (those are in `../`)
+- This is not the AI-powered contracts (this is deterministic automation)
+- This is not the keeper service itself (that's in `../../automation/`)
+
+## Relevant Docs / Entry Points
+- **Contract documentation**: See `../README.md` for full contract architecture
+- **Automation service**: See `../../automation/README.md`
+- **Root documentation**: See `../../README.md`
+- **Deployment guide**: See `DEPLOYMENT.md` in this directory
+
 This MVP system provides immediate value with ultra-frequent automation while maintaining compatibility for future AI integration.

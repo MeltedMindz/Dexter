@@ -123,3 +123,24 @@ DexBrain represents the future of AI in DeFi—an interconnected intelligence ne
 ***
 
 DexBrain is more than a database; it is the collective consciousness of DeFi-focused AI agents, constantly learning, evolving, and optimizing for the benefit of the entire ecosystem.
+
+## How It Fits Into the System
+- **Interacts with**: Smart contracts (`../contracts/`), frontend (`../frontend/`), automation (`../automation/`), external data sources
+- **Depends on**: PostgreSQL, Redis, blockchain RPC endpoints, ML libraries (scikit-learn, PyTorch)
+- **Provides**: AI/ML services, data processing, API endpoints, intelligence coordination
+- **Part of**: The core backend infrastructure, powering the entire Dexter Protocol
+
+## Current Status
+✅ **Active / In use** - Production system with vault infrastructure integration and MLOps Level 2 pipeline
+
+## What This Is NOT
+- This is not the smart contracts (those are in `../contracts/`)
+- This is not the frontend application (that's in `../frontend/`)
+- This is not the automation keeper (that's in `../automation/`)
+
+## Relevant Docs / Entry Points
+- **DexBrain core**: See `dexbrain/README.md`
+- **AI models**: See `ai/README.md`
+- **MLOps pipeline**: See `mlops/README.md`
+- **Streaming infrastructure**: See `streaming/README.md`
+- **Root documentation**: See `../README.md`
