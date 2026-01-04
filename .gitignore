@@ -58,6 +58,12 @@ out/
 .next/
 *.tsbuildinfo
 
+# Hardhat/Solidity build artifacts
+artifacts/
+cache/
+coverage/
+typechain-types/
+
 # Runtime data
 pids
 *.pid

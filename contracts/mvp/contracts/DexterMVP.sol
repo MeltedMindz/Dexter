@@ -8,10 +8,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
-import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
-import "@uniswap/v3-periphery/contracts/libraries/LiquidityAmounts.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
+import "./vendor/uniswap/libraries/TickMath.sol";
+import "./vendor/uniswap/libraries/LiquidityAmounts.sol";
+import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
+import "./vendor/uniswap/interfaces/IPeripheryImmutableState.sol";
+import "./vendor/uniswap/interfaces/ISwapRouter.sol";
 
 /**
  * @title DexterMVP
@@ -174,7 +176,7 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Ownable, Multicall {
      * @param tokenId The position to check
      * @return shouldCompound Whether position needs compounding
      */
-    function shouldCompound(uint256 tokenId) external view validPosition(tokenId) returns (bool) {
+    function shouldCompound(uint256 tokenId) public view validPosition(tokenId) returns (bool) {
         AutomationSettings memory settings = positionAutomation[tokenId];
         if (!settings.autoCompoundEnabled) return false;
         
@@ -267,8 +269,9 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Ownable, Multicall {
         (,, address token0, address token1, uint24 fee, int24 tickLower, int24 tickUpper,,,,,) = 
             nonfungiblePositionManager.positions(tokenId);
         
+        address factoryAddress = IPeripheryImmutableState(address(nonfungiblePositionManager)).factory();
         IUniswapV3Pool pool = IUniswapV3Pool(
-            IUniswapV3Factory(nonfungiblePositionManager.factory()).getPool(token0, token1, fee)
+            IUniswapV3Factory(factoryAddress).getPool(token0, token1, fee)
         );
         
         (, int24 currentTick,,,,,) = pool.slot0();
@@ -299,7 +302,7 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Ownable, Multicall {
      * @param tokenId The position to check
      * @return shouldRebalance Whether position needs rebalancing
      */
-    function shouldRebalance(uint256 tokenId) external view validPosition(tokenId) returns (bool) {
+    function shouldRebalance(uint256 tokenId) public view validPosition(tokenId) returns (bool) {
         AutomationSettings memory settings = positionAutomation[tokenId];
         if (!settings.autoRebalanceEnabled) return false;
         
@@ -417,8 +420,9 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Ownable, Multicall {
     ) internal view returns (int24 tickLower, int24 tickUpper) {
         // Get tick spacing from position
         (,, address token0, address token1, uint24 fee,,,,,,,) = nonfungiblePositionManager.positions(tokenId);
+        address factoryAddress = IPeripheryImmutableState(address(nonfungiblePositionManager)).factory();
         IUniswapV3Pool pool = IUniswapV3Pool(
-            IUniswapV3Factory(nonfungiblePositionManager.factory()).getPool(token0, token1, fee)
+            IUniswapV3Factory(factoryAddress).getPool(token0, token1, fee)
         );
         int24 tickSpacing = pool.tickSpacing();
         

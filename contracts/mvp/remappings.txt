@@ -1,0 +1,4 @@
+@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
+@uniswap/v3-core/=node_modules/@uniswap/v3-core/
+@uniswap/v3-periphery/=node_modules/@uniswap/v3-periphery/
+

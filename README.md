@@ -413,17 +413,102 @@ For commercial licensing inquiries, contact: license@dexteragent.com
 4. **See personalized recommendations** in under 30 seconds
 
 ### **🏗️ For Developers**
+
+#### Quick Start (Local Development)
+
 ```bash
-# Clone the protocol
+# 1. Clone the repository
 git clone https://github.com/MeltedMindz/Dexter.git
 cd Dexter
 
-# See docs for setup instructions
-docs/deployment/    # Full deployment guide
-docs/api/          # Backend API documentation  
-docs/architecture/ # Technical system design
-CONTRIBUTING.md    # Development workflow
+# 2. Set up environment variables
+cp .env.example .env  # Edit with your API keys
+cd contracts/mvp && cp .env.example .env  # Edit with deployment keys
+
+# 3. Install dependencies (using Makefile)
+make install
+
+# Or install manually:
+# Contracts:
+cd contracts/mvp && npm install
+# Backend:
+pip install -r backend/requirements.txt
+# Dexter-liquidity:
+pip install -r dexter-liquidity/requirements.txt
+
+# 4. Build and test
+make build    # Build all components
+make test     # Run all tests
+
+# 5. Start services (Docker)
+make docker-up
 ```
+
+#### Component-Specific Setup
+
+**Smart Contracts:**
+```bash
+cd contracts/mvp
+npm install
+npm run compile
+npm run test
+```
+
+**Backend Services:**
+```bash
+cd backend
+pip install -r requirements.txt
+python -m pytest tests/
+python -m backend.dexbrain.api_server  # Start API server
+```
+
+**Dexter-Liquidity (ML System):**
+```bash
+cd dexter-liquidity
+pip install -r requirements.txt
+pytest tests/
+```
+
+#### Documentation
+- **[Full Deployment Guide](docs/deployment/)** - Production deployment instructions
+- **[API Documentation](docs/api/)** - Backend API reference
+- **[Architecture Guide](docs/architecture/)** - Technical system design
+- **[Contributing Guide](CONTRIBUTING.md)** - Development workflow
+- **[Repository Audit Report](REPO_AUDIT_REPORT.md)** - Current repository status and known issues
+
+## 📊 **Repository Status**
+
+### Build & Test Status
+
+| Component | Build Status | Test Status | Notes |
+|-----------|-------------|-------------|-------|
+| **contracts/mvp** | ✅ Compiles | ⚠️ No tests | Contracts compile successfully, test suite pending |
+| **backend** | ✅ Dependencies valid | ⚠️ Minimal tests | Core modules import successfully, test coverage needs expansion |
+| **dexter-liquidity** | ✅ Dependencies valid | ✅ Test suite exists | Full test suite available |
+
+### Verified Features
+
+✅ **Smart Contracts**
+- MVP contracts compile successfully
+- OpenZeppelin v4 integration working
+- Uniswap V3 interfaces vendored and compatible
+- Hardhat build system configured
+
+✅ **Backend Services**
+- Python dependencies validated
+- Core modules importable
+- API server structure in place
+
+⚠️ **Planned Features** (Code exists, requires verification)
+- ML model training pipeline (see `backend/mlops/`)
+- Kafka streaming infrastructure (see `docker-compose.streaming.yml`)
+- Continuous learning system (see `backend/streaming/`)
+
+### Known Limitations
+
+- Contract test suite: Tests need to be written (compilation verified)
+- Backend test coverage: Limited test files, needs expansion
+- Frontend: Minimal structure, see separate [dexter-website](https://github.com/MeltedMindz/dexter-website) repository
 
 ### **🤖 Follow Dexter AI**
 **Watch our AI agent in action:**

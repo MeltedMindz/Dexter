@@ -2,7 +2,7 @@
 Flask==3.0.0
 Flask-CORS==4.0.0
 aiofiles==23.2.1
-asyncio-compat==0.1.0
+# asyncio-compat==0.1.0  # REMOVED: Package doesn't exist, asyncio is built into Python 3.7+
 numpy==1.24.3
 scikit-learn==1.3.0
 python-dotenv==1.0.0

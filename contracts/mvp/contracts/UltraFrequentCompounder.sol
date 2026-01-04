@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
 
 /**
  * @title UltraFrequentCompounder
@@ -84,7 +84,7 @@ contract UltraFrequentCompounder is Ownable, ReentrancyGuard {
      * @param tokenId Position to check
      * @return should Whether position needs compounding
      */
-    function shouldCompound(uint256 tokenId) external view returns (bool) {
+    function shouldCompound(uint256 tokenId) public view returns (bool) {
         CompoundSettings memory settings = compoundSettings[tokenId];
         if (!settings.enabled) return false;
         
@@ -169,7 +169,7 @@ contract UltraFrequentCompounder is Ownable, ReentrancyGuard {
             }
         }
         
-        uint256 totalGasUsed = gasStart - gasleft();
+        uint256 batchGasUsed = gasStart - gasleft();
         
         require(successCount > 0, "No compounds executed");
         

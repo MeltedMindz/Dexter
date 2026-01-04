@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-import "@uniswap/v3-core/contracts/libraries/TickMath.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+import "./vendor/uniswap/libraries/TickMath.sol";
+import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
 
 /**
  * @title BinRebalancer
@@ -155,7 +155,7 @@ contract BinRebalancer is Ownable, ReentrancyGuard {
      * @param tokenId Position to check
      * @return shouldRebalance Whether position needs rebalancing
      */
-    function shouldRebalance(uint256 tokenId) external view returns (bool) {
+    function shouldRebalance(uint256 tokenId) public view returns (bool) {
         BinSettings memory settings = positionBinSettings[tokenId];
         if (!settings.maintainConcentration) return false;
         
@@ -267,7 +267,7 @@ contract BinRebalancer is Ownable, ReentrancyGuard {
     function setBinSettings(
         uint256 tokenId,
         BinSettings memory settings
-    ) external onlyOwner {
+    ) public onlyOwner {
         require(settings.maxBinsFromPrice >= 1 && settings.maxBinsFromPrice <= MAX_BINS_FROM_PRICE, "Invalid bin drift");
         require(settings.concentrationRatio <= MAX_CONCENTRATION_LEVEL, "Invalid concentration");
         

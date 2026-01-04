@@ -9,7 +9,7 @@ require('dotenv').config();
 
 class MVPDeployer {
     constructor() {
-        this.provider = new ethers.providers.JsonRpcProvider(
+        this.provider = new ethers.JsonRpcProvider(
             process.env.BASE_RPC_URL || 'https://sepolia.base.org'
         );
         this.wallet = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, this.provider);
@@ -66,12 +66,12 @@ class MVPDeployer {
      * Check deployer wallet balance
      */
     async checkDeployerBalance() {
-        const balance = await this.wallet.getBalance();
-        const balanceETH = ethers.utils.formatEther(balance);
+        const balance = await this.provider.getBalance(this.wallet.address);
+        const balanceETH = ethers.formatEther(balance);
         
         console.log(`💰 Deployer balance: ${balanceETH} ETH`);
         
-        if (balance.lt(ethers.utils.parseEther('0.1'))) {
+        if (balance < ethers.parseEther('0.1')) {
             throw new Error('⚠️  Insufficient balance for deployment. Need at least 0.1 ETH');
         }
     }
@@ -84,7 +84,7 @@ class MVPDeployer {
         
         const BinRebalancer = await ethers.getContractFactory('BinRebalancer', this.wallet);
         
-        const gasEstimate = await BinRebalancer.estimateGas.deploy(
+        const gasEstimate = await BinRebalancer.deploy.estimateGas(
             this.baseAddresses.positionManager,
             this.baseAddresses.factory
         );
@@ -93,14 +93,14 @@ class MVPDeployer {
             this.baseAddresses.positionManager,
             this.baseAddresses.factory,
             {
-                gasLimit: Math.floor(gasEstimate.toNumber() * 1.2),
+                gasLimit: gasEstimate * 120n / 100n,
                 gasPrice: await this.getOptimalGasPrice()
             }
         );
         
-        await binRebalancer.deployed();
+        await binRebalancer.waitForDeployment();
         
-        this.deployedContracts.binRebalancer = binRebalancer.address;
+        this.deployedContracts.binRebalancer = await binRebalancer.getAddress();
         console.log(`✅ BinRebalancer deployed: ${binRebalancer.address}`);
         console.log(`📊 Gas used: ${(await binRebalancer.deployTransaction.wait()).gasUsed.toString()}\n`);
     }
@@ -120,11 +120,12 @@ class MVPDeployer {
             }
         );
         
-        await compounder.deployed();
+        await compounder.waitForDeployment();
         
-        this.deployedContracts.compounder = compounder.address;
-        console.log(`✅ UltraFrequentCompounder deployed: ${compounder.address}`);
-        console.log(`📊 Gas used: ${(await compounder.deployTransaction.wait()).gasUsed.toString()}\n`);
+        this.deployedContracts.compounder = await compounder.getAddress();
+        console.log(`✅ UltraFrequentCompounder deployed: ${this.deployedContracts.compounder}`);
+        const receipt = await compounder.deploymentTransaction().wait();
+        console.log(`📊 Gas used: ${receipt.gasUsed.toString()}\n`);
     }
     
     /**
@@ -145,11 +146,12 @@ class MVPDeployer {
             }
         );
         
-        await dexterMVP.deployed();
+        await dexterMVP.waitForDeployment();
         
-        this.deployedContracts.dexterMVP = dexterMVP.address;
-        console.log(`✅ DexterMVP deployed: ${dexterMVP.address}`);
-        console.log(`📊 Gas used: ${(await dexterMVP.deployTransaction.wait()).gasUsed.toString()}\n`);
+        this.deployedContracts.dexterMVP = await dexterMVP.getAddress();
+        console.log(`✅ DexterMVP deployed: ${this.deployedContracts.dexterMVP}`);
+        const receipt = await dexterMVP.deploymentTransaction().wait();
+        console.log(`📊 Gas used: ${receipt.gasUsed.toString()}\n`);
     }
     
     /**
@@ -259,11 +261,12 @@ class MVPDeployer {
      */
     async getOptimalGasPrice() {
         try {
-            const gasPrice = await this.provider.getGasPrice();
-            return gasPrice.mul(110).div(100); // 10% above current
+            const feeData = await this.provider.getFeeData();
+            const gasPrice = feeData.gasPrice || 0n;
+            return gasPrice * 110n / 100n; // 10% above current
         } catch (error) {
             console.warn('⚠️  Failed to get gas price, using default');
-            return ethers.utils.parseUnits('0.1', 'gwei');
+            return ethers.parseUnits('0.1', 'gwei');
         }
     }
 }
@@ -281,8 +284,8 @@ async function deployMainnet() {
     // Additional mainnet safety checks
     console.log('⚠️  MAINNET DEPLOYMENT - Performing additional safety checks...');
     
-    const balance = await deployer.wallet.getBalance();
-    if (balance.lt(ethers.utils.parseEther('0.5'))) {
+    const balance = await deployer.provider.getBalance(deployer.wallet.address);
+    if (balance < ethers.parseEther('0.5')) {
         throw new Error('Insufficient balance for mainnet deployment');
     }
     
