@@ -18,8 +18,10 @@ def test_import_dexbrain_core():
         assert True
     except (ImportError, ModuleNotFoundError) as e:
         # If dependencies are missing, that's expected in CI
-        if any(dep in str(e).lower() for dep in ['psycopg2', 'flask', 'redis', 'numpy', 'aiofiles', 'sqlalchemy', 'loguru', 'pydantic']):
-            pytest.skip(f"Dependencies not installed (expected): {e}")
+        # Handle missing dependencies or optional modules
+        missing_deps = ['psycopg2', 'flask', 'redis', 'numpy', 'aiofiles', 'sqlalchemy', 'loguru', 'pydantic', 'solana']
+        if any(dep in str(e).lower() for dep in missing_deps):
+            pytest.skip(f"Dependencies or optional modules not installed (expected): {e}")
         else:
             pytest.fail(f"Failed to import dexbrain.core: {e}")
 
