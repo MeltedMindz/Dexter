@@ -32,7 +32,9 @@ install-contracts:
 
 install-backend:
 	@echo "📦 Installing backend dependencies..."
-	pip install -r backend/requirements.txt
+	@python3 --version || (echo "❌ Python 3 not found" && exit 1)
+	python3 -m pip install --upgrade pip setuptools wheel
+	python3 -m pip install -r backend/requirements.txt
 
 install-dexter-liquidity:
 	@echo "📦 Installing dexter-liquidity dependencies..."
