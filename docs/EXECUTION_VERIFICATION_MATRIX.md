@@ -175,3 +175,38 @@
 | C | - | - | - |
 | D | - | - | - |
 | Orchestrator | - | - | - |
+
+---
+
+## 10. Phase 2 Baseline Status (Pre-Work)
+
+**Timestamp:** 2026-01-19 (Phase 2 Session Start)
+**Branch:** ralph-phase2
+
+### Command Results
+
+| Command | Result | Details |
+|---------|--------|---------|
+| `make install` | **SUCCESS** | web3, pandas, pytest-cov, etc. installed |
+| `make build` | **SUCCESS** | Contracts compiled (cached) |
+| `make test` (contracts) | **SUCCESS** | 28/28 tests pass |
+| `make test` (backend) | **PARTIAL** | 4 pass, 3 skip, 2 fail, 1 error |
+| `make test` (dexter-liquidity) | **FAIL** | Import error: meteora_fetcher |
+| `make docker-up` | **FAIL** | Docker not installed on system |
+
+### Failure Mapping to Remaining Work
+
+| Failure | Root Cause | Remaining Work Item |
+|---------|------------|---------------------|
+| Backend: solana_connector missing | Module not created | RISK-004: Backend mock data |
+| Backend: DB connection refused | PostgreSQL not running | RISK-007: DB + migrations |
+| dexter-liquidity: meteora_fetcher | Module path incorrect | RISK-002: ML data pipeline |
+| docker-up: No docker-compose | Docker not installed | A-04: Docker verification |
+
+### Current Risk Status Summary
+
+| Category | Resolved | Pending | Total |
+|----------|----------|---------|-------|
+| CRITICAL | 1 | 3 | 4 |
+| HIGH | 2 | 2 | 4 |
+| Verification Items | 8 | 40 | 48 |
