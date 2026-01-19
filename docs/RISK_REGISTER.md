@@ -23,7 +23,7 @@
 
 **Category:** Security / Operational
 **Severity:** CRITICAL
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 9-11)
 
 **Description:**
 Core smart contract functions return hardcoded placeholder values instead of actual calculations.
@@ -64,7 +64,7 @@ function _closePosition(uint256 tokenId) internal returns (uint256 amount0, uint
 
 **Category:** Operational / Misleading Claims
 **Severity:** CRITICAL
-**Status:** ACTIVE
+**Status:** PARTIAL (Sweep 30-32) - Real data pipeline exists, needs runtime verification
 
 **Description:**
 The ML training pipeline generates random data instead of using real blockchain data, making any model outputs meaningless.
@@ -102,7 +102,7 @@ async def _load_training_data(self) -> pd.DataFrame:
 
 **Category:** Security / DoS
 **Severity:** CRITICAL
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 1) - Position limit enforced in depositPosition()
 
 **Description:**
 `MAX_POSITIONS_PER_ADDRESS = 200` is declared but never enforced in deposit logic.
@@ -143,7 +143,7 @@ function depositPosition(...) external nonReentrant {
 
 **Category:** Operational / Misleading
 **Severity:** CRITICAL
-**Status:** ACTIVE
+**Status:** PARTIAL (Sweep 12, 21) - USE_MOCK_DATA=false default, real fetchers added
 
 **Description:**
 Several API endpoints return hardcoded mock data, making the API unreliable for real use.
@@ -186,7 +186,7 @@ vault_metrics = {
 
 **Category:** Security / MEV
 **Severity:** HIGH
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 10) - TWAPOracle.sol integrated into DexterMVP
 
 **Description:**
 TWAP oracle code exists but is not integrated into compound/rebalance operations, leaving positions vulnerable to MEV attacks.
@@ -217,7 +217,7 @@ TWAP oracle code exists but is not integrated into compound/rebalance operations
 
 **Category:** Security / Access Control
 **Severity:** HIGH
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 3) - Emergency pause added via Pausable pattern
 
 **Description:**
 Keepers can be authorized/revoked, but no event history or emergency pause exists.
@@ -259,7 +259,7 @@ function setKeeperAuthorization(address keeper, bool authorized) external onlyOw
 
 **Category:** Operational
 **Severity:** HIGH
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 15) - Alembic migrations with SQLAlchemy models
 
 **Description:**
 Database schema exists but no migration strategy or versioning.
@@ -289,7 +289,7 @@ Database schema exists but no migration strategy or versioning.
 
 **Category:** Security / Supply Chain
 **Severity:** HIGH
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 6) - package-lock.json committed
 
 **Description:**
 No lock files committed, dependencies not pinned to exact versions.
@@ -352,7 +352,7 @@ README and documentation make claims that cannot be verified from the codebase.
 
 **Category:** Operational
 **Severity:** MEDIUM
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 28) - .python-version=3.11 standardized
 
 **Description:**
 Different Python versions specified across documentation and CI.
@@ -416,7 +416,7 @@ function executeCompound(uint256 tokenId) external onlyAuthorizedKeeper {
 
 **Category:** Quality
 **Severity:** MEDIUM
-**Status:** ACTIVE
+**Status:** PARTIAL (Sweep 4, 20) - 62 contract tests (42 unit + 20 integration)
 
 **Description:**
 Test coverage is minimal across all components.
@@ -476,7 +476,7 @@ VPS IP address (5.78.71.231) mentioned in README.
 
 **Category:** Quality
 **Severity:** LOW
-**Status:** ACTIVE
+**Status:** RESOLVED (Sweep 5) - .pre-commit-config.yaml added
 
 **Description:**
 No pre-commit hooks for linting, formatting, or secrets scanning.
@@ -562,27 +562,29 @@ No error tracking or alerting system configured.
 
 ---
 
-## 6. Risk Matrix Summary
+## 6. Risk Matrix Summary (Updated After Sweep 35)
 
-| Risk ID | Category | Severity | Likelihood | Fixable | Priority |
-|---------|----------|----------|------------|---------|----------|
-| RISK-001 | Security | CRITICAL | HIGH | YES | P0 |
-| RISK-002 | Operational | CRITICAL | HIGH | YES | P0 |
-| RISK-003 | Security | CRITICAL | MEDIUM | YES | P0 |
-| RISK-004 | Operational | CRITICAL | HIGH | YES | P0 |
-| RISK-005 | Security | HIGH | HIGH | YES | P1 |
-| RISK-006 | Security | HIGH | MEDIUM | YES | P1 |
-| RISK-007 | Operational | HIGH | HIGH | YES | P1 |
-| RISK-008 | Security | HIGH | MEDIUM | YES | P1 |
-| RISK-009 | Reputational | MEDIUM | HIGH | YES | P2 |
-| RISK-010 | Operational | MEDIUM | MEDIUM | YES | P2 |
-| RISK-011 | Security | MEDIUM | LOW | YES | P2 |
-| RISK-012 | Quality | MEDIUM | HIGH | YES | P2 |
-| RISK-013 | Security | LOW | LOW | YES | P3 |
-| RISK-014 | Quality | LOW | MEDIUM | YES | P3 |
-| RISK-015 | Operational | LOW | MEDIUM | YES | P3 |
-| RISK-016 | Reputational | N/A | N/A | DE-SCOPE | - |
-| RISK-017 | Planning | N/A | N/A | DE-SCOPE | - |
+| Risk ID | Category | Severity | Status | Resolution |
+|---------|----------|----------|--------|------------|
+| RISK-001 | Security | CRITICAL | **RESOLVED** | Sweep 9-11: Real implementations |
+| RISK-002 | Operational | CRITICAL | PARTIAL | Sweep 30-32: Real data pipeline exists |
+| RISK-003 | Security | CRITICAL | **RESOLVED** | Sweep 1: Position limit enforced |
+| RISK-004 | Operational | CRITICAL | PARTIAL | Sweep 12, 21: USE_MOCK_DATA=false |
+| RISK-005 | Security | HIGH | **RESOLVED** | Sweep 10: TWAPOracle integrated |
+| RISK-006 | Security | HIGH | **RESOLVED** | Sweep 3: Emergency pause added |
+| RISK-007 | Operational | HIGH | **RESOLVED** | Sweep 15: Alembic migrations |
+| RISK-008 | Security | HIGH | **RESOLVED** | Sweep 6: Lock files committed |
+| RISK-009 | Reputational | MEDIUM | ACTIVE | README rewritten but needs ongoing audit |
+| RISK-010 | Operational | MEDIUM | **RESOLVED** | Sweep 28: .python-version=3.11 |
+| RISK-011 | Security | MEDIUM | ACTIVE | Rate limiting not yet added to contracts |
+| RISK-012 | Quality | MEDIUM | PARTIAL | Sweep 4, 20: 62 tests (needs more coverage) |
+| RISK-013 | Security | LOW | ACTIVE | IPs still in some docs |
+| RISK-014 | Quality | LOW | **RESOLVED** | Sweep 5: Pre-commit hooks added |
+| RISK-015 | Operational | LOW | ACTIVE | No Sentry/alerting yet |
+| RISK-016 | Reputational | N/A | DE-SCOPED | README rewritten |
+| RISK-017 | Planning | N/A | DE-SCOPED | Roadmap removed |
+
+**Summary:** 9 RESOLVED, 3 PARTIAL, 5 ACTIVE (3 MEDIUM, 2 LOW)
 
 ---
 

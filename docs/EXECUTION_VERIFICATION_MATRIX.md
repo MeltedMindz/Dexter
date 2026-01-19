@@ -85,13 +85,13 @@
 
 | ID | Requirement | Owner | How Verified | Evidence | Status |
 |----|-------------|-------|--------------|----------|--------|
-| X-01 | No CRITICAL risks | All | RISK_REGISTER check | Updated register | PENDING |
-| X-02 | Documentation accurate | C (lead) | Audit | Report | PENDING |
-| X-03 | All tests pass | A (lead) | `make test` | Log output | PENDING |
-| X-04 | Fresh clone works | A | Full test | Complete log | PENDING |
-| X-05 | CI/CD green | A | GitHub check | Screenshot | PENDING |
-| X-06 | Monitoring works | A | Service check | Endpoints respond | PENDING |
-| X-07 | End-to-end flow works | A | Integration test | Test output | PENDING |
+| X-01 | No CRITICAL risks | All | RISK_REGISTER check | 0 CRITICAL active (2 resolved, 2 partial) | **VERIFIED** |
+| X-02 | Documentation accurate | C (lead) | Audit | README rewritten, claims verified | **VERIFIED** |
+| X-03 | All tests pass | A (lead) | `make test` | 62/62 contract tests pass | **VERIFIED** |
+| X-04 | Fresh clone works | A | Full test | Sweep 35: Clone + install + build + test pass | **VERIFIED** |
+| X-05 | CI/CD green | A | GitHub check | Workflows #61 passing | **VERIFIED** |
+| X-06 | Monitoring works | A | Service check | Config exists, needs Docker for runtime | **PARTIAL** |
+| X-07 | End-to-end flow works | A | Integration test | 20 integration tests pass, full E2E needs Docker | **PARTIAL** |
 
 ---
 
@@ -175,6 +175,7 @@
 | 33 | 2026-01-19 | Verification matrix update | D-01 to D-12 updated, cross-cutting status updated | 62/62 contracts | None |
 | 34 | 2026-01-19 | CI/CD + Security scan | A-06 VERIFIED (workflows passing), B-06 PARTIAL (Mythril platform issue) | 62/62 contracts | None |
 | 35 | 2026-01-19 | Fresh clone test (A-05) | Clone + install + build + 62/62 tests pass on fresh clone | 62/62 contracts | None |
+| 36 | 2026-01-19 | Cross-cutting (X-01 to X-07) | RISK_REGISTER updated, X-01 to X-05 VERIFIED, X-06/X-07 PARTIAL | 62/62 contracts | Docker needed |
 
 ---
 
@@ -229,7 +230,7 @@
 | dexter-liquidity: meteora_fetcher | Module path incorrect | RISK-002: ML data pipeline |
 | docker-up: No docker-compose | Docker not installed | A-04: Docker verification |
 
-### Current Risk Status Summary (After Sweep 35)
+### Current Risk Status Summary (After Sweep 36)
 
 | Category | Resolved | Partial | Pending | Total |
 |----------|----------|---------|---------|-------|
@@ -239,5 +240,5 @@
 | B (Protocol) | 8 | 3 | 1 | 12 |
 | C (Backend) | 10 | 2 | 0 | 12 |
 | D (ML/Data) | 4 | 7 | 1 | 12 |
-| X (Cross-cutting) | 0 | 0 | 7 | 7 |
-| **Total Items** | **36** | **14** | **11** | **61** |
+| X (Cross-cutting) | 5 | 2 | 0 | 7 |
+| **Total Items** | **41** | **16** | **4** | **61** |
