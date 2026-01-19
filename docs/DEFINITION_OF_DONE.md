@@ -1,7 +1,9 @@
-# DEFINITION_OF_DONE.md - The Ralph Collective Phase 3
+# DEFINITION_OF_DONE.md - The Ralph Collective Phase 2
 
 **Date:** 2026-01-19
+**Updated:** 2026-01-19 (Phase 2 Session)
 **Purpose:** Define what "fully operational, coherent, reproducible, and aligned" means
+**Scope:** 20 sweeps focusing on remaining work items
 
 ---
 
@@ -242,3 +244,46 @@ Before declaring "DONE":
 - [ ] Documentation audit complete
 - [ ] All 4 Ralphs confirm Done criteria met
 - [ ] Orchestrator confirms Definition of Done satisfied
+
+---
+
+## 9. Phase 2 Specific Scope (20 Sweeps)
+
+### 9.1 Priority Order
+
+| Sweeps | Primary Focus | Owner | Key Deliverables |
+|--------|---------------|-------|------------------|
+| 1-6 | Oracle + TWAP + Placeholder Removal | B | Real price feeds, manipulation protection |
+| 4-10 | Backend DB + Migrations + Mock Removal | C | PostgreSQL integration, Alembic migrations |
+| 6-12 | DevEx + CI + Fresh Clone | A | Verified build system, documented setup |
+| 8-16 | ML Real Data + Baseline Proof | D | Alchemy integration, accuracy metrics |
+| 14-20 | Security + Coverage + Deployment | B/A/C | Slither clean, testnet scripts |
+
+### 9.2 Stop Conditions (Phase 2)
+
+Stop early ONLY if ALL of these are true:
+- [ ] Oracle integration complete (RISK-001 resolved)
+- [ ] Backend no longer returns mock data (RISK-004 resolved)
+- [ ] DB migrations exist and run (RISK-007 resolved)
+- [ ] ML no longer trains on simulated data (RISK-002 addressed)
+- [ ] `make docker-up` verified OR documented blockers
+- [ ] CI pipeline green OR documented why unavailable
+- [ ] Slither scan run, findings addressed or triaged
+
+### 9.3 Phase 2 Key Decisions
+
+1. **solana_connector**: REMOVE (causing test failures, not in scope)
+2. **Docker**: Document as prerequisite, don't block on missing Docker
+3. **Alchemy API**: Required for ML, provide mock mode for dev
+4. **Database**: SQLite fallback for dev, PostgreSQL for production
+5. **Oracle**: Chainlink preferred, Uniswap TWAP as fallback
+
+### 9.4 Success Criteria (Phase 2)
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Contract tests | 28/28 | 35+ (with oracle tests) |
+| Backend tests | 4 pass | All pass |
+| CRITICAL risks | 3 open | 0 open |
+| HIGH risks | 2 open | 0 open |
+| Slither findings | Not run | 0 high/critical |
