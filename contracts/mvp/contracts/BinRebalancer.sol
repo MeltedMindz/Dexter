@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "./vendor/uniswap/libraries/TickMath.sol";
@@ -13,7 +14,7 @@ import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
  * @notice Ultra-concentrated liquidity management with bin-based rebalancing
  * @dev Maintains positions within 1-5 bins of current price for maximum fee generation
  */
-contract BinRebalancer is Ownable, ReentrancyGuard {
+contract BinRebalancer is Ownable, ReentrancyGuard, Pausable {
     
     // ============ CONSTANTS ============
     
@@ -171,7 +172,7 @@ contract BinRebalancer is Ownable, ReentrancyGuard {
      * @notice Execute bin-based rebalance for concentrated liquidity
      * @param tokenId Position to rebalance
      */
-    function executeRebalance(uint256 tokenId) external onlyKeeper nonReentrant {
+    function executeRebalance(uint256 tokenId) external onlyKeeper nonReentrant whenNotPaused {
         uint256 startGas = gasleft();
         require(shouldRebalance(tokenId), "Rebalance not needed");
 
@@ -459,8 +460,24 @@ contract BinRebalancer is Ownable, ReentrancyGuard {
         
         // Copy bin settings to new position
         positionBinSettings[newTokenId] = positionBinSettings[oldTokenId];
-        
+
         // Clear old position settings
         delete positionBinSettings[oldTokenId];
+    }
+
+    // ============ ADMIN FUNCTIONS ============
+
+    /**
+     * @notice Pause the contract (emergency)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }

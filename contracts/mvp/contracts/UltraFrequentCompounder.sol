@@ -3,14 +3,16 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
+import "./interfaces/IPriceAggregator.sol";
 
 /**
  * @title UltraFrequentCompounder
  * @notice Specialized contract for ultra-high frequency compounding on Base chain
  * @dev Optimized for 5-minute compound intervals with $0.50 minimum thresholds
  */
-contract UltraFrequentCompounder is Ownable, ReentrancyGuard {
+contract UltraFrequentCompounder is Ownable, ReentrancyGuard, Pausable {
     
     // ============ CONSTANTS ============
     
@@ -22,7 +24,8 @@ contract UltraFrequentCompounder is Ownable, ReentrancyGuard {
     // ============ STATE VARIABLES ============
     
     INonfungiblePositionManager public immutable nonfungiblePositionManager;
-    
+    IPriceAggregator public priceAggregator;
+
     struct CompoundSettings {
         uint256 minFeeThreshold;     // Minimum fees to trigger compound
         uint256 maxTimeInterval;     // Maximum time between compounds
@@ -103,7 +106,7 @@ contract UltraFrequentCompounder is Ownable, ReentrancyGuard {
      * @notice Execute ultra-frequent compound for single position
      * @param tokenId Position to compound
      */
-    function executeCompound(uint256 tokenId) external onlyKeeper nonReentrant {
+    function executeCompound(uint256 tokenId) external onlyKeeper nonReentrant whenNotPaused {
         require(shouldCompound(tokenId), "Compound not needed");
         
         uint256 gasStart = gasleft();
@@ -320,15 +323,68 @@ contract UltraFrequentCompounder is Ownable, ReentrancyGuard {
     // ============ INTERNAL FUNCTIONS ============
     
     /**
-     * @notice Get unclaimed fees value for a position (simplified for MVP)
+     * @notice Get unclaimed fees value for a position using price oracle
      * @param tokenId Position to check
      * @return feesValue Estimated USD value of unclaimed fees
      */
     function _getUnclaimedFeesValue(uint256 tokenId) internal view returns (uint256) {
-        // Simplified implementation for MVP
-        // In production, this would integrate with price oracles
-        
-        // For now, return a placeholder value that triggers frequent compounds
-        return MIN_COMPOUND_THRESHOLD + 1e17; // $0.60 equivalent
+        // If no oracle configured, return 0 to prevent compounding without price data
+        if (address(priceAggregator) == address(0)) {
+            return 0; // Safe default: don't compound without oracle
+        }
+
+        // Get position info
+        (,, address token0, address token1,,,, uint128 liquidity,,,,) =
+            nonfungiblePositionManager.positions(tokenId);
+
+        if (liquidity == 0) return 0;
+
+        // Use oracle to estimate fees based on token prices
+        // Note: This is simplified - production would query actual unclaimed fees
+        uint256 totalValue = 0;
+
+        // Get token0 price vs reference (using address(0) as USD reference)
+        try priceAggregator.getValidatedPrice(token0, address(0)) returns (uint256 price0, uint256 confidence0, bool valid0) {
+            if (valid0 && confidence0 >= 60) {
+                totalValue += (uint256(liquidity) * price0) / 1e36;
+            }
+        } catch {
+            // Continue without token0 price
+        }
+
+        // Get token1 price vs reference
+        try priceAggregator.getValidatedPrice(token1, address(0)) returns (uint256 price1, uint256 confidence1, bool valid1) {
+            if (valid1 && confidence1 >= 60) {
+                totalValue += (uint256(liquidity) * price1) / 1e36;
+            }
+        } catch {
+            // Continue without token1 price
+        }
+
+        return totalValue;
+    }
+
+    // ============ ADMIN FUNCTIONS ============
+
+    /**
+     * @notice Set the price aggregator oracle
+     * @param _priceAggregator Address of the price aggregator
+     */
+    function setPriceAggregator(IPriceAggregator _priceAggregator) external onlyOwner {
+        priceAggregator = _priceAggregator;
+    }
+
+    /**
+     * @notice Pause the contract (emergency)
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }

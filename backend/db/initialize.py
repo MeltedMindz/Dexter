@@ -1,13 +1,17 @@
+import os
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 DB_CONFIG = {
-    "database": "dexbrain",
-    "user": "postgres",
-    "password": "password123",
-    "host": "localhost",
-    "port": 5432
+    "database": os.getenv("DB_NAME", "dexbrain"),
+    "user": os.getenv("DB_USER", "postgres"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5432"))
 }
+
+if not DB_CONFIG["password"]:
+    raise ValueError("DB_PASSWORD environment variable is required")
 
 def initialize_database():
     connection = psycopg2.connect(
