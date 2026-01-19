@@ -101,7 +101,7 @@
 
 | Risk ID | Description | Owner | Resolution | Evidence | Status |
 |---------|-------------|-------|------------|----------|--------|
-| RISK-001 | Placeholder functions | B | Implement real logic | Code diff | PENDING |
+| RISK-001 | Placeholder functions | B | Implement real logic | IPriceAggregator integration | **PARTIAL** |
 | RISK-002 | ML on simulated data | D | Connect real data | Data source trace | PENDING |
 | RISK-003 | No position limit | B | Add enforcement | DexterMVP.sol:138-142 | **RESOLVED** |
 | RISK-004 | API returns mock data | C | Replace with real | Grep output | PENDING |
@@ -148,6 +148,7 @@
 | 6 | 2026-01-19 | Verification, security | Matrix updates, RISK-008 resolved | 28/28 contracts | None |
 | 7 | 2026-01-19 | Final verification | Tests verified, session summary | 28/28 contracts | External deps |
 | 8 | 2026-01-19 | Backend imports fix | BaseNetworkConnector, DEV_MODE, functools.wraps | 28+9/37 total | Pre-existing test logic |
+| 9 | 2026-01-19 | Oracle integration | IPriceAggregator, _calculateFeesUSD real impl | 33/33 contracts | _closePosition pending |
 | ... | ... | ... | ... | ... | ... |
 | 27 | PENDING | - | - | - | - |
 
