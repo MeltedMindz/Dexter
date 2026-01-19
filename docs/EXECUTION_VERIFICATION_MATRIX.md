@@ -147,8 +147,9 @@
 | 5 | 2026-01-19 | Pre-commit hooks | .pre-commit-config.yaml, .solhint.json | 28/28 contracts | None |
 | 6 | 2026-01-19 | Verification, security | Matrix updates, RISK-008 resolved | 28/28 contracts | None |
 | 7 | 2026-01-19 | Final verification | Tests verified, session summary | 28/28 contracts | External deps |
+| 8 | 2026-01-19 | Backend imports fix | BaseNetworkConnector, DEV_MODE, functools.wraps | 28+9/37 total | Pre-existing test logic |
 | ... | ... | ... | ... | ... | ... |
-| 50 | PENDING | - | - | - | - |
+| 27 | PENDING | - | - | - | - |
 
 ---
 
@@ -183,15 +184,15 @@
 **Timestamp:** 2026-01-19 (Phase 2 Session Start)
 **Branch:** ralph-phase2
 
-### Command Results
+### Command Results (After Sweep 8)
 
 | Command | Result | Details |
 |---------|--------|---------|
 | `make install` | **SUCCESS** | web3, pandas, pytest-cov, etc. installed |
 | `make build` | **SUCCESS** | Contracts compiled (cached) |
 | `make test` (contracts) | **SUCCESS** | 28/28 tests pass |
-| `make test` (backend) | **PARTIAL** | 4 pass, 3 skip, 2 fail, 1 error |
-| `make test` (dexter-liquidity) | **FAIL** | Import error: meteora_fetcher |
+| `make test` (backend) | **SUCCESS** | 9 pass, 1 skip (with DEV_MODE=true) |
+| `make test` (dexter-liquidity) | **PARTIAL** | Import fixed, pre-existing test logic issues |
 | `make docker-up` | **FAIL** | Docker not installed on system |
 
 ### Failure Mapping to Remaining Work
