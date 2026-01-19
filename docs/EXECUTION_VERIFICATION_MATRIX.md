@@ -13,7 +13,7 @@
 | A-02 | `make build` succeeds | Run command | 35 Solidity files compiled | **VERIFIED** |
 | A-03 | `make test` succeeds | Run command | 62 contract tests pass (42 unit + 20 integration) | **VERIFIED** |
 | A-04 | `make docker-up` succeeds | Run command | `docker ps` output | PENDING |
-| A-05 | Fresh clone works | Test in new directory | Complete log | PENDING |
+| A-05 | Fresh clone works | Test in new directory | Clone + install + build + 62/62 contract tests pass | **VERIFIED** |
 | A-06 | CI/CD passes | Check GitHub Actions | Workflows #61 passing (test + CI/CD) | **VERIFIED** |
 | A-07 | Lock files committed | Git check | package-lock.json in git | **VERIFIED** |
 | A-08 | Python version standardized | Check docs/CI | .python-version=3.11, CI uses 3.11 | **VERIFIED** |
@@ -174,6 +174,7 @@
 | 32 | 2026-01-19 | ML/Data review (D items) | ML models, training pipeline, Kafka streaming, MLOps reviewed | 62/62 contracts | Runtime tests needed |
 | 33 | 2026-01-19 | Verification matrix update | D-01 to D-12 updated, cross-cutting status updated | 62/62 contracts | None |
 | 34 | 2026-01-19 | CI/CD + Security scan | A-06 VERIFIED (workflows passing), B-06 PARTIAL (Mythril platform issue) | 62/62 contracts | None |
+| 35 | 2026-01-19 | Fresh clone test (A-05) | Clone + install + build + 62/62 tests pass on fresh clone | 62/62 contracts | None |
 
 ---
 
@@ -228,15 +229,15 @@
 | dexter-liquidity: meteora_fetcher | Module path incorrect | RISK-002: ML data pipeline |
 | docker-up: No docker-compose | Docker not installed | A-04: Docker verification |
 
-### Current Risk Status Summary (After Sweep 34)
+### Current Risk Status Summary (After Sweep 35)
 
 | Category | Resolved | Partial | Pending | Total |
 |----------|----------|---------|---------|-------|
 | CRITICAL | 2 | 2 | 0 | 4 |
 | HIGH | 4 | 0 | 0 | 4 |
-| A (Systems) | 7 | 2 | 3 | 12 |
+| A (Systems) | 8 | 2 | 2 | 12 |
 | B (Protocol) | 8 | 3 | 1 | 12 |
 | C (Backend) | 10 | 2 | 0 | 12 |
 | D (ML/Data) | 4 | 7 | 1 | 12 |
 | X (Cross-cutting) | 0 | 0 | 7 | 7 |
-| **Total Items** | **35** | **14** | **12** | **61** |
+| **Total Items** | **36** | **14** | **11** | **61** |
