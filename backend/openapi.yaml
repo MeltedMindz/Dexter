@@ -1,0 +1,857 @@
+openapi: 3.0.3
+info:
+  title: DexBrain Global Intelligence Network API
+  description: |
+    RESTful API for the DexBrain Global Intelligence Network.
+
+    Provides AI-powered liquidity management intelligence, vault strategies,
+    compound opportunity detection, and market predictions.
+
+    ## Authentication
+    Most endpoints require API key authentication via Bearer token.
+    Register an agent first via `/api/register` to obtain an API key.
+
+    ## Rate Limiting
+    Default rate limit: 100 requests per minute per API key.
+  version: 1.0.0
+  contact:
+    name: Dexter Protocol
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.dexterprotocol.io
+    description: Production server
+
+tags:
+  - name: Health
+    description: Service health monitoring
+  - name: Authentication
+    description: Agent registration and API key management
+  - name: Intelligence
+    description: Market intelligence and predictions
+  - name: Agents
+    description: Agent management endpoints
+  - name: Vault
+    description: Vault-specific intelligence and analytics
+  - name: Models
+    description: ML model management
+  - name: Logs
+    description: System log access
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API key obtained from /api/register endpoint
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+      required:
+        - error
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "1.0.0"
+        components:
+          type: object
+          properties:
+            api:
+              type: string
+            knowledge_base:
+              type: string
+            ml_engine:
+              type: string
+            rate_limiter:
+              type: string
+            dex_brain:
+              type: string
+        mock_data_enabled:
+          type: boolean
+        dev_mode:
+          type: boolean
+
+    RegisterRequest:
+      type: object
+      properties:
+        agent_id:
+          type: string
+          description: Unique identifier for the agent
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Optional agent metadata
+      required:
+        - agent_id
+
+    RegisterResponse:
+      type: object
+      properties:
+        api_key:
+          type: string
+          description: Generated API key for authentication
+        agent_id:
+          type: string
+        message:
+          type: string
+
+    Insight:
+      type: object
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        data:
+          type: object
+        quality_score:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    Prediction:
+      type: object
+      properties:
+        pool_address:
+          type: string
+        predicted_apr:
+          type: number
+          format: float
+        confidence:
+          type: number
+          format: float
+        prediction_time:
+          type: string
+          format: date-time
+        _mock_data:
+          type: boolean
+
+    IntelligenceResponse:
+      type: object
+      properties:
+        insights:
+          type: array
+          items:
+            $ref: '#/components/schemas/Insight'
+        predictions:
+          $ref: '#/components/schemas/Prediction'
+        network_stats:
+          type: object
+          properties:
+            total_agents:
+              type: integer
+            total_insights:
+              type: integer
+            blockchain:
+              type: string
+            category:
+              type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    SubmitDataRequest:
+      type: object
+      properties:
+        blockchain:
+          type: string
+          enum: [base, solana, ethereum]
+        pool_address:
+          type: string
+        performance_data:
+          type: object
+          properties:
+            apr:
+              type: number
+            tvl:
+              type: number
+            volume_24h:
+              type: number
+            fees_collected:
+              type: number
+          additionalProperties: true
+      required:
+        - blockchain
+        - pool_address
+        - performance_data
+
+    SubmitDataResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    Agent:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_used:
+          type: string
+          format: date-time
+        request_count:
+          type: integer
+        data_submissions:
+          type: integer
+        is_active:
+          type: boolean
+
+    AgentListResponse:
+      type: object
+      properties:
+        agents:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Agent'
+        total_count:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    NetworkStatsResponse:
+      type: object
+      properties:
+        network_stats:
+          type: object
+          properties:
+            total_agents:
+              type: integer
+            active_agents:
+              type: integer
+            total_insights:
+              type: integer
+            recent_submissions_24h:
+              type: integer
+            supported_blockchains:
+              type: array
+              items:
+                type: string
+            categories:
+              type: object
+              additionalProperties:
+                type: integer
+            vault_stats:
+              type: object
+              properties:
+                vault_integration:
+                  type: boolean
+                ai_strategies_active:
+                  type: boolean
+                compound_service_active:
+                  type: boolean
+        timestamp:
+          type: string
+          format: date-time
+
+    RetrainRequest:
+      type: object
+      properties:
+        category:
+          type: string
+          default: base_liquidity
+
+    RetrainResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        training_results:
+          type: object
+        category:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    VaultIntelligence:
+      type: object
+      properties:
+        market_regime:
+          type: string
+          enum: [low_volatility, medium_volatility, high_volatility, trending_up, trending_down]
+        recommended_strategy:
+          type: string
+        optimal_ranges:
+          type: array
+          items:
+            type: object
+            properties:
+              tick_lower:
+                type: integer
+              tick_upper:
+                type: integer
+              allocation:
+                type: number
+        risk_assessment:
+          type: object
+          properties:
+            impermanent_loss_risk:
+              type: number
+            volatility_score:
+              type: number
+            recommendation:
+              type: string
+        compound_recommendation:
+          type: object
+          properties:
+            should_compound:
+              type: boolean
+            optimal_timing:
+              type: string
+            expected_profit:
+              type: number
+
+    VaultIntelligenceResponse:
+      type: object
+      properties:
+        vault_intelligence:
+          $ref: '#/components/schemas/VaultIntelligence'
+        timestamp:
+          type: string
+          format: date-time
+
+    CompoundOpportunity:
+      type: object
+      properties:
+        token_id:
+          type: integer
+        owner:
+          type: string
+        current_fees_usd:
+          type: number
+        estimated_gas_cost:
+          type: number
+        profit_potential:
+          type: number
+        optimal_timing_score:
+          type: number
+        strategy:
+          type: string
+        urgency_score:
+          type: number
+        risk_score:
+          type: number
+        ai_confidence:
+          type: number
+        estimated_apr_improvement:
+          type: number
+        priority_score:
+          type: number
+
+    CompoundOpportunitiesResponse:
+      type: object
+      properties:
+        opportunities:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompoundOpportunity'
+        total_count:
+          type: integer
+        filters:
+          type: object
+          properties:
+            limit:
+              type: integer
+            min_profit:
+              type: number
+        timestamp:
+          type: string
+          format: date-time
+
+    VaultAnalyticsResponse:
+      type: object
+      properties:
+        analytics:
+          type: object
+          additionalProperties: true
+        period_days:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    LogEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        level:
+          type: string
+          enum: [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+        module:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+
+    LogsResponse:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEntry'
+        total_count:
+          type: integer
+        filters:
+          type: object
+          properties:
+            limit:
+              type: integer
+            type:
+              type: string
+            since:
+              type: string
+        timestamp:
+          type: string
+          format: date-time
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Returns service health status and version
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new agent
+      description: Register a new agent and receive an API key for authentication
+      operationId: registerAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Agent registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Missing agent_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/intelligence:
+    get:
+      tags:
+        - Intelligence
+      summary: Get market intelligence and predictions
+      description: Retrieve market insights and AI-powered predictions for liquidity pools
+      operationId: getIntelligence
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: blockchain
+          in: query
+          description: Target blockchain
+          schema:
+            type: string
+            default: base
+            enum: [base, solana, ethereum]
+        - name: pool_address
+          in: query
+          description: Pool address for predictions
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Insight category
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of insights to return
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+      responses:
+        '200':
+          description: Intelligence retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntelligenceResponse'
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to retrieve intelligence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/submit-data:
+    post:
+      tags:
+        - Intelligence
+      summary: Submit performance data
+      description: Submit pool performance data to contribute to the intelligence network
+      operationId: submitData
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitDataRequest'
+      responses:
+        '200':
+          description: Data submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitDataResponse'
+        '400':
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Submission failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/agents:
+    get:
+      tags:
+        - Agents
+      summary: List all registered agents
+      description: Administrative endpoint to list all registered agents
+      operationId: listAgents
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Agents listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to list agents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/stats:
+    get:
+      tags:
+        - Intelligence
+      summary: Get public network statistics
+      description: Public endpoint returning network-wide statistics
+      operationId: getNetworkStats
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkStatsResponse'
+        '500':
+          description: Failed to get statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/models/retrain:
+    post:
+      tags:
+        - Models
+      summary: Trigger model retraining
+      description: Administrative endpoint to trigger ML model retraining
+      operationId: retrainModels
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetrainRequest'
+      responses:
+        '200':
+          description: Retraining triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrainResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Retraining failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/vault/intelligence:
+    get:
+      tags:
+        - Vault
+      summary: Get vault intelligence
+      description: Get AI-powered vault intelligence and strategy recommendations
+      operationId: getVaultIntelligence
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: vault_address
+          in: query
+          required: true
+          description: Vault contract address
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vault intelligence retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultIntelligenceResponse'
+        '400':
+          description: Missing vault_address parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Real data sources unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to generate vault intelligence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/vault/compound-opportunities:
+    get:
+      tags:
+        - Vault
+      summary: Get compound opportunities
+      description: Get current compound opportunities from the compound service
+      operationId: getCompoundOpportunities
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum opportunities to return
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+        - name: min_profit
+          in: query
+          description: Minimum profit threshold in USD
+          schema:
+            type: number
+            default: 5.0
+      responses:
+        '200':
+          description: Opportunities retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompoundOpportunitiesResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Compound service not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to get opportunities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/vault/analytics:
+    get:
+      tags:
+        - Vault
+      summary: Get vault analytics
+      description: Get comprehensive vault analytics and performance metrics
+      operationId: getVaultAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          description: Number of days for analytics period
+          schema:
+            type: integer
+            default: 30
+            maximum: 90
+      responses:
+        '200':
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultAnalyticsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Compound service not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to get analytics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/logs/recent:
+    get:
+      tags:
+        - Logs
+      summary: Get recent logs
+      description: Get recent structured logs for monitoring (public endpoint)
+      operationId: getRecentLogs
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum logs to return
+          schema:
+            type: integer
+            default: 100
+            maximum: 500
+        - name: type
+          in: query
+          description: Filter by log type
+          schema:
+            type: string
+            enum: [all, vault, compound, intelligence]
+            default: all
+        - name: since
+          in: query
+          description: Return logs after this timestamp (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsResponse'
+        '500':
+          description: Failed to get logs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

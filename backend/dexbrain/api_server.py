@@ -32,11 +32,42 @@ logger = logging.getLogger(__name__)
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check endpoint"""
+    """Health check endpoint with component status"""
+    components = {
+        'api': 'healthy',
+        'knowledge_base': 'unknown',
+        'ml_engine': 'unknown',
+        'rate_limiter': 'healthy'
+    }
+
+    # Check knowledge base
+    try:
+        if knowledge_base:
+            components['knowledge_base'] = 'healthy'
+    except Exception:
+        components['knowledge_base'] = 'unhealthy'
+
+    # Check ML availability
+    components['ml_engine'] = 'healthy' if ML_AVAILABLE else 'unavailable'
+
+    # Check DexBrain core
+    try:
+        if dex_brain:
+            components['dex_brain'] = 'healthy'
+    except Exception:
+        components['dex_brain'] = 'unhealthy'
+
+    # Overall status
+    unhealthy = [k for k, v in components.items() if v == 'unhealthy']
+    overall_status = 'unhealthy' if unhealthy else 'healthy'
+
     return jsonify({
-        'status': 'healthy',
+        'status': overall_status,
         'timestamp': datetime.now().isoformat(),
-        'version': '1.0.0'
+        'version': '1.0.0',
+        'components': components,
+        'mock_data_enabled': Config.USE_MOCK_DATA,
+        'dev_mode': Config.DEV_MODE
     })
 
 
@@ -95,27 +126,44 @@ def get_intelligence(**kwargs):
         # Get predictions if pool_address provided
         predictions = None
         if pool_address:
-            # This would be expanded with actual pool data fetching
-            pool_data = {
-                'pool_address': pool_address,
-                'blockchain': blockchain,
-                'total_liquidity': 1000000,  # Placeholder
-                'volume_24h': 500000,
-                'fee_tier': 0.003,
-                'token0_reserves': 500000,
-                'token1_reserves': 500000
-            }
-            
-            predicted_apr = asyncio.run(
-                dex_brain.predict_liquidity_metrics(pool_data)
-            )
-            
-            predictions = {
-                'pool_address': pool_address,
-                'predicted_apr': predicted_apr,
-                'confidence': 0.85,  # Would be calculated based on model metrics
-                'prediction_time': datetime.now().isoformat()
-            }
+            pool_data = None
+
+            if Config.USE_MOCK_DATA:
+                # Development mode: use placeholder data
+                logger.warning(f"Using mock pool data for {pool_address} (USE_MOCK_DATA=true)")
+                pool_data = {
+                    'pool_address': pool_address,
+                    'blockchain': blockchain,
+                    'total_liquidity': 1000000,
+                    'volume_24h': 500000,
+                    'fee_tier': 0.003,
+                    'token0_reserves': 500000,
+                    'token1_reserves': 500000,
+                    '_mock_data': True
+                }
+            else:
+                # Production: fetch real pool data
+                try:
+                    pool_data = asyncio.run(
+                        dex_brain.fetch_pool_data(pool_address)
+                    )
+                except Exception as fetch_error:
+                    logger.warning(f"Failed to fetch real pool data for {pool_address}: {fetch_error}")
+                    # Continue without predictions rather than failing entirely
+                    pool_data = None
+
+            if pool_data:
+                predicted_apr = asyncio.run(
+                    dex_brain.predict_liquidity_metrics(pool_data)
+                )
+
+                predictions = {
+                    'pool_address': pool_address,
+                    'predicted_apr': predicted_apr,
+                    'confidence': 0.85 if pool_data.get('_mock_data') else 0.90,
+                    'prediction_time': datetime.now().isoformat(),
+                    '_mock_data': pool_data.get('_mock_data', False)
+                }
         
         # Get network statistics
         agent_count = len(api_key_manager.list_agents())
@@ -318,31 +366,50 @@ def get_vault_intelligence(**kwargs):
         return jsonify({'error': 'vault_address parameter required'}), 400
     
     try:
-        # Mock pool and vault data for demonstration
-        # In production, this would fetch from actual sources
-        pool_data = {
-            'current_tick': 100000,
-            'current_price': 3000,
-            'liquidity': 1000000,
-            'volume_24h': 5000000,
-            'fee_tier': 3000,
-            'tick_spacing': 60,
-            'prices': list(range(2900, 3100, 10))
-        }
-        
-        vault_metrics = {
-            'total_value_locked': 2000000,
-            'total_fees_24h': 5000,
-            'impermanent_loss': 0.02,
-            'apr': 0.15,
-            'sharpe_ratio': 1.2,
-            'max_drawdown': 0.05,
-            'successful_compounds': 45,
-            'ai_optimization_count': 12,
-            'capital_efficiency': 0.85,
-            'risk_score': 0.3
-        }
-        
+        # Check if we should use mock data
+        if Config.USE_MOCK_DATA:
+            logger.warning(f"Using mock data for vault {vault_address} (USE_MOCK_DATA=true)")
+            pool_data = {
+                'current_tick': 100000,
+                'current_price': 3000,
+                'liquidity': 1000000,
+                'volume_24h': 5000000,
+                'fee_tier': 3000,
+                'tick_spacing': 60,
+                'prices': list(range(2900, 3100, 10)),
+                '_mock_data': True  # Flag to indicate mock data
+            }
+
+            vault_metrics = {
+                'total_value_locked': 2000000,
+                'total_fees_24h': 5000,
+                'impermanent_loss': 0.02,
+                'apr': 0.15,
+                'sharpe_ratio': 1.2,
+                'max_drawdown': 0.05,
+                'successful_compounds': 45,
+                'ai_optimization_count': 12,
+                'capital_efficiency': 0.85,
+                'risk_score': 0.3,
+                '_mock_data': True
+            }
+        else:
+            # Production: fetch real pool/vault data from blockchain
+            try:
+                pool_data = asyncio.run(
+                    dex_brain.fetch_pool_data(vault_address)
+                )
+                vault_metrics = asyncio.run(
+                    dex_brain.fetch_vault_metrics(vault_address)
+                )
+            except Exception as fetch_error:
+                logger.error(f"Failed to fetch real data for vault {vault_address}: {fetch_error}")
+                return jsonify({
+                    'error': 'Failed to fetch vault data',
+                    'details': 'Real data sources unavailable. Set USE_MOCK_DATA=true for development.',
+                    'vault_address': vault_address
+                }), 503
+
         # Generate vault intelligence
         intelligence = asyncio.run(
             dex_brain.generate_vault_intelligence(
@@ -465,12 +532,29 @@ def get_recent_logs():
         log_type = request.args.get('type', 'all')  # all, vault, compound, intelligence
         since_timestamp = request.args.get('since')
         
-        # Mock structured logs for demonstration
-        # In production, this would read from actual log files or database
         current_time = datetime.now()
-        
         logs = []
-        
+
+        # Check if we should use mock data
+        if not Config.USE_MOCK_DATA:
+            # Production: attempt to read from real log sources
+            try:
+                # This would integrate with actual logging infrastructure
+                # For now, return empty until real logging is implemented
+                logger.info(f"Real log fetching not yet implemented - returning empty logs")
+                return jsonify({
+                    'logs': [],
+                    'total_count': 0,
+                    'filters': {'limit': limit, 'type': log_type, 'since': since_timestamp},
+                    'message': 'Real-time log aggregation not yet configured',
+                    'timestamp': current_time.isoformat()
+                })
+            except Exception as log_fetch_error:
+                logger.error(f"Failed to fetch real logs: {log_fetch_error}")
+
+        # Development mode: use sample logs for demonstration
+        logger.debug("Using sample logs for demonstration (USE_MOCK_DATA=true)")
+
         # Generate sample logs based on type
         if log_type in ['all', 'vault']:
             logs.extend([

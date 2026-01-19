@@ -172,8 +172,9 @@ contract BinRebalancer is Ownable, ReentrancyGuard {
      * @param tokenId Position to rebalance
      */
     function executeRebalance(uint256 tokenId) external onlyKeeper nonReentrant {
+        uint256 startGas = gasleft();
         require(shouldRebalance(tokenId), "Rebalance not needed");
-        
+
         BinPosition memory binData = calculateBinPosition(tokenId);
         BinSettings storage settings = positionBinSettings[tokenId];
         
@@ -201,7 +202,8 @@ contract BinRebalancer is Ownable, ReentrancyGuard {
         settings.lastRebalanceTime = block.timestamp;
         settings.lastRebalanceTick = binData.currentTick;
         rebalanceCount[tokenId]++;
-        
+        totalRebalanceCost[tokenId] += startGas - gasleft();
+
         emit BinBasedRebalance(
             tokenId,
             newTokenId,

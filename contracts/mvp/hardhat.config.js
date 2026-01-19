@@ -9,7 +9,8 @@ module.exports = {
       optimizer: {
         enabled: true,
         runs: 200
-      }
+      },
+      viaIR: process.env.COVERAGE === 'true'  // Enable for coverage to avoid stack too deep
     }
   },
   paths: {

@@ -554,12 +554,101 @@ class DexBrain:
                 'timestamp': time.time()
             }
     
+    async def fetch_pool_data(self, pool_address: str) -> Dict[str, Any]:
+        """Fetch real pool data from blockchain
+
+        Args:
+            pool_address: The pool/vault address to fetch data for
+
+        Returns:
+            Pool data dictionary with liquidity, volume, tick info
+        """
+        try:
+            # Try to use Base network connector
+            connector = self.blockchain_connectors.get('base')
+            if connector:
+                async with connector as conn:
+                    pool_data = await conn.fetch_liquidity_data(pool_address)
+                    if pool_data:
+                        return pool_data
+
+            # Fallback: try to get from knowledge base
+            insights = await self.knowledge_base.retrieve_insights(
+                'base_liquidity',
+                limit=10
+            )
+
+            for insight in insights:
+                if insight.get('pool_address') == pool_address:
+                    return {
+                        'pool_address': pool_address,
+                        'current_tick': insight.get('current_tick', 0),
+                        'current_price': insight.get('current_price', 0),
+                        'liquidity': insight.get('total_liquidity', 0),
+                        'volume_24h': insight.get('volume_24h', 0),
+                        'fee_tier': int(insight.get('fee_tier', 0.003) * 1000000),
+                        'tick_spacing': insight.get('tick_spacing', 60),
+                        'prices': insight.get('price_history', [])
+                    }
+
+            raise ValueError(f"No data found for pool {pool_address}")
+
+        except Exception as e:
+            self.logger.error(f"Failed to fetch pool data for {pool_address}: {e}")
+            raise
+
+    async def fetch_vault_metrics(self, vault_address: str) -> Dict[str, Any]:
+        """Fetch real vault metrics from blockchain and database
+
+        Args:
+            vault_address: The vault address to fetch metrics for
+
+        Returns:
+            Vault metrics dictionary
+        """
+        try:
+            # Try to get from compound service if available
+            if self.compound_service:
+                try:
+                    analytics = await self.compound_service.get_compound_analytics()
+                    if analytics:
+                        return {
+                            'total_value_locked': analytics.get('total_value_locked', 0),
+                            'total_fees_24h': analytics.get('total_fees_24h', 0),
+                            'impermanent_loss': analytics.get('impermanent_loss', 0),
+                            'apr': analytics.get('apr', 0),
+                            'sharpe_ratio': analytics.get('sharpe_ratio', 0),
+                            'max_drawdown': analytics.get('max_drawdown', 0),
+                            'successful_compounds': analytics.get('successful_compounds', 0),
+                            'ai_optimization_count': analytics.get('ai_optimization_count', 0),
+                            'capital_efficiency': analytics.get('capital_efficiency', 0),
+                            'risk_score': analytics.get('risk_score', 0)
+                        }
+                except Exception as service_error:
+                    self.logger.warning(f"Compound service error: {service_error}")
+
+            # Fallback: try to get from knowledge base
+            insights = await self.knowledge_base.retrieve_insights(
+                'vault_metrics',
+                limit=10
+            )
+
+            for insight in insights:
+                if insight.get('vault_address') == vault_address:
+                    return insight
+
+            raise ValueError(f"No metrics found for vault {vault_address}")
+
+        except Exception as e:
+            self.logger.error(f"Failed to fetch vault metrics for {vault_address}: {e}")
+            raise
+
     def _calculate_volatility(self, pool_data: Dict) -> float:
         """Calculate price volatility from pool data"""
         prices = pool_data.get('prices', [])
         if len(prices) < 2:
             return 0.2  # Default volatility
-        
+
         returns = np.diff(np.log(prices))
         return float(np.std(returns) * np.sqrt(24))  # Annualized volatility
 

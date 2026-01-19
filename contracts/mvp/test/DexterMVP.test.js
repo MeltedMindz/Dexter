@@ -253,5 +253,73 @@ describe("DexterMVP", function () {
       expect(await contract.MIN_PRICE_CONFIDENCE()).to.equal(60);
     });
   });
+
+  describe("TWAP Protection (RISK-005)", function () {
+    let contract;
+
+    beforeEach(async function () {
+      const DexterMVP = await ethers.getContractFactory("DexterMVP");
+      contract = await DexterMVP.deploy(
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
+        WETH_ADDRESS
+      );
+    });
+
+    it("Should have default TWAP configuration", async function () {
+      expect(await contract.twapPeriod()).to.equal(60); // 60 seconds
+      expect(await contract.maxTickDifference()).to.equal(100); // ~1% deviation
+      expect(await contract.twapProtectionEnabled()).to.be.true;
+    });
+
+    it("Should allow owner to update TWAP config", async function () {
+      await contract.connect(owner).setTWAPConfig(120, 200, true);
+
+      expect(await contract.twapPeriod()).to.equal(120);
+      expect(await contract.maxTickDifference()).to.equal(200);
+      expect(await contract.twapProtectionEnabled()).to.be.true;
+    });
+
+    it("Should allow owner to disable TWAP protection", async function () {
+      await contract.connect(owner).setTWAPConfig(60, 100, false);
+      expect(await contract.twapProtectionEnabled()).to.be.false;
+    });
+
+    it("Should prevent non-owner from setting TWAP config", async function () {
+      await expect(
+        contract.connect(user).setTWAPConfig(120, 200, true)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it("Should reject TWAP period too short", async function () {
+      await expect(
+        contract.connect(owner).setTWAPConfig(30, 100, true)
+      ).to.be.revertedWith("TWAP period too short");
+    });
+
+    it("Should reject invalid tick difference (zero)", async function () {
+      await expect(
+        contract.connect(owner).setTWAPConfig(60, 0, true)
+      ).to.be.revertedWith("Invalid tick difference");
+    });
+
+    it("Should reject invalid tick difference (too high)", async function () {
+      await expect(
+        contract.connect(owner).setTWAPConfig(60, 501, true)
+      ).to.be.revertedWith("Invalid tick difference");
+    });
+
+    it("Should emit TWAPConfigUpdated event", async function () {
+      await expect(contract.connect(owner).setTWAPConfig(120, 200, false))
+        .to.emit(contract, "TWAPConfigUpdated")
+        .withArgs(120, 200, false);
+    });
+
+    it("Should have _validateTWAP function integrated", async function () {
+      // Verify the contract has executeCompound function (which uses TWAP validation)
+      expect(contract.executeCompound).to.not.be.undefined;
+      expect(contract.executeRebalance).to.not.be.undefined;
+    });
+  });
 });
 

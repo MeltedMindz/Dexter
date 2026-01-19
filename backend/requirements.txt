@@ -10,6 +10,7 @@ python-dotenv==1.0.0
 # Database
 psycopg2-binary==2.9.7
 SQLAlchemy==2.0.21
+alembic==1.12.1
 
 # Redis
 redis==4.6.0

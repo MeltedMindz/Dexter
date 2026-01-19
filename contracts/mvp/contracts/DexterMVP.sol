@@ -16,6 +16,7 @@ import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
 import "./vendor/uniswap/interfaces/IPeripheryImmutableState.sol";
 import "./vendor/uniswap/interfaces/ISwapRouter.sol";
 import "./interfaces/IPriceAggregator.sol";
+import "./libraries/TWAPOracle.sol";
 
 /**
  * @title DexterMVP
@@ -80,6 +81,11 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     IPriceAggregator public priceAggregator;
     uint256 public constant MIN_PRICE_CONFIDENCE = 60; // Minimum confidence threshold
 
+    // TWAP protection configuration (RISK-005 fix)
+    uint32 public twapPeriod = 60; // Default 60 seconds TWAP
+    int24 public maxTickDifference = 100; // ~1% max deviation from TWAP
+    bool public twapProtectionEnabled = true; // Enable TWAP checks
+
     // Performance tracking
     mapping(uint256 => uint256) public compoundCount;
     mapping(uint256 => uint256) public rebalanceCount;
@@ -106,6 +112,9 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     event AutomationSettingsUpdated(uint256 indexed tokenId, AutomationSettings settings);
     event KeeperAuthorized(address indexed keeper, bool authorized);
     event PriceAggregatorUpdated(address indexed oldAggregator, address indexed newAggregator);
+    event TWAPConfigUpdated(uint32 twapPeriod, int24 maxTickDifference, bool enabled);
+    event TWAPCheckFailed(uint256 indexed tokenId, int24 currentTick, int24 twapTick);
+    event PositionRebalanced(uint256 indexed oldTokenId, uint256 indexed newTokenId, int24 tickLower, int24 tickUpper);
 
     // ============ MODIFIERS ============
     
@@ -142,6 +151,28 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
         address oldAggregator = address(priceAggregator);
         priceAggregator = IPriceAggregator(_priceAggregator);
         emit PriceAggregatorUpdated(oldAggregator, _priceAggregator);
+    }
+
+    /**
+     * @notice Configure TWAP protection parameters
+     * @dev RISK-005 fix: MEV protection via TWAP validation
+     * @param _twapPeriod Period in seconds for TWAP calculation (min 60)
+     * @param _maxTickDifference Maximum allowed tick deviation from TWAP
+     * @param _enabled Whether TWAP protection is enabled
+     */
+    function setTWAPConfig(
+        uint32 _twapPeriod,
+        int24 _maxTickDifference,
+        bool _enabled
+    ) external onlyOwner {
+        require(_twapPeriod >= 60, "TWAP period too short");
+        require(_maxTickDifference > 0 && _maxTickDifference <= 500, "Invalid tick difference");
+
+        twapPeriod = _twapPeriod;
+        maxTickDifference = _maxTickDifference;
+        twapProtectionEnabled = _enabled;
+
+        emit TWAPConfigUpdated(_twapPeriod, _maxTickDifference, _enabled);
     }
 
     // ============ POSITION MANAGEMENT ============
@@ -218,11 +249,13 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     
     /**
      * @notice Execute ultra-frequent compound for a single position
+     * @dev RISK-005: TWAP protection prevents MEV attacks during compound
      * @param tokenId The position to compound
      */
-    function executeCompound(uint256 tokenId) external onlyAuthorizedKeeper validPosition(tokenId) whenNotPaused {
+    function executeCompound(uint256 tokenId) external nonReentrant onlyAuthorizedKeeper validPosition(tokenId) whenNotPaused {
         require(shouldCompound(tokenId), "Compound not needed");
-        
+        require(_validateTWAP(tokenId), "TWAP check failed - possible MEV");
+
         AutomationSettings storage settings = positionAutomation[tokenId];
         
         // Collect fees
@@ -340,11 +373,13 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     
     /**
      * @notice Execute bin-based rebalance for concentrated liquidity
+     * @dev RISK-005: TWAP protection prevents MEV attacks during rebalance
      * @param tokenId The position to rebalance
      */
-    function executeRebalance(uint256 tokenId) external onlyAuthorizedKeeper validPosition(tokenId) whenNotPaused {
+    function executeRebalance(uint256 tokenId) external nonReentrant onlyAuthorizedKeeper validPosition(tokenId) whenNotPaused {
         require(shouldRebalance(tokenId), "Rebalance not needed");
-        
+        require(_validateTWAP(tokenId), "TWAP check failed - possible MEV");
+
         BinPosition memory binData = calculateBinPosition(tokenId);
         AutomationSettings storage settings = positionAutomation[tokenId];
         
@@ -433,7 +468,50 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     }
 
     // ============ INTERNAL FUNCTIONS ============
-    
+
+    /**
+     * @notice Validate TWAP protection for a position's pool
+     * @dev RISK-005 fix: Prevents MEV attacks by checking price manipulation
+     * @param tokenId The position to validate
+     * @return valid Whether the TWAP check passed
+     */
+    function _validateTWAP(uint256 tokenId) internal view returns (bool valid) {
+        // Skip if TWAP protection disabled
+        if (!twapProtectionEnabled) {
+            return true;
+        }
+
+        // Get pool from position
+        (
+            ,
+            ,
+            address token0,
+            address token1,
+            uint24 fee,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+        ) = nonfungiblePositionManager.positions(tokenId);
+
+        address factoryAddress = IPeripheryImmutableState(address(nonfungiblePositionManager)).factory();
+        IUniswapV3Pool pool = IUniswapV3Pool(
+            IUniswapV3Factory(factoryAddress).getPool(token0, token1, fee)
+        );
+
+        // Verify TWAP
+        (bool success, ) = TWAPOracle.verifyTWAP(
+            pool,
+            twapPeriod,
+            maxTickDifference,
+            false // Don't accept AI override in this context
+        );
+
+        return success;
+    }
+
     function _validateAutomationSettings(AutomationSettings memory settings) internal pure {
         require(settings.compoundThresholdUSD >= MIN_COMPOUND_THRESHOLD_USD / 10, "Threshold too low");
         require(settings.compoundThresholdUSD <= 100e18, "Threshold too high");
@@ -536,21 +614,47 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     }
 
     /**
-     * @notice PLACEHOLDER: Close position and retrieve liquidity
-     * @dev CRITICAL (RISK-001): This function returns (0, 0) without removing liquidity.
-     *      Production implementation requires:
-     *      1. Call decreaseLiquidity on position manager
-     *      2. Collect all tokens from position
-     *      3. Handle edge cases (single-sided positions, dust amounts)
-     *      4. Proper slippage protection
-     * @param tokenId The position to close (currently unused)
-     * @return amount0 Always returns 0 (placeholder)
-     * @return amount1 Always returns 0 (placeholder)
+     * @notice Close position and retrieve liquidity
+     * @dev Removes all liquidity and collects all tokens from position
+     * @param tokenId The position to close
+     * @return amount0 Total token0 withdrawn (liquidity + fees)
+     * @return amount1 Total token1 withdrawn (liquidity + fees)
      */
     function _closePosition(uint256 tokenId) internal returns (uint256 amount0, uint256 amount1) {
-        // PLACEHOLDER: Returns (0, 0) without actually closing position
-        // TODO: Implement proper liquidity removal
-        return (0, 0);
+        // Get position data to determine liquidity amount
+        (,, address token0, address token1,,,, uint128 liquidity,,,,) = nonfungiblePositionManager.positions(tokenId);
+
+        // If there's liquidity, remove it first
+        if (liquidity > 0) {
+            INonfungiblePositionManager.DecreaseLiquidityParams memory decreaseParams =
+                INonfungiblePositionManager.DecreaseLiquidityParams({
+                    tokenId: tokenId,
+                    liquidity: liquidity,
+                    amount0Min: 0, // Slippage protection handled at higher level
+                    amount1Min: 0,
+                    deadline: block.timestamp
+                });
+
+            nonfungiblePositionManager.decreaseLiquidity(decreaseParams);
+        }
+
+        // Collect all tokens (liquidity + fees)
+        INonfungiblePositionManager.CollectParams memory collectParams =
+            INonfungiblePositionManager.CollectParams({
+                tokenId: tokenId,
+                recipient: address(this),
+                amount0Max: type(uint128).max,
+                amount1Max: type(uint128).max
+            });
+
+        (amount0, amount1) = nonfungiblePositionManager.collect(collectParams);
+
+        // Update account balances
+        address positionOwner = ownerOf[tokenId];
+        if (positionOwner != address(0)) {
+            accountBalances[positionOwner][token0] += amount0;
+            accountBalances[positionOwner][token1] += amount1;
+        }
     }
     
     function _calculateConcentratedRange(
@@ -579,20 +683,14 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     }
     
     /**
-     * @notice PLACEHOLDER: Open new position with given range and amounts
-     * @dev CRITICAL (RISK-001): This function returns oldTokenId without creating position.
-     *      Production implementation requires:
-     *      1. Approve tokens to position manager
-     *      2. Call mint on position manager with new tick range
-     *      3. Handle leftover tokens from optimal swap
-     *      4. Update internal tracking to new token ID
-     *      5. Transfer ownership of old position to owner
-     * @param oldTokenId The previous position ID (returned as placeholder)
-     * @param tickLower New lower tick (currently unused)
-     * @param tickUpper New upper tick (currently unused)
-     * @param amount0 Amount of token0 to deposit (currently unused)
-     * @param amount1 Amount of token1 to deposit (currently unused)
-     * @return newTokenId Always returns oldTokenId (placeholder)
+     * @notice Open new position with given range and amounts
+     * @dev Creates a new LP position using the position manager
+     * @param oldTokenId The previous position ID (used for token0/token1/fee lookup)
+     * @param tickLower New lower tick for the position
+     * @param tickUpper New upper tick for the position
+     * @param amount0 Amount of token0 to deposit
+     * @param amount1 Amount of token1 to deposit
+     * @return newTokenId The newly minted position token ID
      */
     function _openNewPosition(
         uint256 oldTokenId,
@@ -601,9 +699,59 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
         uint256 amount0,
         uint256 amount1
     ) internal returns (uint256 newTokenId) {
-        // PLACEHOLDER: Returns oldTokenId without creating new position
-        // TODO: Implement proper position minting
-        return oldTokenId;
+        // Get token info from old position
+        (,, address token0, address token1, uint24 fee,,,,,,,) = nonfungiblePositionManager.positions(oldTokenId);
+        address positionOwner = ownerOf[oldTokenId];
+
+        // Approve tokens to position manager
+        if (amount0 > 0) {
+            IERC20(token0).safeApprove(address(nonfungiblePositionManager), amount0);
+        }
+        if (amount1 > 0) {
+            IERC20(token1).safeApprove(address(nonfungiblePositionManager), amount1);
+        }
+
+        // Create new position
+        INonfungiblePositionManager.MintParams memory mintParams =
+            INonfungiblePositionManager.MintParams({
+                token0: token0,
+                token1: token1,
+                fee: fee,
+                tickLower: tickLower,
+                tickUpper: tickUpper,
+                amount0Desired: amount0,
+                amount1Desired: amount1,
+                amount0Min: 0, // Slippage protection at higher level
+                amount1Min: 0,
+                recipient: address(this),
+                deadline: block.timestamp
+            });
+
+        (newTokenId,,,) = nonfungiblePositionManager.mint(mintParams);
+
+        // Update internal tracking
+        ownerOf[newTokenId] = positionOwner;
+        accountTokens[positionOwner].push(newTokenId);
+
+        // Copy automation settings from old position
+        positionAutomation[newTokenId] = positionAutomation[oldTokenId];
+        positionAutomation[newTokenId].lastCompoundTime = block.timestamp;
+        positionAutomation[newTokenId].lastRebalanceTime = block.timestamp;
+
+        // Clean up old position tracking
+        _removeFromAccountTokens(positionOwner, oldTokenId);
+        delete ownerOf[oldTokenId];
+        delete positionAutomation[oldTokenId];
+
+        // Reset approvals for safety
+        if (amount0 > 0) {
+            IERC20(token0).safeApprove(address(nonfungiblePositionManager), 0);
+        }
+        if (amount1 > 0) {
+            IERC20(token1).safeApprove(address(nonfungiblePositionManager), 0);
+        }
+
+        emit PositionRebalanced(oldTokenId, newTokenId, tickLower, tickUpper);
     }
     
     function _removeFromAccountTokens(address account, uint256 tokenId) internal {
