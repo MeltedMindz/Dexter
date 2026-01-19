@@ -38,7 +38,7 @@ install-backend:
 
 install-dexter-liquidity:
 	@echo "📦 Installing dexter-liquidity dependencies..."
-	pip install -r dexter-liquidity/requirements.txt
+	python3 -m pip install -r dexter-liquidity/requirements.txt
 
 # ============ BUILD ============
 build: build-contracts
@@ -56,11 +56,11 @@ test-contracts:
 
 test-backend:
 	@echo "🧪 Testing backend..."
-	cd backend && python -m pytest tests/ -v || echo "⚠️  Backend tests may require database setup"
+	cd backend && python3 -m pytest tests/ -v || echo "⚠️  Backend tests may require dependencies (pip install -r requirements.txt)"
 
 test-dexter-liquidity:
 	@echo "🧪 Testing dexter-liquidity..."
-	cd dexter-liquidity && pytest tests/ -v || echo "⚠️  Dexter-liquidity tests may require configuration"
+	cd dexter-liquidity && python3 -m pytest tests/ -v || echo "⚠️  Dexter-liquidity tests may require configuration"
 
 # ============ CLEANUP ============
 clean: clean-contracts clean-backend clean-dexter-liquidity

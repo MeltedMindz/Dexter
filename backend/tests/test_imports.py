@@ -32,7 +32,7 @@ def test_import_dexbrain_config():
         import dexbrain.config
         assert True
     except (ImportError, ModuleNotFoundError) as e:
-        if any(dep in str(e).lower() for dep in ['psycopg2', 'flask', 'redis']):
+        if any(dep in str(e).lower() for dep in ['psycopg2', 'flask', 'redis', 'dotenv']):
             pytest.skip(f"Dependencies not installed (expected): {e}")
         else:
             pytest.fail(f"Failed to import dexbrain.config: {e}")
@@ -71,7 +71,8 @@ def test_import_api_server_structure():
     except (ImportError, ModuleNotFoundError) as e:
         # Expected if dependencies aren't installed - this is a smoke test
         # The test passes if the module structure is correct
-        if 'flask_cors' in str(e).lower() or 'psycopg2' in str(e).lower():
+        expected_missing = ['flask', 'flask_cors', 'psycopg2', 'dotenv', 'redis']
+        if any(dep in str(e).lower() for dep in expected_missing):
             pytest.skip(f"Dependencies not installed (expected in CI): {e}")
         else:
             pytest.fail(f"Unexpected import error: {e}")

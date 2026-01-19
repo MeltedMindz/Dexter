@@ -29,7 +29,7 @@ def test_env_defaults_safe():
         assert True
     except (ImportError, ModuleNotFoundError) as e:
         # If dependencies are missing, skip
-        if any(dep in str(e).lower() for dep in ['psycopg2', 'flask', 'redis']):
+        if any(dep in str(e).lower() for dep in ['psycopg2', 'flask', 'redis', 'dotenv']):
             pytest.skip(f"Dependencies not installed: {e}")
         else:
             pytest.fail(f"Config import failed: {e}")

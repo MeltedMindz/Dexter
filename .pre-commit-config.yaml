@@ -1,0 +1,63 @@
+# Pre-commit hooks for Dexter Protocol
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # Python formatting
+  - repo: https://github.com/psf/black
+    rev: 24.1.0
+    hooks:
+      - id: black
+        language_version: python3
+        files: ^(dexter-liquidity|backend)/
+
+  # Python import sorting
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+        files: ^(dexter-liquidity|backend)/
+
+  # Python linting
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: ['--max-line-length=120', '--ignore=E501,W503']
+        files: ^(dexter-liquidity|backend)/
+
+  # Python security
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: ['-ll', '-q']
+        files: ^(dexter-liquidity|backend)/
+        exclude: tests/
+
+  # Solidity formatting (requires solhint)
+  - repo: local
+    hooks:
+      - id: solhint
+        name: Solidity Linter
+        entry: npx solhint
+        language: system
+        files: \.sol$
+        args: ['--fix']
+        pass_filenames: true
+
+# CI/CD reminder: pre-commit is also run in CI via test.yml
