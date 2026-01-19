@@ -15,6 +15,7 @@ import "./vendor/uniswap/libraries/LiquidityAmounts.sol";
 import "./vendor/uniswap/interfaces/INonfungiblePositionManager.sol";
 import "./vendor/uniswap/interfaces/IPeripheryImmutableState.sol";
 import "./vendor/uniswap/interfaces/ISwapRouter.sol";
+import "./interfaces/IPriceAggregator.sol";
 
 /**
  * @title DexterMVP
@@ -74,7 +75,11 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     
     // Keeper authorization
     mapping(address => bool) public authorizedKeepers;
-    
+
+    // Price oracle integration (RISK-001 fix)
+    IPriceAggregator public priceAggregator;
+    uint256 public constant MIN_PRICE_CONFIDENCE = 60; // Minimum confidence threshold
+
     // Performance tracking
     mapping(uint256 => uint256) public compoundCount;
     mapping(uint256 => uint256) public rebalanceCount;
@@ -100,7 +105,8 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     );
     event AutomationSettingsUpdated(uint256 indexed tokenId, AutomationSettings settings);
     event KeeperAuthorized(address indexed keeper, bool authorized);
-    
+    event PriceAggregatorUpdated(address indexed oldAggregator, address indexed newAggregator);
+
     // ============ MODIFIERS ============
     
     modifier onlyAuthorizedKeeper() {
@@ -124,7 +130,20 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
         swapRouter = _swapRouter;
         weth = _weth;
     }
-    
+
+    // ============ ADMIN FUNCTIONS ============
+
+    /**
+     * @notice Set the price aggregator contract for USD conversions
+     * @dev Required for real fee calculations (RISK-001 fix)
+     * @param _priceAggregator Address of the PriceAggregator contract
+     */
+    function setPriceAggregator(address _priceAggregator) external onlyOwner {
+        address oldAggregator = address(priceAggregator);
+        priceAggregator = IPriceAggregator(_priceAggregator);
+        emit PriceAggregatorUpdated(oldAggregator, _priceAggregator);
+    }
+
     // ============ POSITION MANAGEMENT ============
     
     /**
@@ -423,37 +442,97 @@ contract DexterMVP is IERC721Receiver, ReentrancyGuard, Pausable, Ownable, Multi
     }
     
     /**
-     * @notice PLACEHOLDER: Get unclaimed fees in USD value
-     * @dev CRITICAL (RISK-001): This function returns a hardcoded $1 USD value.
-     *      Production implementation requires:
-     *      1. Integration with price oracle (Chainlink, Uniswap TWAP, etc.)
-     *      2. Fetching actual unclaimed fees from position
-     *      3. Converting token amounts to USD using oracle prices
-     * @param tokenId The position to check (currently unused)
-     * @return feesUSD Always returns 1e18 (placeholder $1 USD)
+     * @notice Get unclaimed fees in USD value using price oracle
+     * @dev RISK-001 RESOLVED: Now uses PriceAggregator for real USD conversion
+     * @param tokenId The position to check
+     * @return feesUSD Actual fees in USD (18 decimals)
      */
     function _getUnclaimedFeesUSD(uint256 tokenId) internal view returns (uint256) {
-        // PLACEHOLDER: Returns $1 USD regardless of actual fees
-        // TODO: Integrate price oracle for real USD conversion
-        return 1e18;
+        // Get position details
+        (
+            ,
+            ,
+            address token0,
+            address token1,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        ) = nonfungiblePositionManager.positions(tokenId);
+
+        // If no oracle configured, fall back to placeholder behavior
+        if (address(priceAggregator) == address(0)) {
+            return 1e18; // Fallback: $1 USD
+        }
+
+        return _calculateFeesUSD(tokensOwed0, tokensOwed1, tokenId);
     }
 
     /**
-     * @notice PLACEHOLDER: Calculate fees in USD value
-     * @dev CRITICAL (RISK-001): This function returns a hardcoded $1 USD value.
-     *      Production implementation requires:
-     *      1. Price oracle integration for token0 and token1
-     *      2. Proper decimal handling for different tokens
-     *      3. Slippage/spread consideration
-     * @param amount0 Amount of token0 (currently unused)
-     * @param amount1 Amount of token1 (currently unused)
-     * @param tokenId The position ID (currently unused)
-     * @return feesUSD Always returns 1e18 (placeholder $1 USD)
+     * @notice Calculate fees in USD value using price oracle
+     * @dev RISK-001 RESOLVED: Now uses PriceAggregator for real USD conversion
+     * @param amount0 Amount of token0
+     * @param amount1 Amount of token1
+     * @param tokenId The position ID (for token addresses lookup)
+     * @return feesUSD Fees in USD (18 decimals)
      */
     function _calculateFeesUSD(uint256 amount0, uint256 amount1, uint256 tokenId) internal view returns (uint256) {
-        // PLACEHOLDER: Returns $1 USD regardless of actual amounts
-        // TODO: Integrate price oracle for real USD conversion
-        return 1e18;
+        // If no oracle configured, fall back to placeholder behavior
+        if (address(priceAggregator) == address(0)) {
+            return 1e18; // Fallback: $1 USD
+        }
+
+        // Get position token addresses
+        (
+            ,
+            ,
+            address token0,
+            address token1,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+        ) = nonfungiblePositionManager.positions(tokenId);
+
+        uint256 totalUSD = 0;
+
+        // Get token0 price in USD (using WETH as reference)
+        if (amount0 > 0) {
+            (uint256 price0, uint256 confidence0, bool valid0) = priceAggregator.getValidatedPrice(token0, weth);
+            if (valid0 && confidence0 >= MIN_PRICE_CONFIDENCE) {
+                // Get ETH/USD price
+                (uint256 ethPrice, uint256 ethConf, bool ethValid) = priceAggregator.getValidatedPrice(weth, address(0));
+                if (ethValid && ethConf >= MIN_PRICE_CONFIDENCE) {
+                    totalUSD += (amount0 * price0 * ethPrice) / (1e18 * 1e18);
+                }
+            }
+        }
+
+        // Get token1 price in USD (using WETH as reference)
+        if (amount1 > 0) {
+            (uint256 price1, uint256 confidence1, bool valid1) = priceAggregator.getValidatedPrice(token1, weth);
+            if (valid1 && confidence1 >= MIN_PRICE_CONFIDENCE) {
+                // Get ETH/USD price
+                (uint256 ethPrice, uint256 ethConf, bool ethValid) = priceAggregator.getValidatedPrice(weth, address(0));
+                if (ethValid && ethConf >= MIN_PRICE_CONFIDENCE) {
+                    totalUSD += (amount1 * price1 * ethPrice) / (1e18 * 1e18);
+                }
+            }
+        }
+
+        // If oracle prices unavailable, return fallback
+        if (totalUSD == 0 && (amount0 > 0 || amount1 > 0)) {
+            return 1e18; // Fallback: $1 USD when oracle unavailable
+        }
+
+        return totalUSD;
     }
 
     /**

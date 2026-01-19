@@ -214,5 +214,44 @@ describe("DexterMVP", function () {
       expect(await contract.authorizedKeepers(keeper.address)).to.be.false;
     });
   });
+
+  describe("Price Aggregator Integration (RISK-001)", function () {
+    let contract;
+    const MOCK_AGGREGATOR_ADDRESS = "0x1234567890123456789012345678901234567890";
+
+    beforeEach(async function () {
+      const DexterMVP = await ethers.getContractFactory("DexterMVP");
+      contract = await DexterMVP.deploy(
+        ethers.ZeroAddress,
+        ethers.ZeroAddress,
+        WETH_ADDRESS
+      );
+    });
+
+    it("Should start with no price aggregator", async function () {
+      expect(await contract.priceAggregator()).to.equal(ethers.ZeroAddress);
+    });
+
+    it("Should allow owner to set price aggregator", async function () {
+      await contract.connect(owner).setPriceAggregator(MOCK_AGGREGATOR_ADDRESS);
+      expect(await contract.priceAggregator()).to.equal(MOCK_AGGREGATOR_ADDRESS);
+    });
+
+    it("Should prevent non-owner from setting price aggregator", async function () {
+      await expect(
+        contract.connect(user).setPriceAggregator(MOCK_AGGREGATOR_ADDRESS)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it("Should emit PriceAggregatorUpdated event", async function () {
+      await expect(contract.connect(owner).setPriceAggregator(MOCK_AGGREGATOR_ADDRESS))
+        .to.emit(contract, "PriceAggregatorUpdated")
+        .withArgs(ethers.ZeroAddress, MOCK_AGGREGATOR_ADDRESS);
+    });
+
+    it("Should have MIN_PRICE_CONFIDENCE constant", async function () {
+      expect(await contract.MIN_PRICE_CONFIDENCE()).to.equal(60);
+    });
+  });
 });
 
