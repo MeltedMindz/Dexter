@@ -50,15 +50,24 @@ class Config:
     DEFAULT_INSIGHTS_LIMIT: int = int(os.getenv('DEFAULT_INSIGHTS_LIMIT', '100'))
     MAX_INSIGHTS_LIMIT: int = int(os.getenv('MAX_INSIGHTS_LIMIT', '1000'))
     PREDICTION_POOL_LIMIT: int = int(os.getenv('PREDICTION_POOL_LIMIT', '5'))
-    
+
+    # Development Mode Flags
+    DEV_MODE: bool = os.getenv('DEV_MODE', 'false').lower() == 'true'
+    USE_MOCK_DATA: bool = os.getenv('USE_MOCK_DATA', 'false').lower() == 'true'
+    USE_SQLITE_FALLBACK: bool = os.getenv('USE_SQLITE_FALLBACK', 'false').lower() == 'true'
+
     @classmethod
     def validate(cls) -> None:
         """Validate configuration settings"""
         # Ensure required directories exist
         cls.MODEL_STORAGE_PATH.mkdir(parents=True, exist_ok=True)
         cls.KNOWLEDGE_DB_PATH.mkdir(parents=True, exist_ok=True)
-        
-        # Validate RPC endpoints
+
+        # In dev mode, skip RPC validation
+        if cls.DEV_MODE:
+            return
+
+        # Validate RPC endpoints (only in production)
         if 'YOUR_PROJECT_ID' in cls.ETHEREUM_RPC:
             raise ValueError("Please configure a valid Ethereum RPC endpoint")
             

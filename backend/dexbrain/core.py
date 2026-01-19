@@ -3,10 +3,10 @@ import logging
 import time
 from typing import List, Dict, Any, Optional
 import numpy as np
-from .blockchain.solana_connector import SolanaConnector
 from .blockchain.base_connector import BlockchainConnector
+from .blockchain.base_network_connector import BaseNetworkConnector
 from .models.knowledge_base import KnowledgeBase
-from .models.ml_models import DeFiMLEngine
+from .models import DeFiMLEngine, ML_AVAILABLE
 from .config import Config
 from .auth import APIKeyManager
 from .agent_registry import AgentRegistry
@@ -39,12 +39,15 @@ class DexBrain:
         
         # Initialize components
         self.blockchain_connectors: Dict[str, BlockchainConnector] = {
-            'solana': SolanaConnector()
+            'base': BaseNetworkConnector()
         }
         
         self.knowledge_base = KnowledgeBase()
-        self.ml_engine = DeFiMLEngine()
+        self.ml_engine = DeFiMLEngine() if ML_AVAILABLE else None
         self._shutdown_event = asyncio.Event()
+
+        if not ML_AVAILABLE:
+            self.logger.warning("PyTorch not available - ML predictions disabled")
         
         # Global intelligence network components
         self.api_key_manager = APIKeyManager()
@@ -117,17 +120,21 @@ class DexBrain:
     
     async def train_models(self, category: str) -> Dict[str, Any]:
         """Train ML models based on stored insights
-        
+
         Args:
             category: Insights category to use for training
-            
+
         Returns:
             Training metrics
         """
+        if not self.ml_engine:
+            self.logger.warning("ML engine not available - skipping training")
+            return {'status': 'skipped', 'reason': 'ml_not_available'}
+
         try:
             # Retrieve insights
             insights = await self.knowledge_base.retrieve_insights(category, limit=1000)
-            
+
             if len(insights) < 10:
                 self.logger.warning(f"Insufficient insights for training: {len(insights)}")
                 return {'status': 'skipped', 'reason': 'insufficient_data'}
@@ -166,17 +173,21 @@ class DexBrain:
             raise
     
     async def predict_liquidity_metrics(
-        self, 
+        self,
         pool_data: Dict[str, Any]
     ) -> float:
         """Predict liquidity metrics for a given pool
-        
+
         Args:
             pool_data: Pool information
-            
+
         Returns:
-            Predicted APR
+            Predicted APR (or 0.0 if ML not available)
         """
+        if not self.ml_engine:
+            self.logger.debug("ML engine not available - returning default prediction")
+            return 0.0
+
         feature_vector = np.array([[
             pool_data.get('total_liquidity', 0),
             pool_data.get('volume_24h', 0),
@@ -184,7 +195,7 @@ class DexBrain:
             pool_data.get('token0_reserves', 0),
             pool_data.get('token1_reserves', 0),
         ]])
-        
+
         prediction = self.ml_engine.predict(feature_vector)
         return float(prediction[0])
     
@@ -566,8 +577,8 @@ async def main():
     
     try:
         await dexbrain.run(
-            blockchain='solana', 
-            pool_addresses=['pool1', 'pool2']  # Replace with actual addresses
+            blockchain='base',
+            pool_addresses=['pool1', 'pool2']  # Replace with actual Base pool addresses
         )
     except KeyboardInterrupt:
         await dexbrain.shutdown()

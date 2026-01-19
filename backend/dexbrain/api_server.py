@@ -11,7 +11,7 @@ import json
 from .core import DexBrain
 from .auth import APIKeyManager, RateLimiter, require_api_key
 from .models.knowledge_base import KnowledgeBase
-from .models.ml_models import DeFiMLEngine
+from .models import DeFiMLEngine, ML_AVAILABLE
 from .config import Config
 
 

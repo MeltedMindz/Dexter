@@ -3,6 +3,7 @@
 import secrets
 import hashlib
 import time
+from functools import wraps
 from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
 import json
@@ -199,6 +200,7 @@ class RateLimiter:
 def require_api_key(rate_limiter: RateLimiter, api_key_manager: APIKeyManager):
     """Decorator for API endpoints requiring authentication"""
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             # Extract API key from request headers
             api_key = kwargs.get('api_key') or (args[0].headers.get('Authorization', '').replace('Bearer ', '') if args else None)
